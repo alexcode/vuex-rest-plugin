@@ -1,0 +1,1706 @@
+[
+  {
+    "id": "45fd9933-8f24-4e3f-a12d-b492643be3e8",
+    "name": "Ressource 12",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "a9635fe4-feb3-407a-965a-7d36e7669838",
+      "name": "mtt12 mtt12",
+      "first_name": "mtt12",
+      "last_name": "mtt12",
+      "email": "mtt12@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "cf307525-fa0d-4ee8-9b7a-eeff435a0869",
+      "name": "Camion 12",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "8aa358b1-8914-46a8-874f-fabcdb0dbe14",
+    "name": "Ressource 11",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "bee7bd0e-9895-4d61-bdc4-0f490af134bf",
+      "name": "mtt11 mtt11",
+      "first_name": "mtt11",
+      "last_name": "mtt11",
+      "email": "mtt11@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "d761be0a-2660-4c96-908f-39693c1cf1b6",
+      "name": "Camion 11",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "67d335df-5af9-47ca-8aef-45de4e7b9dd5",
+    "name": "Ressource 10",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "0e04f90c-b88d-46a3-9507-270d85b3d034",
+      "name": "mtt10 mtt10",
+      "first_name": "mtt10",
+      "last_name": "mtt10",
+      "email": "mtt10@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "f3f45bb2-2d84-45d0-8192-840dee71954b",
+      "name": "Camion 10",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "46320d99-c74e-43f7-b1d9-1119e4b05f3a",
+    "name": "Ressource 9",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "0e54374c-87ca-49e8-80f7-8c0da66f2f02",
+      "name": "mtt9 mtt9",
+      "first_name": "mtt9",
+      "last_name": "mtt9",
+      "email": "mtt9@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "35782f20-f130-4ec2-b59c-ea8a443f9523",
+      "name": "Camion 9",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "ec6f871c-8ff0-4d64-b831-57f0661be01c",
+    "name": "Ressource 8",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "19908156-80c7-412c-a94d-a1640c40e584",
+      "name": "mtt8 mtt8",
+      "first_name": "mtt8",
+      "last_name": "mtt8",
+      "email": "mtt8@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "41ca33e7-4eb8-42cd-a711-ae911a29a3ef",
+      "name": "Camion 8",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "a0deb06d-45c1-4041-8ac1-bf4ca71c2db5",
+    "name": "Ressource 7",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "8e313484-b06c-4a51-a2ce-6c3ea1689b81",
+      "name": "mtt7 mtt7",
+      "first_name": "mtt7",
+      "last_name": "mtt7",
+      "email": "mtt7@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "04913fc4-547d-4abb-aa98-4a1f1708d9e4",
+      "name": "Camion 7",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "bcc5e5fb-b8b1-4804-ba84-4dcc39a966b0",
+    "name": "Ressource 6",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "7abb2387-fa39-4a59-96d8-add55206cc4b",
+      "name": "mtt6 mtt6",
+      "first_name": "mtt6",
+      "last_name": "mtt6",
+      "email": "mtt6@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "6e1f2d82-6840-411f-b54a-31498ccd53b6",
+      "name": "Camion 6",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "524152bf-52f6-4943-af4b-a46148d7c6dd",
+    "name": "Ressource 5",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "ec82ae84-1198-4aa7-bbca-f55950279027",
+      "name": "mtt5 mtt5",
+      "first_name": "mtt5",
+      "last_name": "mtt5",
+      "email": "mtt5@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "7a1e8128-3b9c-4ed7-aeba-64e9a727b5d7",
+      "name": "Camion 5",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "3dc75a47-ea23-4977-bed6-7ecc6cc46323",
+    "name": "Ressource 4",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "762452c0-baa0-4fdc-b047-35d2ed475871",
+      "name": "mtt4 mtt4",
+      "first_name": "mtt4",
+      "last_name": "mtt4",
+      "email": "mtt4@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "dab4cd7a-f180-423f-8ed1-95335c01d590",
+      "name": "Camion 4",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "82fce925-4432-4012-9414-82d06cb11d5e",
+    "name": "Ressource 3",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "e3e5f60f-2b54-4c45-8544-6bc5681775d5",
+      "name": "mtt3 mtt3",
+      "first_name": "mtt3",
+      "last_name": "mtt3",
+      "email": "mtt3@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "8242d4d2-65a1-4002-b92e-a522aead7d73",
+      "name": "Camion 3",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "c50423fb-ffc1-41fb-bec4-7b62c4fd00ad",
+    "name": "Ressource 2",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "427fd9b3-b4cf-4f61-9111-eb9342f61358",
+      "name": "mtt2 mtt2",
+      "first_name": "mtt2",
+      "last_name": "mtt2",
+      "email": "mtt2@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "c9c29f64-eae3-4615-99a3-76447b4ec46b",
+      "name": "Camion 2",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  },
+  {
+    "id": "accbaa88-a200-430f-b9ad-22995f1449df",
+    "name": "Ressource 1",
+    "shifts": [
+      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [{ "end": "16:00", "start": "9:00" }],
+      [],
+      []
+    ],
+    "external_id": null,
+    "mobility_id": null,
+    "user": {
+      "id": "df177703-cf47-4557-96ea-6f18fcd8556d",
+      "name": "mtt1 mtt1",
+      "first_name": "mtt1",
+      "last_name": "mtt1",
+      "email": "mtt1@mtt.fr",
+      "tools": null,
+      "config": {
+        "mobile": {
+          "ios": { "version": "1.1.7", "force_update": false },
+          "android": { "version": "1.1.8", "force_update": false }
+        }
+      },
+      "role": {
+        "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
+        "name": "livreur",
+        "abilities": {
+          "client": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "delivery": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "intake": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "item": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "organization": {
+            "read": false,
+            "create": true,
+            "update": false,
+            "destroy": false
+          },
+          "place": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "resource": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "role": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "route": {
+            "read": true,
+            "create": true,
+            "update": true,
+            "destroy": false
+          },
+          "user": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          },
+          "vehicle": {
+            "read": false,
+            "create": false,
+            "update": false,
+            "destroy": false
+          }
+        },
+        "modules": {
+          "user": false,
+          "intake": false,
+          "route": false,
+          "mobile": true,
+          "organization": false,
+          "place": false,
+          "client": false,
+          "role": false,
+          "resource": false,
+          "tracking": false,
+          "upload": false,
+          "statistics": false,
+          "vehicle": false,
+          "search": false
+        }
+      }
+    },
+    "vehicle": {
+      "id": "d0ee84c9-02be-4885-bcd5-e7227d8f7988",
+      "name": "Camion 1",
+      "capacities": [
+        { "type": "volume", "value": 12 },
+        { "type": "weight", "value": 1300 }
+      ],
+      "tools": []
+    },
+    "depot": {
+      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
+      "name": "MTT Champigny",
+      "external_id": null,
+      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+      "street_number": "4",
+      "street_name": "4 Rue des Armoiries",
+      "secondary": null,
+      "city": "Champigny-sur-Marne",
+      "postcode": "94500",
+      "country_code": "FR",
+      "latitude": 48.82179,
+      "longitude": 2.52428,
+      "is_gecoded": true,
+      "is_approximate": true
+    }
+  }
+]
