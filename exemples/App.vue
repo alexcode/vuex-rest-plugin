@@ -1,14 +1,30 @@
 <template>
   <div id="app">
     <h1>My Generated Store</h1>
-    <code>{{ $store.state }}</code>
+    <button type="button" name="button" @click="populate">
+      Populate store
+    </button>
+    <br />
+    <code>{{ JSON.stringify($store.getters) }}</code>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+const data = require('./../tests/unit/apistore.spec.data');
 
-export default class App extends Vue {}
+@Component
+export default class App extends Vue {
+  populate(): void {
+    this.$store
+      .dispatch('post', {
+        url: 'https://httpbin.org/post',
+        type: 'resource',
+        data
+      })
+      .then(() => this.$forceUpdate());
+  }
+}
 </script>
 
 <style>

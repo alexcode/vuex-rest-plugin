@@ -47,7 +47,7 @@ interface Payload {
   type: string;
   transition?: string;
   url?: string;
-  query?: string;
+  query?: any;
   data?: IndexedObject | Array<IndexedObject>;
   [index: string]: any;
 }
@@ -64,12 +64,12 @@ type Modifier = (value: IndexedObject | Array<IndexedObject>) => void;
 
 // Classes
 class ActionQueue {
-  create: Array<object>;
-  save: object;
-  delete: object;
+  readonly post: Array<object>;
+  readonly patch: object;
+  readonly delete: object;
   constructor() {
-    this.create = [];
-    this.save = {};
+    this.post = [];
+    this.patch = {};
     this.delete = {};
   }
 }
@@ -139,11 +139,10 @@ async function applyModifier(
 class Actions<S, R> implements ActionTree<S, R> {
   [key: string]: Action<S, R>;
   init: Action<S, R>;
-  create: Action<S, R>;
   get: Action<S, R>;
-  save: Action<S, R>;
+  post: Action<S, R>;
+  patch: Action<S, R>;
   delete: Action<S, R>;
-  mutate: Action<S, R>;
   queueActionWatcher: Action<S, R>;
   queueAction: Action<S, R>;
   processActionQueue: Action<S, R>;
@@ -179,6 +178,8 @@ class Actions<S, R> implements ActionTree<S, R> {
       return url;
     };
 
+    const _isAll = (p: Payload) => !has(p, 'id') && isArray(p.data);
+
     const _getModel = (p: Payload | QueuePayload): ModelType => models[p.type];
 
     // retrieve entity from Vuex store
@@ -189,8 +190,8 @@ class Actions<S, R> implements ActionTree<S, R> {
     // fetch entity from API
     const _fetchEntity = (commit: Commit, payload: Payload) => {
       const model = _getModel(payload);
-      const { id, data } = payload;
-      if (get(payload, 'clear', id === 'all')) {
+      const { data } = payload;
+      if (get(payload, 'clear', _isAll(payload))) {
         commit(`CLEAR_${_getModel(payload).name.toUpperCase()}`);
       }
       return axios.get(_formatUrl(payload)).then(async result => {
@@ -202,10 +203,13 @@ class Actions<S, R> implements ActionTree<S, R> {
     };
 
     // store entity to API
-    const _storeEntity = async (commit: Commit, payload: Payload) => {
+    const _storeEntity = async (
+      commit: Commit,
+      payload: Payload,
+      method: string = 'post'
+    ) => {
       const model = _getModel(payload);
-      const { id, data } = payload;
-      const method = !isNil(id) ? 'patch' : 'post';
+      const { data } = payload;
       return axios({
         method,
         url: _formatUrl(payload),
@@ -223,7 +227,7 @@ class Actions<S, R> implements ActionTree<S, R> {
       const model = _getModel(payload);
       const { id, data } = payload;
 
-      if (id === 'all') {
+      if (_isAll(payload)) {
         return axios
           .patch(
             `${_formatUrl(payload)}/delete`,
@@ -250,13 +254,16 @@ class Actions<S, R> implements ActionTree<S, R> {
       return _getEntity(state, payload) || _fetchEntity(commit, payload);
     };
 
-    this.save = (context: ActionContext<S, R>, payload: Payload) => {
+    this.post = (context: ActionContext<S, R>, payload: Payload) => {
       const { commit } = context;
       return _storeEntity(commit, payload);
     };
-    // alias for save
-    this.create = this.save;
-    this.mutate = this.save;
+
+    this.patch = (context: ActionContext<S, R>, payload: Payload) => {
+      const { commit } = context;
+      return _storeEntity(commit, payload, 'patch');
+    };
+
     this.delete = (context: ActionContext<S, R>, payload: Payload) => {
       const { commit } = context;
       return _deleteEntity(commit, payload);
@@ -299,7 +306,7 @@ class Actions<S, R> implements ActionTree<S, R> {
             get(state, `${model.plural}.actionQueue`),
             (entities: IndexedObjectTree, action: string) =>
               map(entities, e => {
-                if (action === 'create') {
+                if (action === 'post') {
                   return dispatch(action, { type: queue, data: e })
                     .then(() => commit(`DELETE_${model.name}`, e))
                     .then(() => commit(`RESET_QUEUE_${model.name}`));
@@ -331,7 +338,10 @@ class Actions<S, R> implements ActionTree<S, R> {
         if (get(state, `${model.plural}.hasAction`)) {
           const origin = keys(
             get(state, `${model.plural}.actionQueue.delete`, [])
-          ).concat(keys(get(state, `${model.plural}.actionQueue.save`, [])));
+          ).concat(
+            keys(get(state, `${model.plural}.actionQueue.post`, [])),
+            keys(get(state, `${model.plural}.actionQueue.patch`, []))
+          );
           commit(
             `ADD_${model.name}`,
             await applyModifier(
@@ -429,7 +439,7 @@ class ApiStore<S> implements StoreOptions<S> {
       ) => {
         const store = state[modelIdx];
         const storeAction = async (d: IndexedObject) => {
-          if (obj.action === 'create') {
+          if (obj.action === 'post') {
             set(store.items, d.id, await applyModifier(model.afterSave, d));
             store.actionQueue[obj.action].push(
               await applyModifier(model.beforeSave, d)
@@ -584,7 +594,7 @@ const ApiStorePlugin = (options: any) => {
   const apiStore = new ApiStore(options.models);
   apiStore.actions = new Actions(options.axios, options.models);
 
-  return (store: any) => store.registerModule('api', apiStore);
+  return (store: any) => store.registerModule(options.name || 'api', apiStore);
 };
 
 export { ApiStorePlugin, ApiState, DateTimeState };

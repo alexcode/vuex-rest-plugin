@@ -2,15 +2,6 @@
   {
     "id": "45fd9933-8f24-4e3f-a12d-b492643be3e8",
     "name": "Ressource 12",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -28,91 +19,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -144,15 +51,6 @@
   {
     "id": "8aa358b1-8914-46a8-874f-fabcdb0dbe14",
     "name": "Ressource 11",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -170,91 +68,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -286,15 +100,6 @@
   {
     "id": "67d335df-5af9-47ca-8aef-45de4e7b9dd5",
     "name": "Ressource 10",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -312,91 +117,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -428,15 +149,6 @@
   {
     "id": "46320d99-c74e-43f7-b1d9-1119e4b05f3a",
     "name": "Ressource 9",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -454,91 +166,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -570,15 +198,6 @@
   {
     "id": "ec6f871c-8ff0-4d64-b831-57f0661be01c",
     "name": "Ressource 8",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -596,91 +215,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -712,15 +247,6 @@
   {
     "id": "a0deb06d-45c1-4041-8ac1-bf4ca71c2db5",
     "name": "Ressource 7",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -738,91 +264,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -854,15 +296,6 @@
   {
     "id": "bcc5e5fb-b8b1-4804-ba84-4dcc39a966b0",
     "name": "Ressource 6",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -880,91 +313,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -996,15 +345,6 @@
   {
     "id": "524152bf-52f6-4943-af4b-a46148d7c6dd",
     "name": "Ressource 5",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -1022,91 +362,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -1138,15 +394,6 @@
   {
     "id": "3dc75a47-ea23-4977-bed6-7ecc6cc46323",
     "name": "Ressource 4",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -1164,91 +411,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -1280,15 +443,6 @@
   {
     "id": "82fce925-4432-4012-9414-82d06cb11d5e",
     "name": "Ressource 3",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -1306,91 +460,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -1422,15 +492,6 @@
   {
     "id": "c50423fb-ffc1-41fb-bec4-7b62c4fd00ad",
     "name": "Ressource 2",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -1448,91 +509,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {
@@ -1564,15 +541,6 @@
   {
     "id": "accbaa88-a200-430f-b9ad-22995f1449df",
     "name": "Ressource 1",
-    "shifts": [
-      [{ "end": "16:00", "idx": 0, "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [{ "end": "16:00", "start": "9:00" }],
-      [],
-      []
-    ],
     "external_id": null,
     "mobility_id": null,
     "user": {
@@ -1590,91 +558,7 @@
       },
       "role": {
         "id": "53230d44-75c6-4f60-bfaf-1e4653406915",
-        "name": "livreur",
-        "abilities": {
-          "client": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "delivery": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "intake": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "item": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "organization": {
-            "read": false,
-            "create": true,
-            "update": false,
-            "destroy": false
-          },
-          "place": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "resource": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "role": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "route": {
-            "read": true,
-            "create": true,
-            "update": true,
-            "destroy": false
-          },
-          "user": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          },
-          "vehicle": {
-            "read": false,
-            "create": false,
-            "update": false,
-            "destroy": false
-          }
-        },
-        "modules": {
-          "user": false,
-          "intake": false,
-          "route": false,
-          "mobile": true,
-          "organization": false,
-          "place": false,
-          "client": false,
-          "role": false,
-          "resource": false,
-          "tracking": false,
-          "upload": false,
-          "statistics": false,
-          "vehicle": false,
-          "search": false
-        }
+        "name": "livreur"
       }
     },
     "vehicle": {

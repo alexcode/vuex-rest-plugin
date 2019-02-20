@@ -2184,38 +2184,6 @@ module.exports = baseHasIn;
 
 /***/ }),
 
-/***/ "2768":
-/***/ (function(module, exports) {
-
-/**
- * Checks if `value` is `null` or `undefined`.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is nullish, else `false`.
- * @example
- *
- * _.isNil(null);
- * // => true
- *
- * _.isNil(void 0);
- * // => true
- *
- * _.isNil(NaN);
- * // => false
- */
-function isNil(value) {
-  return value == null;
-}
-
-module.exports = isNil;
-
-
-/***/ }),
-
 /***/ "28c9":
 /***/ (function(module, exports) {
 
@@ -10601,10 +10569,6 @@ var isEqual_default = /*#__PURE__*/__webpack_require__.n(isEqual);
 var isFunction = __webpack_require__("9520");
 var isFunction_default = /*#__PURE__*/__webpack_require__.n(isFunction);
 
-// EXTERNAL MODULE: ./node_modules/lodash/isNil.js
-var isNil = __webpack_require__("2768");
-var isNil_default = /*#__PURE__*/__webpack_require__.n(isNil);
-
 // EXTERNAL MODULE: ./node_modules/lodash/isObject.js
 var isObject = __webpack_require__("1a8c");
 var isObject_default = /*#__PURE__*/__webpack_require__.n(isObject);
@@ -10659,14 +10623,13 @@ var some_default = /*#__PURE__*/__webpack_require__.n(some);
 
 
 
-
  // Classes
 
 var lib_ActionQueue = function ActionQueue() {
   _classCallCheck(this, ActionQueue);
 
-  this.create = [];
-  this.save = {};
+  this.post = [];
+  this.patch = {};
   this.delete = {};
 };
 
@@ -10826,6 +10789,10 @@ var lib_Actions = function Actions(axios, models) {
     return url;
   };
 
+  var _isAll = function _isAll(p) {
+    return !has_default()(p, 'id') && isArray_default()(p.data);
+  };
+
   var _getModel = function _getModel(p) {
     return models[p.type];
   }; // retrieve entity from Vuex store
@@ -10839,10 +10806,9 @@ var lib_Actions = function Actions(axios, models) {
   var _fetchEntity = function _fetchEntity(commit, payload) {
     var model = _getModel(payload);
 
-    var id = payload.id,
-        data = payload.data;
+    var data = payload.data;
 
-    if (get_default()(payload, 'clear', id === 'all')) {
+    if (get_default()(payload, 'clear', _isAll(payload))) {
       commit("CLEAR_".concat(_getModel(payload).name.toUpperCase()));
     }
 
@@ -10886,14 +10852,17 @@ var lib_Actions = function Actions(axios, models) {
     var _ref2 = _asyncToGenerator(
     /*#__PURE__*/
     regeneratorRuntime.mark(function _callee3(commit, payload) {
-      var model, id, data, method;
+      var method,
+          model,
+          data,
+          _args3 = arguments;
       return regeneratorRuntime.wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
+              method = _args3.length > 2 && _args3[2] !== undefined ? _args3[2] : 'post';
               model = _getModel(payload);
-              id = payload.id, data = payload.data;
-              method = !isNil_default()(id) ? 'patch' : 'post';
+              data = payload.data;
               _context3.t0 = axios;
               _context3.t1 = method;
               _context3.t2 = _formatUrl(payload);
@@ -10970,7 +10939,7 @@ var lib_Actions = function Actions(axios, models) {
               model = _getModel(payload);
               id = payload.id, data = payload.data;
 
-              if (!(id === 'all')) {
+              if (!_isAll(payload)) {
                 _context4.next = 10;
                 break;
               }
@@ -11041,14 +11010,15 @@ var lib_Actions = function Actions(axios, models) {
     };
   }();
 
-  this.save = function (context, payload) {
+  this.post = function (context, payload) {
     var commit = context.commit;
     return _storeEntity(commit, payload);
-  }; // alias for save
+  };
 
-
-  this.create = this.save;
-  this.mutate = this.save;
+  this.patch = function (context, payload) {
+    var commit = context.commit;
+    return _storeEntity(commit, payload, 'patch');
+  };
 
   this.delete = function (context, payload) {
     var commit = context.commit;
@@ -11088,7 +11058,7 @@ var lib_Actions = function Actions(axios, models) {
       if (get_default()(state, "".concat(model.plural, ".hasAction"))) {
         return flatMap_default()(get_default()(state, "".concat(model.plural, ".actionQueue")), function (entities, action) {
           return map_default()(entities, function (e) {
-            if (action === 'create') {
+            if (action === 'post') {
               return dispatch(action, {
                 type: queue,
                 data: e
@@ -11142,7 +11112,7 @@ var lib_Actions = function Actions(axios, models) {
                   break;
                 }
 
-                origin = keys_default()(get_default()(state, "".concat(model.plural, ".actionQueue.delete"), [])).concat(keys_default()(get_default()(state, "".concat(model.plural, ".actionQueue.save"), [])));
+                origin = keys_default()(get_default()(state, "".concat(model.plural, ".actionQueue.delete"), [])).concat(keys_default()(get_default()(state, "".concat(model.plural, ".actionQueue.post"), [])), keys_default()(get_default()(state, "".concat(model.plural, ".actionQueue.patch"), [])));
                 _context6.t0 = commit;
                 _context6.t1 = "ADD_".concat(model.name);
                 _context6.next = 7;
@@ -11255,7 +11225,7 @@ function () {
               while (1) {
                 switch (_context7.prev = _context7.next) {
                   case 0:
-                    if (!(obj.action === 'create')) {
+                    if (!(obj.action === 'post')) {
                       _context7.next = 15;
                       break;
                     }
@@ -11536,7 +11506,7 @@ var ApiStorePlugin = function ApiStorePlugin(options) {
   var apiStore = new lib_ApiStore(options.models);
   apiStore.actions = new lib_Actions(options.axios, options.models);
   return function (store) {
-    return store.registerModule('api', apiStore);
+    return store.registerModule(options.name || 'api', apiStore);
   };
 };
 

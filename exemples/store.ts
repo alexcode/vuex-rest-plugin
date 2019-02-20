@@ -5,6 +5,7 @@ import { ApiStorePlugin, ApiState } from '../lib';
 
 Vue.use(Vuex);
 const axiosInstance = axios.create();
+axiosInstance.defaults.transformResponse = [data => JSON.parse(data).json];
 
 export default new Vuex.Store({
   plugins: [

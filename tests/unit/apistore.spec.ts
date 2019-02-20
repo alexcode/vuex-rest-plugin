@@ -45,9 +45,8 @@ describe('ApiStore', () => {
   const axiosInstance = axios.create();
   const mock = new MockAdapter(axiosInstance);
   const fillStore = async () => {
-    mock.onGet('/resource/all').reply(200, data);
+    mock.onGet('/resource').reply(200, data);
     store.dispatch('get', {
-      id: 'all',
       type: 'resource'
     });
     await flushPromises();
@@ -74,9 +73,9 @@ describe('ApiStore', () => {
     forEach(store.state.api, (state: ApiState) => {
       expect(state).toEqual({
         actionQueue: {
-          create: [],
+          post: [],
           delete: {},
-          save: {}
+          patch: {}
         },
         items: {},
         lastLoad: expect.any(Date),
@@ -86,9 +85,8 @@ describe('ApiStore', () => {
     });
   });
   it('test get Action (GET)', async () => {
-    mock.onGet('/resource/all').reply(200, data);
+    mock.onGet('/resource').reply(200, data);
     store.dispatch('get', {
-      id: 'all',
       type: 'resource'
     });
     await flushPromises();
@@ -124,9 +122,8 @@ describe('ApiStore', () => {
   });
 
   it('test if references are proper ref', async () => {
-    mock.onGet('/resource/all').reply(200, data);
+    mock.onGet('/resource').reply(200, data);
     store.dispatch('get', {
-      id: 'all',
       type: 'resource'
     });
     await flushPromises();
@@ -141,10 +138,10 @@ describe('ApiStore', () => {
     });
   });
 
-  it('test create Action (POST)', async () => {
+  it('test post Action', async () => {
     const singleResource = data[0];
     mock.onPost(`/resource`).reply(200, singleResource);
-    store.dispatch('create', {
+    store.dispatch('post', {
       type: 'resource',
       data: singleResource
     });
@@ -154,23 +151,10 @@ describe('ApiStore', () => {
     ).not.toBeUndefined();
   });
 
-  it('test save Action (POST)', async () => {
-    const singleResource = data[0];
-    mock.onPost(`/resource`).reply(200, singleResource);
-    store.dispatch('save', {
-      type: 'resource',
-      data: singleResource
-    });
-    await flushPromises();
-    expect(
-      store.getters.resources.items[singleResource.id]
-    ).not.toBeUndefined();
-  });
-
-  it('test save Action (PATCH)', async () => {
+  it('test patch Action', async () => {
     const singleResource = { ...data[0], name: 'test' };
     mock.onPatch(`/resource/${singleResource.id}`).reply(200, singleResource);
-    store.dispatch('save', {
+    store.dispatch('patch', {
       id: singleResource.id,
       type: 'resource',
       data: singleResource
@@ -178,6 +162,25 @@ describe('ApiStore', () => {
     await flushPromises();
     expect(store.getters.resources.items[singleResource.id].name).not.toEqual(
       data[0].name
+    );
+  });
+
+  it('test patch Action batch', async () => {
+    const resources = [
+      { ...data[0], name: 'test' },
+      { ...data[1], name: 'test2' }
+    ];
+    mock.onPatch(`/resource`).reply(200, resources);
+    store.dispatch('patch', {
+      type: 'resource',
+      data: resources
+    });
+    await flushPromises();
+    expect(store.getters.resources.items[resources[0].id].name).not.toEqual(
+      data[0].name
+    );
+    expect(store.getters.resources.items[resources[1].id].name).not.toEqual(
+      data[1].name
     );
   });
 
@@ -196,9 +199,8 @@ describe('ApiStore', () => {
   it('test delete Action (PATCH)', async () => {
     const toDelete = [data[0], data[1]];
     await fillStore();
-    mock.onPatch(`/resource/all/delete`).reply(200);
+    mock.onPatch(`/resource/delete`).reply(200);
     store.dispatch('delete', {
-      id: 'all',
       type: 'resource',
       data: toDelete
     });
@@ -209,7 +211,7 @@ describe('ApiStore', () => {
 
   it('test queueAction', async () => {
     store.dispatch('queueAction', {
-      action: 'save',
+      action: 'post',
       type: 'resource',
       data: data[0]
     });
@@ -219,39 +221,37 @@ describe('ApiStore', () => {
       data: data[1]
     });
     store.dispatch('queueAction', {
-      action: 'create',
+      action: 'patch',
       type: 'resource',
       data: data[2]
     });
     await flushPromises();
-    expect(store.getters.resources.actionQueue.save[data[0].id]).toMatchObject(
-      data[0]
-    );
+    expect(store.getters.resources.actionQueue.post[0]).toMatchObject(data[0]);
     expect(
       store.getters.resources.actionQueue.delete[data[1].id]
     ).toMatchObject(data[1]);
-    expect(store.getters.resources.actionQueue.create[0]).toMatchObject(
+    expect(store.getters.resources.actionQueue.patch[data[2].id]).toMatchObject(
       data[2]
     );
   });
 
   it('test processActionQueue', async () => {
     store.dispatch('queueAction', {
-      action: 'save',
+      action: 'patch',
       type: 'resource',
       data: data[0]
     });
     mock.onPost(`/resource`).reply(200, data[0]);
     store.dispatch('processActionQueue', ['resource']);
     await flushPromises();
-    expect(store.getters.resources.actionQueue.save[data[0].id]).toMatchObject(
+    expect(store.getters.resources.actionQueue.patch[data[0].id]).toMatchObject(
       data[0]
     );
   });
 
   it('test cancelActionQueue', async () => {
     store.dispatch('queueAction', {
-      action: 'save',
+      action: 'patch',
       type: 'resource',
       data: data[0]
     });
@@ -259,46 +259,46 @@ describe('ApiStore', () => {
     store.dispatch('cancelActionQueue', ['resource']);
     await flushPromises();
     expect(
-      store.getters.resources.actionQueue.save[data[0].id]
+      store.getters.resources.actionQueue.patch[data[0].id]
     ).toBeUndefined();
   });
 
   it('test cancelAction', async () => {
     store.dispatch('queueAction', {
-      action: 'save',
+      action: 'patch',
       type: 'resource',
       data: data[0]
     });
     await flushPromises();
     store.dispatch('cancelAction', {
-      action: 'save',
+      action: 'patch',
       type: 'resource',
       data: data[0]
     });
     await flushPromises();
     expect(
-      store.getters.resources.actionQueue.save[data[0].id]
+      store.getters.resources.actionQueue.patch[data[0].id]
     ).toBeUndefined();
   });
 
   it('test queueActionWatcher', async () => {
     await fillStore();
     store.dispatch('queueActionWatcher', {
-      action: 'save',
+      action: 'patch',
       type: 'resource',
       data: data[0]
     });
     store.dispatch('queueActionWatcher', {
-      action: 'save',
+      action: 'patch',
       type: 'resource',
       data: { ...data[1], name: 'test' }
     });
     await flushPromises();
     expect(
-      store.getters.resources.actionQueue.save[data[0].id]
+      store.getters.resources.actionQueue.patch[data[0].id]
     ).toBeUndefined();
     expect(
-      store.getters.resources.actionQueue.save[data[1].id]
+      store.getters.resources.actionQueue.patch[data[1].id]
     ).not.toBeUndefined();
   });
 });
