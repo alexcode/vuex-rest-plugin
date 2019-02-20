@@ -83,7 +83,7 @@ The payload will format the URL as `:type/:id?:query` or `:type?:query` dependin
 
 `data` the payload to send with a `PATCH` or `POST` requests.
 
-### `get`, fetch from the server
+### `get`
 
 ```js
 // fetch array
@@ -92,21 +92,21 @@ this.$store.dispatch('get', { type: 'resource' });
 this.$store.dispatch('get', { type: 'resource', id: 'my_id' });
 ```
 
-### post
+### `post`
 
 ```js
 this.$store.dispatch('post', { type: 'resource'  data: {...} });
 this.$store.dispatch('post', { type: 'resource'  data: [{...}] });
 ```
 
-### patch (aliases: create, mutate)
+### `patch`
 
 ```js
 this.$store.dispatch('patch', { id: 'my_id', type: 'resource'  data: {...} });
 this.$store.dispatch('patch', { type: 'resource'  data: [{...}] });
 ```
 
-### delete
+### `delete`
 
 ```js
 this.$store.dispatch('delete', { id: 'my_id', type: 'resource' });
@@ -114,7 +114,7 @@ this.$store.dispatch('delete', { id: 'my_id', type: 'resource' });
 
 Any of the above action can be queue and process/cancel at a later stage. Here are some helpers to help you with this.
 
-### queueAction
+### `queueAction`
 
 ```js
 this.$store.dispatch('queueAction', {
@@ -124,7 +124,7 @@ this.$store.dispatch('queueAction', {
 });
 ```
 
-### cancelAction
+### `cancelAction`
 
 ```js
 this.$store.dispatch('cancelAction', {
@@ -134,21 +134,21 @@ this.$store.dispatch('cancelAction', {
 });
 ```
 
-### processActionQueue
+### `processActionQueue`
 
 ```js
 this.$store.dispatch('processActionQueue', ['resource']);
 this.$store.dispatch('processActionQueue', ['resource', 'role']);
 ```
 
-### cancelActionQueue
+### `cancelActionQueue`
 
 ```js
 this.$store.dispatch('cancelActionQueue', ['resource']);
 this.$store.dispatch('cancelActionQueue', ['resource', 'role']);
 ```
 
-### queueActionWatcher
+### `queueActionWatcher`
 
 It can be called in a watcher to set the object to queue.
 
