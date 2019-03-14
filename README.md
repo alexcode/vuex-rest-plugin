@@ -20,6 +20,8 @@ export default new Vuex.Store({
     ApiStorePlugin({
       axios: axiosInstance,
       name: 'my_custom_name', //default is 'api'
+      dataPath: 'path_of_the_retured_payload', //default undefined. The path in axios return data.
+      namespaced: true, // default true
       models: {
         resource: {
           name: 'RESOURCE',
