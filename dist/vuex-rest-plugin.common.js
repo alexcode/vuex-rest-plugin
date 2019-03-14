@@ -10753,7 +10753,7 @@ function _applyModifier() {
   return _applyModifier.apply(this, arguments);
 }
 
-var lib_Actions = function Actions(axios, models) {
+var lib_Actions = function Actions(axios, models, dataPath) {
   _classCallCheck(this, Actions);
 
   var _formatUrl = function _formatUrl(payload) {
@@ -10818,20 +10818,22 @@ var lib_Actions = function Actions(axios, models) {
       var _ref = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee(result) {
+        var resultData;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                resultData = dataPath ? get_default()(result.data, dataPath) : result.data;
                 _context.t0 = commit;
                 _context.t1 = "ADD_".concat(_getModel(payload).name.toUpperCase());
-                _context.next = 4;
-                return applyModifier(model.afterGet, result.data);
+                _context.next = 5;
+                return applyModifier(model.afterGet, resultData);
 
-              case 4:
+              case 5:
                 _context.t2 = _context.sent;
                 (0, _context.t0)(_context.t1, _context.t2);
 
-              case 6:
+              case 7:
               case "end":
                 return _context.stop();
             }
@@ -10883,20 +10885,22 @@ var lib_Actions = function Actions(axios, models) {
                 var _ref3 = _asyncToGenerator(
                 /*#__PURE__*/
                 regeneratorRuntime.mark(function _callee2(result) {
+                  var resultData;
                   return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                       switch (_context2.prev = _context2.next) {
                         case 0:
+                          resultData = dataPath ? get_default()(result.data, dataPath) : result.data;
                           _context2.t0 = commit;
                           _context2.t1 = "ADD_".concat(_getModel(payload).name.toUpperCase());
-                          _context2.next = 4;
-                          return applyModifier(model.afterSave, result.data);
+                          _context2.next = 5;
+                          return applyModifier(model.afterSave, resultData);
 
-                        case 4:
+                        case 5:
                           _context2.t2 = _context2.sent;
                           (0, _context2.t0)(_context2.t1, _context2.t2);
 
-                        case 6:
+                        case 7:
                         case "end":
                           return _context2.stop();
                       }
@@ -11156,11 +11160,12 @@ var lib_Actions = function Actions(axios, models) {
 var lib_ApiStore =
 /*#__PURE__*/
 function () {
-  function ApiStore(models) {
+  function ApiStore(models, namespaced) {
     var _this2 = this;
 
     _classCallCheck(this, ApiStore);
 
+    this.namespaced = namespaced;
     this.models = models;
     this.state = create_default()(null);
     this.getters = create_default()(null);
@@ -11177,7 +11182,7 @@ function () {
 
         _this2.linkReferences(item, state, model.references);
 
-        return item;
+        state[modelIdx].lastLoad = new Date();
       }; // adding INIT_* mutations
 
 
@@ -11457,7 +11462,11 @@ function () {
         if (model.references) {
           forEach_default()(model.references, function (modelName, prop) {
             if (has_default()(entity, prop) && get_default()(entity, prop)) {
-              _this3.patchEntity(state, _this3.models[modelName], get_default()(entity, prop));
+              try {
+                _this3.patchEntity(state, _this3.models[modelName], get_default()(entity, prop));
+              } catch (e) {
+                console.warn("Patch error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
+              }
             }
           });
         }
@@ -11470,19 +11479,23 @@ function () {
       var _this4 = this;
 
       var setLink = function setLink(item, value, key) {
-        var itemId = get_default()(item[key], 'id');
-        var itemStore = state[_this4.models[value].plural];
+        try {
+          var itemId = get_default()(item[key], 'id');
+          var itemStore = state[_this4.models[value].plural];
 
-        if (itemId) {
-          _this4.storeOriginItem(itemStore.originItems, get_default()(item, key), itemStore.beforeQueue);
+          if (itemId) {
+            _this4.storeOriginItem(itemStore.originItems, get_default()(item, key), itemStore.beforeQueue);
 
-          itemStore.items[itemId] = item[key];
-        }
+            itemStore.items[itemId] = item[key];
+          }
 
-        var recurRef = get_default()(state, "".concat(_this4.models[value].plural, ".references"));
+          var recurRef = get_default()(state, "".concat(_this4.models[value].plural, ".references"));
 
-        if (recurRef) {
-          _this4.linkReferences(item, state, recurRef);
+          if (recurRef) {
+            _this4.linkReferences(item, state, recurRef);
+          }
+        } catch (e) {
+          console.warn("Reference error: We could not find the model ".concat(value, " for the reference ").concat(key, "."));
         }
       };
 
@@ -11502,9 +11515,11 @@ function () {
 }(); // Plugin
 
 
-var ApiStorePlugin = function ApiStorePlugin(options) {
-  var apiStore = new lib_ApiStore(options.models);
-  apiStore.actions = new lib_Actions(options.axios, options.models);
+var lib_ApiStorePlugin = function ApiStorePlugin(options) {
+  var namespaced = get_default()(options, 'namespaced', true);
+  var dataPath = get_default()(options, 'dataPath');
+  var apiStore = new lib_ApiStore(options.models, namespaced);
+  apiStore.actions = new lib_Actions(options.axios, options.models, dataPath);
   return function (store) {
     return store.registerModule(options.name || 'api', apiStore);
   };
@@ -11512,7 +11527,7 @@ var ApiStorePlugin = function ApiStorePlugin(options) {
 
 
 // CONCATENATED MODULE: ./node_modules/@vue/cli-service/lib/commands/build/entry-lib-no-default.js
-/* concated harmony reexport ApiStorePlugin */__webpack_require__.d(__webpack_exports__, "ApiStorePlugin", function() { return ApiStorePlugin; });
+/* concated harmony reexport ApiStorePlugin */__webpack_require__.d(__webpack_exports__, "ApiStorePlugin", function() { return lib_ApiStorePlugin; });
 /* concated harmony reexport ApiState */__webpack_require__.d(__webpack_exports__, "ApiState", function() { return lib_ApiState; });
 /* concated harmony reexport DateTimeState */__webpack_require__.d(__webpack_exports__, "DateTimeState", function() { return lib_DateTimeState; });
 
