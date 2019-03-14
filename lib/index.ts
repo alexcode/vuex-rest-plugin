@@ -148,7 +148,7 @@ class Actions<S, R> implements ActionTree<S, R> {
   processActionQueue: Action<S, R>;
   cancelAction: Action<S, R>;
   cancelActionQueue: Action<S, R>;
-  constructor(axios: AxiosInstance, models: ModelTypeTree) {
+  constructor(axios: AxiosInstance, models: ModelTypeTree, dataPath?: string) {
     const _formatUrl = (payload: Payload) => {
       let url = payload.url || payload.type;
 
@@ -195,9 +195,10 @@ class Actions<S, R> implements ActionTree<S, R> {
         commit(`CLEAR_${_getModel(payload).name.toUpperCase()}`);
       }
       return axios.get(_formatUrl(payload)).then(async result => {
+        const resultData = dataPath ? get(result.data, dataPath) : result.data;
         commit(
           `ADD_${_getModel(payload).name.toUpperCase()}`,
-          await applyModifier(model.afterGet, result.data)
+          await applyModifier(model.afterGet, resultData)
         );
       });
     };
@@ -215,9 +216,10 @@ class Actions<S, R> implements ActionTree<S, R> {
         url: _formatUrl(payload),
         data: await applyModifier(model.beforeSave, data)
       }).then(async result => {
+        const resultData = dataPath ? get(result.data, dataPath) : result.data;
         commit(
           `ADD_${_getModel(payload).name.toUpperCase()}`,
-          await applyModifier(model.afterSave, result.data)
+          await applyModifier(model.afterSave, resultData)
         );
       });
     };
@@ -373,12 +375,14 @@ class Actions<S, R> implements ActionTree<S, R> {
   }
 }
 class ApiStore<S> implements StoreOptions<S> {
+  namespaced: boolean;
   state: any;
   actions?: Actions<S, S>;
   readonly models: ModelTypeTree;
   readonly getters?: any;
   readonly mutations?: any;
-  constructor(models: ModelTypeTree) {
+  constructor(models: ModelTypeTree, namespaced: true) {
+    this.namespaced = namespaced;
     this.models = models;
     this.state = Object.create(null);
     this.getters = Object.create(null);
@@ -389,7 +393,7 @@ class ApiStore<S> implements StoreOptions<S> {
       this.state[modelIdx] = model.type;
       // adding ADD_* mutations
       this.mutations[`ADD_${model.name.toUpperCase()}`] = (
-        state: S,
+        state: ApiState,
         item: IndexedObject | Array<IndexedObject>
       ) => {
         this.storeOriginItem(
@@ -399,7 +403,7 @@ class ApiStore<S> implements StoreOptions<S> {
         );
         this.patchEntity(state, model, item);
         this.linkReferences(item, state, model.references);
-        return item;
+        state[modelIdx].lastLoad = new Date();
       };
       // adding INIT_* mutations
       this.mutations[`INIT_${model.name.toUpperCase()}`] = (
@@ -550,7 +554,17 @@ class ApiStore<S> implements StoreOptions<S> {
       if (model.references) {
         forEach(model.references, (modelName, prop) => {
           if (has(entity, prop) && get(entity, prop)) {
-            this.patchEntity(state, this.models[modelName], get(entity, prop));
+            try {
+              this.patchEntity(
+                state,
+                this.models[modelName],
+                get(entity, prop)
+              );
+            } catch (e) {
+              console.warn(
+                `Patch error: We could not find the model ${modelName} for the reference ${prop}.`
+              );
+            }
           }
         });
       }
@@ -563,19 +577,25 @@ class ApiStore<S> implements StoreOptions<S> {
     references?: ReferenceTree
   ) {
     const setLink = (item: IndexedObject, value: any, key: string | number) => {
-      const itemId = get(item[key], 'id');
-      const itemStore = state[this.models[value].plural];
-      if (itemId) {
-        this.storeOriginItem(
-          itemStore.originItems,
-          get(item, key),
-          itemStore.beforeQueue
+      try {
+        const itemId = get(item[key], 'id');
+        const itemStore = state[this.models[value].plural];
+        if (itemId) {
+          this.storeOriginItem(
+            itemStore.originItems,
+            get(item, key),
+            itemStore.beforeQueue
+          );
+          itemStore.items[itemId] = item[key];
+        }
+        const recurRef = get(state, `${this.models[value].plural}.references`);
+        if (recurRef) {
+          this.linkReferences(item, state, recurRef);
+        }
+      } catch (e) {
+        console.warn(
+          `Reference error: We could not find the model ${value} for the reference ${key}.`
         );
-        itemStore.items[itemId] = item[key];
-      }
-      const recurRef = get(state, `${this.models[value].plural}.references`);
-      if (recurRef) {
-        this.linkReferences(item, state, recurRef);
       }
     };
 
@@ -591,8 +611,10 @@ class ApiStore<S> implements StoreOptions<S> {
 
 // Plugin
 const ApiStorePlugin = (options: any) => {
-  const apiStore = new ApiStore(options.models);
-  apiStore.actions = new Actions(options.axios, options.models);
+  const namespaced = get(options, 'namespaced', true);
+  const dataPath = get(options, 'dataPath');
+  const apiStore = new ApiStore(options.models, namespaced);
+  apiStore.actions = new Actions(options.axios, options.models, dataPath);
 
   return (store: any) => store.registerModule(options.name || 'api', apiStore);
 };
