@@ -1,4 +1,5 @@
 import { ActionContext, Commit, ActionTree, Action, StoreOptions } from 'vuex';
+import Vue from 'vue';
 import { AxiosInstance } from 'axios';
 import at from 'lodash/at';
 import cloneDeep from 'lodash/cloneDeep';
@@ -543,12 +544,12 @@ class ApiStore<S> implements StoreOptions<S> {
         forEach(store.items[entity.id], (value, idx: string) => {
           if (!isFunction(value)) {
             if (has(entity, idx) && !isEqual(value, get(entity, idx))) {
-              set(store.items[entity.id], idx, get(entity, idx));
+              Vue.set(store.items[entity.id], idx, get(entity, idx));
             }
           }
         });
       } else {
-        set(store.items, entity.id, entity);
+        Vue.set(store.items, entity.id, entity);
       }
 
       if (model.references) {
@@ -561,6 +562,7 @@ class ApiStore<S> implements StoreOptions<S> {
                 get(entity, prop)
               );
             } catch (e) {
+              // eslint-disable-next-line no-console
               console.warn(
                 `Patch error: We could not find the model ${modelName} for the reference ${prop}.`
               );
@@ -588,11 +590,8 @@ class ApiStore<S> implements StoreOptions<S> {
           );
           itemStore.items[itemId] = item[key];
         }
-        const recurRef = get(state, `${this.models[value].plural}.references`);
-        if (recurRef) {
-          this.linkReferences(item, state, recurRef);
-        }
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.warn(
           `Reference error: We could not find the model ${value} for the reference ${key}.`
         );
