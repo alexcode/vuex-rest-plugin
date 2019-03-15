@@ -29,7 +29,25 @@
         { "type": "volume", "value": 12 },
         { "type": "weight", "value": 1300 }
       ],
-      "tools": []
+      "tools": [],
+      "user": {
+        "id": "762452c0-baa0-4fdc-b047-35d2ed475871",
+        "name": "mtt4 mtt4",
+        "first_name": "mtt4",
+        "last_name": "mtt4",
+        "email": "mtt4@mtt.fr",
+        "tools": null,
+        "config": {
+          "mobile": {
+            "ios": { "version": "1.1.7", "force_update": false },
+            "android": { "version": "1.1.8", "force_update": false }
+          }
+        },
+        "role": {
+          "id": "45230d44-75c6-4f60-bfaf-1e4653406915",
+          "name": "livreur2"
+        }
+      }
     },
     "depot": {
       "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",

@@ -9,40 +9,39 @@ import { ApiStorePlugin, ApiState } from '../../lib';
 
 declare var global: any;
 
-const data = require('./apistore.spec.data.json');
 Vue.use(Vuex);
 
-const models = {
-  resource: {
-    name: 'RESOURCE',
-    plural: 'RESOURCES',
-    type: new ApiState(),
-    references: {
-      user: 'user',
-      vehicle: 'vehicle'
+describe('ApiStore by default', function() {
+  const data = require('./apistore.spec.data.json');
+  const models = {
+    resource: {
+      name: 'RESOURCE',
+      plural: 'RESOURCES',
+      type: new ApiState(),
+      references: {
+        user: 'user',
+        vehicle: 'vehicle'
+      }
+    },
+    user: {
+      name: 'USER',
+      plural: 'USERS',
+      type: new ApiState(),
+      references: {
+        role: 'role'
+      }
+    },
+    vehicle: {
+      name: 'VEHICLE',
+      plural: 'VEHICLES',
+      type: new ApiState()
+    },
+    role: {
+      name: 'ROLE',
+      plural: 'ROLES',
+      type: new ApiState()
     }
-  },
-  user: {
-    name: 'USER',
-    plural: 'USERS',
-    type: new ApiState(),
-    references: {
-      role: 'role'
-    }
-  },
-  vehicle: {
-    name: 'VEHICLE',
-    plural: 'VEHICLES',
-    type: new ApiState()
-  },
-  role: {
-    name: 'ROLE',
-    plural: 'ROLES',
-    type: new ApiState()
-  }
-};
-
-describe('ApiStore by default', () => {
+  };
   let store: any;
   const axiosInstance = axios.create();
   const mock = new MockAdapter(axiosInstance);
@@ -317,7 +316,37 @@ describe('ApiStore by default', () => {
   });
 });
 
-describe('ApiStore custom', () => {
+describe('ApiStore options', function() {
+  const data = require('./apistore.spec.data.json');
+  const models = {
+    resource: {
+      name: 'RESOURCE',
+      plural: 'RESOURCES',
+      type: new ApiState(),
+      references: {
+        user: 'user',
+        vehicle: 'vehicle'
+      }
+    },
+    user: {
+      name: 'USER',
+      plural: 'USERS',
+      type: new ApiState(),
+      references: {
+        role: 'role'
+      }
+    },
+    vehicle: {
+      name: 'VEHICLE',
+      plural: 'VEHICLES',
+      type: new ApiState()
+    },
+    role: {
+      name: 'ROLE',
+      plural: 'ROLES',
+      type: new ApiState()
+    }
+  };
   const axiosInstance = axios.create();
   const mock = new MockAdapter(axiosInstance);
   afterEach(() => {
@@ -360,7 +389,8 @@ describe('ApiStore custom', () => {
   });
 });
 
-describe('ApiStore wrong model', () => {
+describe('ApiStore custom model', function() {
+  const data = require('./apistore.spec.data.json');
   const axiosInstance = axios.create();
   const mock = new MockAdapter(axiosInstance);
   afterEach(() => {
@@ -368,26 +398,34 @@ describe('ApiStore wrong model', () => {
   });
 
   it('test wrong reference', async () => {
-    const wrongModels = {
-      resource: {
-        name: 'RESOURCE',
-        plural: 'RESOURCES',
-        type: new ApiState(),
-        references: {
-          user: 'users'
-        }
-      },
-      user: {
-        name: 'USER',
-        plural: 'USERS',
-        type: new ApiState()
-      }
-    };
     const store = new Vuex.Store({
       plugins: [
         ApiStorePlugin({
           axios: axiosInstance,
-          models: wrongModels
+          models: {
+            resource: {
+              name: 'RESOURCE',
+              plural: 'RESOURCES',
+              type: new ApiState(),
+              references: {
+                user: 'users',
+                vehicle: 'vehicle'
+              }
+            },
+            user: {
+              name: 'USER',
+              plural: 'USERS',
+              type: new ApiState()
+            },
+            vehicle: {
+              name: 'VEHICLE',
+              plural: 'VEHICLES',
+              type: new ApiState(),
+              references: {
+                user: 'user'
+              }
+            }
+          }
         })
       ]
     });
@@ -407,6 +445,63 @@ describe('ApiStore wrong model', () => {
     );
     expect(spyWarn).toHaveBeenCalledWith(
       'Reference error: We could not find the model users for the reference user.'
+    );
+  });
+
+  it('test nested reference', async () => {
+    await flushPromises();
+    const store = new Vuex.Store({
+      plugins: [
+        ApiStorePlugin({
+          axios: axiosInstance,
+          models: {
+            resource: {
+              name: 'RESOURCE',
+              plural: 'RESOURCES',
+              type: new ApiState(),
+              references: {
+                user: 'user',
+                vehicle: 'vehicle'
+              }
+            },
+            user: {
+              name: 'USER',
+              plural: 'USERS',
+              type: new ApiState(),
+              references: {
+                role: 'role'
+              }
+            },
+            vehicle: {
+              name: 'VEHICLE',
+              plural: 'VEHICLES',
+              type: new ApiState(),
+              references: {
+                user: 'user'
+              }
+            },
+            role: {
+              name: 'ROLE',
+              plural: 'ROLES',
+              type: new ApiState()
+            }
+          }
+        })
+      ]
+    });
+    const resource = data[0];
+    store.commit('api/ADD_RESOURCE', resource);
+    expect(resource).toStrictEqual(
+      store.getters['api/resources'].items[resource.id]
+    );
+    expect(resource.user).toStrictEqual(
+      store.getters['api/users'].items[resource.user.id]
+    );
+    expect(resource.vehicle.user).toStrictEqual(
+      store.getters['api/users'].items[resource.vehicle.user.id]
+    );
+    expect(resource.vehicle.user.role).toStrictEqual(
+      store.getters['api/roles'].items[resource.vehicle.user.role.id]
     );
   });
 });
