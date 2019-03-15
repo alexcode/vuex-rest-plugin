@@ -5984,6 +5984,13 @@ module.exports = baseAssignValue;
 
 /***/ }),
 
+/***/ "8bbf":
+/***/ (function(module, exports) {
+
+module.exports = require("vue");
+
+/***/ }),
+
 /***/ "8e60":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10525,6 +10532,10 @@ function _classCallCheck(instance, Constructor) {
     throw new TypeError("Cannot call a class as a function");
   }
 }
+// EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
+var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
+var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
+
 // EXTERNAL MODULE: ./node_modules/lodash/at.js
 var at = __webpack_require__("b8bb");
 var at_default = /*#__PURE__*/__webpack_require__.n(at);
@@ -10594,6 +10605,7 @@ var some = __webpack_require__("3092");
 var some_default = /*#__PURE__*/__webpack_require__.n(some);
 
 // CONCATENATED MODULE: ./lib/index.ts
+
 
 
 
@@ -11451,12 +11463,12 @@ function () {
           forEach_default()(store.items[entity.id], function (value, idx) {
             if (!isFunction_default()(value)) {
               if (has_default()(entity, idx) && !isEqual_default()(value, get_default()(entity, idx))) {
-                set_default()(store.items[entity.id], idx, get_default()(entity, idx));
+                external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(store.items[entity.id], idx, get_default()(entity, idx));
               }
             }
           });
         } else {
-          set_default()(store.items, entity.id, entity);
+          external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(store.items, entity.id, entity);
         }
 
         if (model.references) {
@@ -11465,6 +11477,7 @@ function () {
               try {
                 _this3.patchEntity(state, _this3.models[modelName], get_default()(entity, prop));
               } catch (e) {
+                // eslint-disable-next-line no-console
                 console.warn("Patch error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
               }
             }
@@ -11488,13 +11501,8 @@ function () {
 
             itemStore.items[itemId] = item[key];
           }
-
-          var recurRef = get_default()(state, "".concat(_this4.models[value].plural, ".references"));
-
-          if (recurRef) {
-            _this4.linkReferences(item, state, recurRef);
-          }
         } catch (e) {
+          // eslint-disable-next-line no-console
           console.warn("Reference error: We could not find the model ".concat(value, " for the reference ").concat(key, "."));
         }
       };
