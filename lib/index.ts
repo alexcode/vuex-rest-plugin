@@ -197,10 +197,7 @@ class Actions<S, R> implements ActionTree<S, R> {
       }
       return axios.get(_formatUrl(payload)).then(async result => {
         const resultData = dataPath ? get(result.data, dataPath) : result.data;
-        commit(
-          `ADD_${_getModel(payload).name.toUpperCase()}`,
-          await applyModifier(model.afterGet, resultData)
-        );
+        commit(`ADD_${_getModel(payload).name.toUpperCase()}`, resultData);
       });
     };
 
@@ -396,16 +393,17 @@ class ApiStore<S> implements StoreOptions<S> {
       this.mutations[`ADD_${model.name.toUpperCase()}`] = (
         state: ApiState,
         item: IndexedObject | Array<IndexedObject>
-      ) => {
-        this.storeOriginItem(
-          get(state, `${modelIdx}.originItems`),
-          item,
-          model.beforeQueue
-        );
-        this.patchEntity(state, model, item);
-        this.linkReferences(item, state, model.references);
-        state[modelIdx].lastLoad = new Date();
-      };
+      ) =>
+        applyModifier(model.afterGet, item).then(i => {
+          this.storeOriginItem(
+            get(state, `${modelIdx}.originItems`),
+            i,
+            model.beforeQueue
+          );
+          this.patchEntity(state, model, i);
+          this.linkReferences(i, state, model.references);
+          state[modelIdx].lastLoad = new Date();
+        });
       // adding INIT_* mutations
       this.mutations[`INIT_${model.name.toUpperCase()}`] = (
         state: ApiState,

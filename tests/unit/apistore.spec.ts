@@ -491,6 +491,7 @@ describe('ApiStore custom model', function() {
     });
     const resource = data[0];
     store.commit('api/ADD_RESOURCE', resource);
+    await flushPromises();
     expect(resource).toStrictEqual(
       store.getters['api/resources'].items[resource.id]
     );
