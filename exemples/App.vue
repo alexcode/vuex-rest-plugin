@@ -5,7 +5,7 @@
       Populate store
     </button>
     <br />
-    <code>{{ JSON.stringify($store.getters) }}</code>
+    <pre>{{ JSON.stringify($store.getters, undefined, 2) }}</pre>
   </div>
 </template>
 
@@ -17,7 +17,7 @@ const data = require('./../tests/unit/apistore.spec.data');
 export default class App extends Vue {
   populate(): void {
     this.$store
-      .dispatch('post', {
+      .dispatch('api/post', {
         url: 'https://httpbin.org/post',
         type: 'resource',
         data
@@ -35,5 +35,9 @@ export default class App extends Vue {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+#app pre {
+  text-align: left;
 }
 </style>
