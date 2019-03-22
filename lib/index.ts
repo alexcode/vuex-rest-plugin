@@ -419,11 +419,11 @@ class ApiStore<S> implements StoreOptions<S> {
         const store = state[modelIdx];
         const deleteItem = (i: string | IndexedObject) => {
           if (isString(i)) {
-            delete store.originItems[i];
-            delete store.items[i];
+            Vue.delete(store.originItems, i);
+            Vue.delete(store.items, i);
           } else {
             this.removeOriginItem(store.originItems, i);
-            delete store.items[i.id];
+            Vue.delete(store.items, i.id);
           }
         };
 
@@ -526,7 +526,7 @@ class ApiStore<S> implements StoreOptions<S> {
   // Removing original copy
   removeOriginItem(originItems: IndexedObject, item: IndexedObject) {
     if (item && has(originItems, item.id)) {
-      delete originItems[item.id];
+      Vue.delete(originItems, item.id);
     }
   }
   patchEntity(
