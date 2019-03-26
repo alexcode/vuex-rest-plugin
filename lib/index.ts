@@ -106,36 +106,33 @@ class DateTimeState extends ApiState {
   }
 }
 async function applyModifier(
-  modifierFnList: any,
+  modifier: string,
+  modelName: string,
+  models: ModelTypeTree,
   data?: object | Array<object>
-) {
-  const promises = <any>[];
-
-  if (isArray(modifierFnList)) {
-    forEach(modifierFnList, cb => {
-      if (!isFunction(cb)) return;
-
-      if (isArray(data)) {
-        forEach(data, d => {
-          promises.push(cb(d) || d);
-        });
-      } else {
-        promises.push(cb(data) || data);
+): Promise<any> {
+  const applyFn = (d?: object) => {
+    const fn = get(models, `${modelName}.${modifier}`);
+    return !isFunction(fn) ? Promise.resolve(d) : fn(d);
+  };
+  const refs = get(models, `${modelName}.references`, []);
+  const applyRefFn = (d?: object) =>
+    map(refs, (ref, key) => {
+      if (has(d, key)) {
+        return applyModifier(modifier, ref, models, get(d, key));
       }
+      return Promise.resolve(d);
     });
-  } else if (isFunction(modifierFnList)) {
-    if (isArray(data)) {
-      forEach(data, d => {
-        promises.push(modifierFnList(d) || d);
-      });
-    } else {
-      return Promise.resolve(modifierFnList(data) || data);
-    }
-  } else {
-    return Promise.resolve(data);
-  }
 
-  return Promise.all(promises);
+  if (isArray(data)) {
+    return Promise.all(
+      data.reduce(
+        (acc: Array<any>, v) => [...acc, applyFn(v), applyRefFn(v)],
+        []
+      )
+    );
+  }
+  return Promise.resolve(applyRefFn(data)).then(() => applyFn(data));
 }
 class Actions<S, R> implements ActionTree<S, R> {
   [key: string]: Action<S, R>;
@@ -207,17 +204,17 @@ class Actions<S, R> implements ActionTree<S, R> {
       payload: Payload,
       method: string = 'post'
     ) => {
-      const model = _getModel(payload);
+      // const model = _getModel(payload);
       const { data } = payload;
       return axios({
         method,
         url: _formatUrl(payload),
-        data: await applyModifier(model.beforeSave, data)
+        data: await applyModifier('beforeSave', payload.type, models, data)
       }).then(async result => {
         const resultData = dataPath ? get(result.data, dataPath) : result.data;
         commit(
           `ADD_${_getModel(payload).name.toUpperCase()}`,
-          await applyModifier(model.afterSave, resultData)
+          await applyModifier('afterSave', payload.type, models, resultData)
         );
       });
     };
@@ -231,7 +228,7 @@ class Actions<S, R> implements ActionTree<S, R> {
         return axios
           .patch(
             `${_formatUrl(payload)}/delete`,
-            await applyModifier(model.beforeSave, data)
+            await applyModifier('beforeSave', payload.type, models, data)
           )
           .then(() => {
             commit(`DELETE_${model.name.toUpperCase()}`, data);
@@ -345,7 +342,9 @@ class Actions<S, R> implements ActionTree<S, R> {
           commit(
             `ADD_${model.name}`,
             await applyModifier(
-              model.afterQueue,
+              'afterQueue',
+              queue,
+              models,
               at(get(state, `${model.plural}.originItems`), origin)
             )
           );
@@ -385,7 +384,7 @@ class ApiStore<S> implements StoreOptions<S> {
     this.state = Object.create(null);
     this.getters = Object.create(null);
     this.mutations = Object.create(null);
-    forEach(this.models, model => {
+    forEach(this.models, (model, modelKey) => {
       const modelIdx = model.plural;
       // adding all states
       this.state[modelIdx] = model.type;
@@ -394,16 +393,18 @@ class ApiStore<S> implements StoreOptions<S> {
         state: ApiState,
         item: IndexedObject | Array<IndexedObject>
       ) =>
-        applyModifier(model.afterGet, item).then(i => {
-          this.storeOriginItem(
-            get(state, `${modelIdx}.originItems`),
-            i,
-            model.beforeQueue
-          );
-          this.patchEntity(state, model, i);
-          this.linkReferences(i, state, model.references);
-          state[modelIdx].lastLoad = new Date();
-        });
+        applyModifier('afterGet', modelKey, this.models, item).then(
+          (i: any) => {
+            this.storeOriginItem(
+              get(state, `${modelIdx}.originItems`),
+              i,
+              model.beforeQueue
+            );
+            this.patchEntity(state, model, i);
+            this.linkReferences(i, state, model.references);
+            state[modelIdx].lastLoad = new Date();
+          }
+        );
       // adding INIT_* mutations
       this.mutations[`INIT_${model.name.toUpperCase()}`] = (
         state: ApiState,
@@ -443,15 +444,19 @@ class ApiStore<S> implements StoreOptions<S> {
         const store = state[modelIdx];
         const storeAction = async (d: IndexedObject) => {
           if (obj.action === 'post') {
-            set(store.items, d.id, await applyModifier(model.afterSave, d));
+            set(
+              store.items,
+              d.id,
+              await applyModifier('afterSave', modelKey, this.models, d)
+            );
             store.actionQueue[obj.action].push(
-              await applyModifier(model.beforeSave, d)
+              await applyModifier('beforeSave', modelKey, this.models, d)
             );
           } else {
             set(
               store.actionQueue[obj.action],
               d.id,
-              await applyModifier(model.beforeSave, d)
+              await applyModifier('beforeSave', modelKey, this.models, d)
             );
             if (obj.action === 'delete') {
               delete store.items[d.id];

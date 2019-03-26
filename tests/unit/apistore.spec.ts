@@ -505,4 +505,101 @@ describe('ApiStore custom model', function() {
       store.getters['api/roles'].items[resource.vehicle.user.role.id]
     );
   });
+
+  it('test hooks with collection', async () => {
+    const store = new Vuex.Store({
+      plugins: [
+        ApiStorePlugin({
+          axios: axiosInstance,
+          models: {
+            resource: {
+              name: 'RESOURCE',
+              plural: 'RESOURCES',
+              type: new ApiState(),
+              afterGet: (v: any) => {
+                v.some_id = 'other_id_resource';
+                return v;
+              },
+              references: {
+                user: 'user'
+              }
+            },
+            user: {
+              name: 'USER',
+              plural: 'USERS',
+              type: new ApiState(),
+              afterGet: (v: any) => {
+                v.some_id = 'other_id_user';
+                return v;
+              },
+              references: {
+                role: 'role'
+              }
+            }
+          }
+        })
+      ]
+    });
+    const resource = data[0];
+    mock.onGet('/resource').reply(200, [resource]);
+    store.dispatch('api/get', {
+      type: 'resource'
+    });
+    await flushPromises();
+    expect(store.getters['api/resources'].items[resource.id].some_id).toBe(
+      'other_id_resource'
+    );
+    expect(store.getters['api/users'].items[resource.user.id].some_id).toBe(
+      'other_id_user'
+    );
+  });
+
+  it('test hooks with single object', async () => {
+    const store = new Vuex.Store({
+      plugins: [
+        ApiStorePlugin({
+          axios: axiosInstance,
+          models: {
+            resource: {
+              name: 'RESOURCE',
+              plural: 'RESOURCES',
+              type: new ApiState(),
+              afterGet: (v: any) => {
+                v.some_id = 'other_id_resource';
+                return v;
+              },
+              references: {
+                user: 'user'
+              }
+            },
+            user: {
+              name: 'USER',
+              plural: 'USERS',
+              type: new ApiState(),
+              afterGet: (v: any) => {
+                v.some_id = 'other_id_user';
+                return v;
+              },
+              references: {
+                role: 'role'
+              }
+            }
+          }
+        })
+      ]
+    });
+    const singleResource = data[0];
+    mock.onGet(`/resource/${singleResource.id}`).reply(200, singleResource);
+    store.dispatch('api/get', {
+      id: singleResource.id,
+      type: 'resource'
+    });
+    await flushPromises();
+    expect(
+      store.getters['api/resources'].items[singleResource.id].some_id
+    ).toBe('other_id_resource');
+    expect(
+      store.getters['api/users'].items[singleResource.user.id].some_id
+    ).toBe('other_id_user');
+  });
 });
