@@ -5,7 +5,8 @@ import axios from 'axios';
 import flushPromises from 'flush-promises';
 import size from 'lodash/size';
 import forEach from 'lodash/forEach';
-import { ApiStorePlugin, ApiState } from '../../lib';
+import ApiStorePlugin from '../../lib/ApiStorePlugin';
+import ApiState from '../../lib/ApiState';
 
 declare var global: any;
 
