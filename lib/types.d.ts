@@ -7,6 +7,21 @@ export interface IndexedObjectTree {
   [id: string]: IndexedObject;
 }
 
+export interface ApiState {
+  [key: string]: any;
+  items?: IndexedObjectTree;
+  lastLoad: Date;
+  loaded: boolean;
+  originItems: IndexedObject;
+  actionQueue: ActionQueue;
+}
+
+export interface ActionQueue {
+  readonly post: Array<object>;
+  readonly patch: object;
+  readonly delete: object;
+}
+
 export interface ModelType {
   name: string;
   plural: string;
