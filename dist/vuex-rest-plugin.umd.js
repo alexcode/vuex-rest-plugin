@@ -1362,6 +1362,17 @@ module.exports = isObject;
 
 /***/ }),
 
+/***/ "1af6":
+/***/ (function(module, exports, __webpack_require__) {
+
+// 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
+var $export = __webpack_require__("63b6");
+
+$export($export.S, 'Array', { isArray: __webpack_require__("9003") });
+
+
+/***/ }),
+
 /***/ "1bac":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1638,6 +1649,22 @@ function matchesStrictComparable(key, srcValue) {
 }
 
 module.exports = matchesStrictComparable;
+
+
+/***/ }),
+
+/***/ "20fd":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $defineProperty = __webpack_require__("d9f6");
+var createDesc = __webpack_require__("aebd");
+
+module.exports = function (object, index, value) {
+  if (index in object) $defineProperty.f(object, index, createDesc(0, value));
+  else object[index] = value;
+};
 
 
 /***/ }),
@@ -4017,6 +4044,61 @@ module.exports = Object.getPrototypeOf || function (O) {
 
 /***/ }),
 
+/***/ "549b":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var ctx = __webpack_require__("d864");
+var $export = __webpack_require__("63b6");
+var toObject = __webpack_require__("241e");
+var call = __webpack_require__("b0dc");
+var isArrayIter = __webpack_require__("3702");
+var toLength = __webpack_require__("b447");
+var createProperty = __webpack_require__("20fd");
+var getIterFn = __webpack_require__("7cd6");
+
+$export($export.S + $export.F * !__webpack_require__("4ee1")(function (iter) { Array.from(iter); }), 'Array', {
+  // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
+  from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
+    var O = toObject(arrayLike);
+    var C = typeof this == 'function' ? this : Array;
+    var aLen = arguments.length;
+    var mapfn = aLen > 1 ? arguments[1] : undefined;
+    var mapping = mapfn !== undefined;
+    var index = 0;
+    var iterFn = getIterFn(O);
+    var length, result, step, iterator;
+    if (mapping) mapfn = ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
+    // if object isn't iterable or it's array with default iterator - use simple case
+    if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
+      for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
+        createProperty(result, index, mapping ? call(iterator, mapfn, [step.value, index], true) : step.value);
+      }
+    } else {
+      length = toLength(O.length);
+      for (result = new C(length); length > index; index++) {
+        createProperty(result, index, mapping ? mapfn(O[index], index) : O[index]);
+      }
+    }
+    result.length = index;
+    return result;
+  }
+});
+
+
+/***/ }),
+
+/***/ "54a1":
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__("6c1c");
+__webpack_require__("1654");
+module.exports = __webpack_require__("95d5");
+
+
+/***/ }),
+
 /***/ "54eb":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5343,6 +5425,13 @@ if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 
 /***/ }),
 
+/***/ "774e":
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__("d2d5");
+
+/***/ }),
+
 /***/ "77f1":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6235,6 +6324,23 @@ function isFunction(value) {
 }
 
 module.exports = isFunction;
+
+
+/***/ }),
+
+/***/ "95d5":
+/***/ (function(module, exports, __webpack_require__) {
+
+var classof = __webpack_require__("40c3");
+var ITERATOR = __webpack_require__("5168")('iterator');
+var Iterators = __webpack_require__("481b");
+module.exports = __webpack_require__("584a").isIterable = function (it) {
+  var O = Object(it);
+  return O[ITERATOR] !== undefined
+    || '@@iterator' in O
+    // eslint-disable-next-line no-prototype-builtins
+    || Iterators.hasOwnProperty(classof(O));
+};
 
 
 /***/ }),
@@ -7686,6 +7792,13 @@ module.exports = mapCacheHas;
 
 /***/ }),
 
+/***/ "a745":
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__("f410");
+
+/***/ }),
+
 /***/ "a994":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8722,6 +8835,13 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "c8bb":
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__("54a1");
+
+/***/ }),
+
 /***/ "c8fe":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9050,6 +9170,16 @@ function stackSet(key, value) {
 }
 
 module.exports = stackSet;
+
+
+/***/ }),
+
+/***/ "d2d5":
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__("1654");
+__webpack_require__("549b");
+module.exports = __webpack_require__("584a").Array.from;
 
 
 /***/ }),
@@ -10152,6 +10282,15 @@ module.exports = shortOut;
 
 /***/ }),
 
+/***/ "f410":
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__("1af6");
+module.exports = __webpack_require__("584a").Array.isArray;
+
+
+/***/ }),
+
 /***/ "f4d6":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10362,6 +10501,13 @@ if (typeof window !== 'undefined') {
 // Indicate to webpack that this file can be concatenated
 /* harmony default export */ var setPublicPath = (null);
 
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es6.function.name.js
+var es6_function_name = __webpack_require__("7f7f");
+
+// EXTERNAL MODULE: ./node_modules/lodash/get.js
+var get = __webpack_require__("9b02");
+var get_default = /*#__PURE__*/__webpack_require__.n(get);
+
 // EXTERNAL MODULE: ./node_modules/core-js/modules/web.dom.iterable.js
 var web_dom_iterable = __webpack_require__("ac6a");
 
@@ -10377,9 +10523,6 @@ var promise_default = /*#__PURE__*/__webpack_require__.n(promise);
 
 // EXTERNAL MODULE: ./node_modules/regenerator-runtime/runtime.js
 var runtime = __webpack_require__("96cf");
-
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es6.function.name.js
-var es6_function_name = __webpack_require__("7f7f");
 
 // CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/asyncToGenerator.js
 
@@ -10419,139 +10562,15 @@ function _asyncToGenerator(fn) {
     });
   };
 }
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/symbol/iterator.js
-var iterator = __webpack_require__("5d58");
-var iterator_default = /*#__PURE__*/__webpack_require__.n(iterator);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/symbol.js
-var symbol = __webpack_require__("67bb");
-var symbol_default = /*#__PURE__*/__webpack_require__.n(symbol);
-
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/typeof.js
-
-
-
-function typeof_typeof2(obj) { if (typeof symbol_default.a === "function" && typeof iterator_default.a === "symbol") { typeof_typeof2 = function _typeof2(obj) { return typeof obj; }; } else { typeof_typeof2 = function _typeof2(obj) { return obj && typeof symbol_default.a === "function" && obj.constructor === symbol_default.a && obj !== symbol_default.a.prototype ? "symbol" : typeof obj; }; } return typeof_typeof2(obj); }
-
-function typeof_typeof(obj) {
-  if (typeof symbol_default.a === "function" && typeof_typeof2(iterator_default.a) === "symbol") {
-    typeof_typeof = function _typeof(obj) {
-      return typeof_typeof2(obj);
-    };
-  } else {
-    typeof_typeof = function _typeof(obj) {
-      return obj && typeof symbol_default.a === "function" && obj.constructor === symbol_default.a && obj !== symbol_default.a.prototype ? "symbol" : typeof_typeof2(obj);
-    };
-  }
-
-  return typeof_typeof(obj);
-}
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/assertThisInitialized.js
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn.js
-
-
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof_typeof(call) === "object" || typeof call === "function")) {
-    return call;
-  }
-
-  return _assertThisInitialized(self);
-}
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/get-prototype-of.js
-var get_prototype_of = __webpack_require__("061b");
-var get_prototype_of_default = /*#__PURE__*/__webpack_require__.n(get_prototype_of);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/set-prototype-of.js
-var set_prototype_of = __webpack_require__("4d16");
-var set_prototype_of_default = /*#__PURE__*/__webpack_require__.n(set_prototype_of);
-
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/getPrototypeOf.js
-
-
-function getPrototypeOf_getPrototypeOf(o) {
-  getPrototypeOf_getPrototypeOf = set_prototype_of_default.a ? get_prototype_of_default.a : function _getPrototypeOf(o) {
-    return o.__proto__ || get_prototype_of_default()(o);
-  };
-  return getPrototypeOf_getPrototypeOf(o);
-}
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/create.js
-var create = __webpack_require__("4aa6");
-var create_default = /*#__PURE__*/__webpack_require__.n(create);
-
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/setPrototypeOf.js
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = set_prototype_of_default.a || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/inherits.js
-
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-
-  subClass.prototype = create_default()(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/define-property.js
-var define_property = __webpack_require__("85f2");
-var define_property_default = /*#__PURE__*/__webpack_require__.n(define_property);
-
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/createClass.js
-
-
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-
-    define_property_default()(target, descriptor.key, descriptor);
-  }
-}
-
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
 // CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/classCallCheck.js
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
 }
-// EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
-var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
-var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
-
 // EXTERNAL MODULE: ./node_modules/lodash/at.js
 var at = __webpack_require__("b8bb");
 var at_default = /*#__PURE__*/__webpack_require__.n(at);
-
-// EXTERNAL MODULE: ./node_modules/lodash/cloneDeep.js
-var cloneDeep = __webpack_require__("0644");
-var cloneDeep_default = /*#__PURE__*/__webpack_require__.n(cloneDeep);
 
 // EXTERNAL MODULE: ./node_modules/lodash/flatMap.js
 var flatMap = __webpack_require__("e9a8");
@@ -10560,10 +10579,6 @@ var flatMap_default = /*#__PURE__*/__webpack_require__.n(flatMap);
 // EXTERNAL MODULE: ./node_modules/lodash/forEach.js
 var forEach = __webpack_require__("6cd4");
 var forEach_default = /*#__PURE__*/__webpack_require__.n(forEach);
-
-// EXTERNAL MODULE: ./node_modules/lodash/get.js
-var get = __webpack_require__("9b02");
-var get_default = /*#__PURE__*/__webpack_require__.n(get);
 
 // EXTERNAL MODULE: ./node_modules/lodash/has.js
 var has = __webpack_require__("3852");
@@ -10577,10 +10592,6 @@ var isArray_default = /*#__PURE__*/__webpack_require__.n(isArray);
 var isDate = __webpack_require__("6220");
 var isDate_default = /*#__PURE__*/__webpack_require__.n(isDate);
 
-// EXTERNAL MODULE: ./node_modules/lodash/isEmpty.js
-var isEmpty = __webpack_require__("13ea");
-var isEmpty_default = /*#__PURE__*/__webpack_require__.n(isEmpty);
-
 // EXTERNAL MODULE: ./node_modules/lodash/isEqual.js
 var isEqual = __webpack_require__("63ea");
 var isEqual_default = /*#__PURE__*/__webpack_require__.n(isEqual);
@@ -10593,10 +10604,6 @@ var isFunction_default = /*#__PURE__*/__webpack_require__.n(isFunction);
 var isObject = __webpack_require__("1a8c");
 var isObject_default = /*#__PURE__*/__webpack_require__.n(isObject);
 
-// EXTERNAL MODULE: ./node_modules/lodash/isString.js
-var isString = __webpack_require__("e2a0");
-var isString_default = /*#__PURE__*/__webpack_require__.n(isString);
-
 // EXTERNAL MODULE: ./node_modules/lodash/keys.js
 var keys = __webpack_require__("ec69");
 var keys_default = /*#__PURE__*/__webpack_require__.n(keys);
@@ -10605,176 +10612,141 @@ var keys_default = /*#__PURE__*/__webpack_require__.n(keys);
 var map = __webpack_require__("dd61");
 var map_default = /*#__PURE__*/__webpack_require__.n(map);
 
-// EXTERNAL MODULE: ./node_modules/lodash/set.js
-var set = __webpack_require__("0f5c");
-var set_default = /*#__PURE__*/__webpack_require__.n(set);
-
 // EXTERNAL MODULE: ./node_modules/lodash/some.js
 var some = __webpack_require__("3092");
 var some_default = /*#__PURE__*/__webpack_require__.n(some);
 
-// CONCATENATED MODULE: ./lib/index.ts
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/array/is-array.js
+var is_array = __webpack_require__("a745");
+var is_array_default = /*#__PURE__*/__webpack_require__.n(is_array);
 
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/arrayWithoutHoles.js
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- // Classes
-
-var lib_ActionQueue = function ActionQueue() {
-  _classCallCheck(this, ActionQueue);
-
-  this.post = [];
-  this.patch = {};
-  this.delete = {};
-};
-
-var lib_ApiState =
-/*#__PURE__*/
-function () {
-  function ApiState() {
-    _classCallCheck(this, ApiState);
-
-    this.lastLoad = new Date();
-    this.loaded = false;
-    this.items = create_default()(null);
-    this.originItems = create_default()(null);
-    this.actionQueue = new lib_ActionQueue();
-  }
-
-  _createClass(ApiState, [{
-    key: "reset",
-    value: function reset() {
-      this.lastLoad = new Date();
-      this.loaded = false;
-      this.items = create_default()(null);
-      this.originItems = create_default()(null);
-      this.actionQueue = new lib_ActionQueue();
+function _arrayWithoutHoles(arr) {
+  if (is_array_default()(arr)) {
+    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
+      arr2[i] = arr[i];
     }
-  }]);
 
-  return ApiState;
-}();
-
-var lib_DateTimeState =
-/*#__PURE__*/
-function (_ApiState) {
-  _inherits(DateTimeState, _ApiState);
-
-  function DateTimeState() {
-    var _this;
-
-    _classCallCheck(this, DateTimeState);
-
-    _this = _possibleConstructorReturn(this, getPrototypeOf_getPrototypeOf(DateTimeState).call(this));
-    _this.from = null;
-    _this.to = null;
-    return _this;
+    return arr2;
   }
+}
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/array/from.js
+var from = __webpack_require__("774e");
+var from_default = /*#__PURE__*/__webpack_require__.n(from);
 
-  return DateTimeState;
-}(lib_ApiState);
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/is-iterable.js
+var is_iterable = __webpack_require__("c8bb");
+var is_iterable_default = /*#__PURE__*/__webpack_require__.n(is_iterable);
 
-function applyModifier(_x, _x2) {
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/iterableToArray.js
+
+
+function _iterableToArray(iter) {
+  if (is_iterable_default()(Object(iter)) || Object.prototype.toString.call(iter) === "[object Arguments]") return from_default()(iter);
+}
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/nonIterableSpread.js
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance");
+}
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/toConsumableArray.js
+
+
+
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+}
+// CONCATENATED MODULE: ./lib/utils.ts
+
+
+
+
+
+
+
+
+
+
+
+
+function applyModifier(_x, _x2, _x3, _x4) {
   return _applyModifier.apply(this, arguments);
 }
 
 function _applyModifier() {
   _applyModifier = _asyncToGenerator(
   /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee10(modifierFnList, data) {
-    var promises;
-    return regeneratorRuntime.wrap(function _callee10$(_context10) {
+  regeneratorRuntime.mark(function _callee(modifier, modelName, models, data) {
+    var applyFn, refs, applyRefFn;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
-        switch (_context10.prev = _context10.next) {
+        switch (_context.prev = _context.next) {
           case 0:
-            promises = [];
+            applyFn = function applyFn(d) {
+              var fn = get_default()(models, "".concat(modelName, ".").concat(modifier));
+              return !isFunction_default()(fn) ? promise_default.a.resolve(d) : fn(d);
+            };
 
-            if (!isArray_default()(modifierFnList)) {
-              _context10.next = 5;
-              break;
-            }
+            refs = get_default()(models, "".concat(modelName, ".references"), []);
 
-            forEach_default()(modifierFnList, function (cb) {
-              if (!isFunction_default()(cb)) return;
+            applyRefFn = function applyRefFn(d) {
+              return map_default()(refs, function (ref, key) {
+                if (has_default()(d, key)) {
+                  return applyModifier(modifier, ref, models, get_default()(d, key));
+                }
 
-              if (isArray_default()(data)) {
-                forEach_default()(data, function (d) {
-                  promises.push(cb(d) || d);
-                });
-              } else {
-                promises.push(cb(data) || data);
-              }
-            });
-            _context10.next = 14;
-            break;
-
-          case 5:
-            if (!isFunction_default()(modifierFnList)) {
-              _context10.next = 13;
-              break;
-            }
+                return promise_default.a.resolve(d);
+              });
+            };
 
             if (!isArray_default()(data)) {
-              _context10.next = 10;
+              _context.next = 5;
               break;
             }
 
-            forEach_default()(data, function (d) {
-              promises.push(modifierFnList(d) || d);
-            });
-            _context10.next = 11;
-            break;
+            return _context.abrupt("return", promise_default.a.all(data.reduce(function (acc, v) {
+              return [].concat(_toConsumableArray(acc), [applyFn(v), applyRefFn(v)]);
+            }, [])));
 
-          case 10:
-            return _context10.abrupt("return", promise_default.a.resolve(modifierFnList(data) || data));
+          case 5:
+            return _context.abrupt("return", promise_default.a.resolve(applyRefFn(data)).then(function () {
+              return applyFn(data);
+            }));
 
-          case 11:
-            _context10.next = 14;
-            break;
-
-          case 13:
-            return _context10.abrupt("return", promise_default.a.resolve(data));
-
-          case 14:
-            return _context10.abrupt("return", promise_default.a.all(promises));
-
-          case 15:
+          case 6:
           case "end":
-            return _context10.stop();
+            return _context.stop();
         }
       }
-    }, _callee10, this);
+    }, _callee, this);
   }));
   return _applyModifier.apply(this, arguments);
 }
+// CONCATENATED MODULE: ./lib/Actions.ts
 
-var lib_Actions = function Actions(axios, models, dataPath) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var Actions_Actions = function Actions(axios, models, dataPath) {
   _classCallCheck(this, Actions);
 
   var _formatUrl = function _formatUrl(payload) {
@@ -10845,16 +10817,9 @@ var lib_Actions = function Actions(axios, models, dataPath) {
             switch (_context.prev = _context.next) {
               case 0:
                 resultData = dataPath ? get_default()(result.data, dataPath) : result.data;
-                _context.t0 = commit;
-                _context.t1 = "ADD_".concat(_getModel(payload).name.toUpperCase());
-                _context.next = 5;
-                return applyModifier(model.afterGet, resultData);
+                commit("ADD_".concat(_getModel(payload).name.toUpperCase()), resultData);
 
-              case 5:
-                _context.t2 = _context.sent;
-                (0, _context.t0)(_context.t1, _context.t2);
-
-              case 7:
+              case 2:
               case "end":
                 return _context.stop();
             }
@@ -10862,7 +10827,7 @@ var lib_Actions = function Actions(axios, models, dataPath) {
         }, _callee, this);
       }));
 
-      return function (_x3) {
+      return function (_x) {
         return _ref.apply(this, arguments);
       };
     }());
@@ -10876,7 +10841,6 @@ var lib_Actions = function Actions(axios, models, dataPath) {
     /*#__PURE__*/
     regeneratorRuntime.mark(function _callee3(commit, payload) {
       var method,
-          model,
           data,
           _args3 = arguments;
       return regeneratorRuntime.wrap(function _callee3$(_context3) {
@@ -10884,15 +10848,15 @@ var lib_Actions = function Actions(axios, models, dataPath) {
           switch (_context3.prev = _context3.next) {
             case 0:
               method = _args3.length > 2 && _args3[2] !== undefined ? _args3[2] : 'post';
-              model = _getModel(payload);
+              // const model = _getModel(payload);
               data = payload.data;
               _context3.t0 = axios;
               _context3.t1 = method;
               _context3.t2 = _formatUrl(payload);
-              _context3.next = 8;
-              return applyModifier(model.beforeSave, data);
+              _context3.next = 7;
+              return applyModifier('beforeSave', payload.type, models, data);
 
-            case 8:
+            case 7:
               _context3.t3 = _context3.sent;
               _context3.t4 = {
                 method: _context3.t1,
@@ -10915,7 +10879,7 @@ var lib_Actions = function Actions(axios, models, dataPath) {
                           _context2.t0 = commit;
                           _context2.t1 = "ADD_".concat(_getModel(payload).name.toUpperCase());
                           _context2.next = 5;
-                          return applyModifier(model.afterSave, resultData);
+                          return applyModifier('afterSave', payload.type, models, resultData);
 
                         case 5:
                           _context2.t2 = _context2.sent;
@@ -10929,14 +10893,14 @@ var lib_Actions = function Actions(axios, models, dataPath) {
                   }, _callee2, this);
                 }));
 
-                return function (_x6) {
+                return function (_x4) {
                   return _ref3.apply(this, arguments);
                 };
               }();
 
               return _context3.abrupt("return", (0, _context3.t0)(_context3.t4).then(_context3.t5));
 
-            case 12:
+            case 11:
             case "end":
               return _context3.stop();
           }
@@ -10944,7 +10908,7 @@ var lib_Actions = function Actions(axios, models, dataPath) {
       }, _callee3, this);
     }));
 
-    return function _storeEntity(_x4, _x5) {
+    return function _storeEntity(_x2, _x3) {
       return _ref2.apply(this, arguments);
     };
   }(); // delete entity to API
@@ -10972,7 +10936,7 @@ var lib_Actions = function Actions(axios, models, dataPath) {
               _context4.t0 = axios;
               _context4.t1 = "".concat(_formatUrl(payload), "/delete");
               _context4.next = 7;
-              return applyModifier(model.beforeSave, data);
+              return applyModifier('beforeSave', payload.type, models, data);
 
             case 7:
               _context4.t2 = _context4.sent;
@@ -10996,7 +10960,7 @@ var lib_Actions = function Actions(axios, models, dataPath) {
       }, _callee4, this);
     }));
 
-    return function _deleteEntity(_x7, _x8) {
+    return function _deleteEntity(_x5, _x6) {
       return _ref4.apply(this, arguments);
     };
   }();
@@ -11030,7 +10994,7 @@ var lib_Actions = function Actions(axios, models, dataPath) {
       }, _callee5, this);
     }));
 
-    return function (_x9, _x10) {
+    return function (_x7, _x8) {
       return _ref5.apply(this, arguments);
     };
   }();
@@ -11141,7 +11105,7 @@ var lib_Actions = function Actions(axios, models, dataPath) {
                 _context6.t0 = commit;
                 _context6.t1 = "ADD_".concat(model.name);
                 _context6.next = 7;
-                return applyModifier(model.afterQueue, at_default()(get_default()(state, "".concat(model.plural, ".originItems")), origin));
+                return applyModifier('afterQueue', queue, models, at_default()(get_default()(state, "".concat(model.plural, ".originItems")), origin));
 
               case 7:
                 _context6.t2 = _context6.sent;
@@ -11156,7 +11120,7 @@ var lib_Actions = function Actions(axios, models, dataPath) {
         }, _callee6, this);
       }));
 
-      return function cancelActionType(_x11) {
+      return function cancelActionType(_x9) {
         return _ref6.apply(this, arguments);
       };
     }();
@@ -11178,11 +11142,80 @@ var lib_Actions = function Actions(axios, models, dataPath) {
   };
 };
 
-var lib_ApiStore =
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/create.js
+var create = __webpack_require__("4aa6");
+var create_default = /*#__PURE__*/__webpack_require__.n(create);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/define-property.js
+var define_property = __webpack_require__("85f2");
+var define_property_default = /*#__PURE__*/__webpack_require__.n(define_property);
+
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/createClass.js
+
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+
+    define_property_default()(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+// EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
+var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
+var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
+
+// EXTERNAL MODULE: ./node_modules/lodash/cloneDeep.js
+var cloneDeep = __webpack_require__("0644");
+var cloneDeep_default = /*#__PURE__*/__webpack_require__.n(cloneDeep);
+
+// EXTERNAL MODULE: ./node_modules/lodash/isEmpty.js
+var isEmpty = __webpack_require__("13ea");
+var isEmpty_default = /*#__PURE__*/__webpack_require__.n(isEmpty);
+
+// EXTERNAL MODULE: ./node_modules/lodash/isString.js
+var isString = __webpack_require__("e2a0");
+var isString_default = /*#__PURE__*/__webpack_require__.n(isString);
+
+// EXTERNAL MODULE: ./node_modules/lodash/set.js
+var set = __webpack_require__("0f5c");
+var set_default = /*#__PURE__*/__webpack_require__.n(set);
+
+// CONCATENATED MODULE: ./lib/ApiStore.ts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var ApiStore_ApiStore =
 /*#__PURE__*/
 function () {
   function ApiStore(models, namespaced) {
-    var _this2 = this;
+    var _this = this;
 
     _classCallCheck(this, ApiStore);
 
@@ -11191,38 +11224,40 @@ function () {
     this.state = create_default()(null);
     this.getters = create_default()(null);
     this.mutations = create_default()(null);
-    forEach_default()(this.models, function (model) {
+    forEach_default()(this.models, function (model, modelKey) {
       var modelIdx = model.plural; // adding all states
 
-      _this2.state[modelIdx] = model.type; // adding ADD_* mutations
+      _this.state[modelIdx] = model.type; // adding ADD_* mutations
 
-      _this2.mutations["ADD_".concat(model.name.toUpperCase())] = function (state, item) {
-        _this2.storeOriginItem(get_default()(state, "".concat(modelIdx, ".originItems")), item, model.beforeQueue);
+      _this.mutations["ADD_".concat(model.name.toUpperCase())] = function (state, item) {
+        return applyModifier('afterGet', modelKey, _this.models, item).then(function (i) {
+          _this.storeOriginItem(get_default()(state, "".concat(modelIdx, ".originItems")), i, model.beforeQueue);
 
-        _this2.patchEntity(state, model, item);
+          _this.patchEntity(state, model, i);
 
-        _this2.linkReferences(item, state, model.references);
+          _this.linkReferences(i, state, model.references);
 
-        state[modelIdx].lastLoad = new Date();
+          state[modelIdx].lastLoad = new Date();
+        });
       }; // adding INIT_* mutations
 
 
-      _this2.mutations["INIT_".concat(model.name.toUpperCase())] = function (state, item) {
+      _this.mutations["INIT_".concat(model.name.toUpperCase())] = function (state, item) {
         set_default()(state[modelIdx], 'init', item);
       }; // adding DELETE_* mutations
 
 
-      _this2.mutations["DELETE_".concat(model.name.toUpperCase())] = function (state, item) {
+      _this.mutations["DELETE_".concat(model.name.toUpperCase())] = function (state, item) {
         var store = state[modelIdx];
 
         var deleteItem = function deleteItem(i) {
           if (isString_default()(i)) {
-            delete store.originItems[i];
-            delete store.items[i];
+            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(store.originItems, i);
+            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(store.items, i);
           } else {
-            _this2.removeOriginItem(store.originItems, i);
+            _this.removeOriginItem(store.originItems, i);
 
-            delete store.items[i.id];
+            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(store.items, i.id);
           }
         };
 
@@ -11234,74 +11269,74 @@ function () {
       }; // adding CLEAR_* mutations
 
 
-      _this2.mutations["CLEAR_".concat(model.name.toUpperCase())] = function (state) {
+      _this.mutations["CLEAR_".concat(model.name.toUpperCase())] = function (state) {
         return state.reset;
       };
 
-      _this2.mutations["QUEUE_ACTION_".concat(model.name.toUpperCase())] = function (state, obj) {
+      _this.mutations["QUEUE_ACTION_".concat(model.name.toUpperCase())] = function (state, obj) {
         var store = state[modelIdx];
 
         var storeAction =
         /*#__PURE__*/
         function () {
-          var _ref7 = _asyncToGenerator(
+          var _ref = _asyncToGenerator(
           /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee7(d) {
-            return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          regeneratorRuntime.mark(function _callee(d) {
+            return regeneratorRuntime.wrap(function _callee$(_context) {
               while (1) {
-                switch (_context7.prev = _context7.next) {
+                switch (_context.prev = _context.next) {
                   case 0:
                     if (!(obj.action === 'post')) {
-                      _context7.next = 15;
+                      _context.next = 15;
                       break;
                     }
 
-                    _context7.t0 = set_default.a;
-                    _context7.t1 = store.items;
-                    _context7.t2 = d.id;
-                    _context7.next = 6;
-                    return applyModifier(model.afterSave, d);
+                    _context.t0 = set_default.a;
+                    _context.t1 = store.items;
+                    _context.t2 = d.id;
+                    _context.next = 6;
+                    return applyModifier('afterSave', modelKey, _this.models, d);
 
                   case 6:
-                    _context7.t3 = _context7.sent;
-                    (0, _context7.t0)(_context7.t1, _context7.t2, _context7.t3);
-                    _context7.t4 = store.actionQueue[obj.action];
-                    _context7.next = 11;
-                    return applyModifier(model.beforeSave, d);
+                    _context.t3 = _context.sent;
+                    (0, _context.t0)(_context.t1, _context.t2, _context.t3);
+                    _context.t4 = store.actionQueue[obj.action];
+                    _context.next = 11;
+                    return applyModifier('beforeSave', modelKey, _this.models, d);
 
                   case 11:
-                    _context7.t5 = _context7.sent;
+                    _context.t5 = _context.sent;
 
-                    _context7.t4.push.call(_context7.t4, _context7.t5);
+                    _context.t4.push.call(_context.t4, _context.t5);
 
-                    _context7.next = 23;
+                    _context.next = 23;
                     break;
 
                   case 15:
-                    _context7.t6 = set_default.a;
-                    _context7.t7 = store.actionQueue[obj.action];
-                    _context7.t8 = d.id;
-                    _context7.next = 20;
-                    return applyModifier(model.beforeSave, d);
+                    _context.t6 = set_default.a;
+                    _context.t7 = store.actionQueue[obj.action];
+                    _context.t8 = d.id;
+                    _context.next = 20;
+                    return applyModifier('beforeSave', modelKey, _this.models, d);
 
                   case 20:
-                    _context7.t9 = _context7.sent;
-                    (0, _context7.t6)(_context7.t7, _context7.t8, _context7.t9);
+                    _context.t9 = _context.sent;
+                    (0, _context.t6)(_context.t7, _context.t8, _context.t9);
 
                     if (obj.action === 'delete') {
-                      delete store.items[d.id];
+                      external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(store.items, d.id);
                     }
 
                   case 23:
                   case "end":
-                    return _context7.stop();
+                    return _context.stop();
                 }
               }
-            }, _callee7, this);
+            }, _callee, this);
           }));
 
-          return function storeAction(_x12) {
-            return _ref7.apply(this, arguments);
+          return function storeAction(_x) {
+            return _ref.apply(this, arguments);
           };
         }();
 
@@ -11317,9 +11352,9 @@ function () {
         }
       };
 
-      _this2.mutations["UNQUEUE_ACTION_".concat(model.name.toUpperCase())] = function (state, obj) {
+      _this.mutations["UNQUEUE_ACTION_".concat(model.name.toUpperCase())] = function (state, obj) {
         var deleteAction = function deleteAction(i) {
-          return delete state[model.plural].actionQueue[obj.action][i.id];
+          return external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(state[model.plural].actionQueue[obj.action], i.id);
         };
 
         if (isArray_default()(obj.data)) {
@@ -11329,14 +11364,14 @@ function () {
         }
       };
 
-      _this2.mutations["RESET_QUEUE_".concat(model.name.toUpperCase())] = function (state) {
+      _this.mutations["RESET_QUEUE_".concat(model.name.toUpperCase())] = function (state) {
         forEach_default()(state[model.plural].actionQueue, function (actionList, action) {
           state[model.plural].actionQueue[action] = isArray_default()(actionList) ? [] : {};
         });
       }; // adding getters
 
 
-      _this2.getters[modelIdx.toLowerCase()] = function (state) {
+      _this.getters[modelIdx.toLowerCase()] = function (state) {
         var s = get_default()(state, modelIdx);
         s.hasAction = some_default()(s.actionQueue, function (a) {
           return !isEmpty_default()(a);
@@ -11345,7 +11380,7 @@ function () {
       }; // adding init getters
 
 
-      _this2.getters["".concat(modelIdx.toLowerCase(), "_init")] = function (state) {
+      _this.getters["".concat(modelIdx.toLowerCase(), "_init")] = function (state) {
         return get_default()(state, "".concat(modelIdx, ".init"), create_default()(null));
       };
     });
@@ -11356,45 +11391,45 @@ function () {
     value: function () {
       var _applyToArrayObject = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee8(data, fun) {
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+      regeneratorRuntime.mark(function _callee2(data, fun) {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 if (!isArray_default()(data)) {
-                  _context8.next = 8;
+                  _context2.next = 8;
                   break;
                 }
 
-                _context8.t1 = data;
-                _context8.next = 4;
+                _context2.t1 = data;
+                _context2.next = 4;
                 return fun;
 
               case 4:
-                _context8.t2 = _context8.sent;
-                _context8.t0 = _context8.t1.map.call(_context8.t1, _context8.t2);
-                _context8.next = 11;
+                _context2.t2 = _context2.sent;
+                _context2.t0 = _context2.t1.map.call(_context2.t1, _context2.t2);
+                _context2.next = 11;
                 break;
 
               case 8:
-                _context8.next = 10;
+                _context2.next = 10;
                 return fun(data);
 
               case 10:
-                _context8.t0 = _context8.sent;
+                _context2.t0 = _context2.sent;
 
               case 11:
-                return _context8.abrupt("return", _context8.t0);
+                return _context2.abrupt("return", _context2.t0);
 
               case 12:
               case "end":
-                return _context8.stop();
+                return _context2.stop();
             }
           }
-        }, _callee8, this);
+        }, _callee2, this);
       }));
 
-      function applyToArrayObject(_x13, _x14) {
+      function applyToArrayObject(_x2, _x3) {
         return _applyToArrayObject.apply(this, arguments);
       }
 
@@ -11406,43 +11441,43 @@ function () {
     value: function () {
       var _storeOriginItem = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee9(originItems, item, modifiers) {
+      regeneratorRuntime.mark(function _callee3(originItems, item, modifiers) {
         var data;
-        return regeneratorRuntime.wrap(function _callee9$(_context9) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 if (!modifiers) {
-                  _context9.next = 6;
+                  _context3.next = 6;
                   break;
                 }
 
-                _context9.next = 3;
+                _context3.next = 3;
                 return this.applyToArrayObject(item, modifiers);
 
               case 3:
-                _context9.t0 = _context9.sent;
-                _context9.next = 7;
+                _context3.t0 = _context3.sent;
+                _context3.next = 7;
                 break;
 
               case 6:
-                _context9.t0 = item;
+                _context3.t0 = item;
 
               case 7:
-                data = _context9.t0;
+                data = _context3.t0;
                 this.applyToArrayObject(data, function (d) {
                   originItems[d.id] = cloneDeep_default()(d);
                 });
 
               case 9:
               case "end":
-                return _context9.stop();
+                return _context3.stop();
             }
           }
-        }, _callee9, this);
+        }, _callee3, this);
       }));
 
-      function storeOriginItem(_x15, _x16, _x17) {
+      function storeOriginItem(_x4, _x5, _x6) {
         return _storeOriginItem.apply(this, arguments);
       }
 
@@ -11453,17 +11488,17 @@ function () {
     key: "removeOriginItem",
     value: function removeOriginItem(originItems, item) {
       if (item && has_default()(originItems, item.id)) {
-        delete originItems[item.id];
+        external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(originItems, item.id);
       }
     }
   }, {
     key: "patchEntity",
     value: function patchEntity(state, model, entity) {
-      var _this3 = this;
+      var _this2 = this;
 
       if (isArray_default()(entity)) {
         forEach_default()(entity, function (e) {
-          return _this3.patchEntity(state, model, e);
+          return _this2.patchEntity(state, model, e);
         });
       } else if (entity.id) {
         var store = state[model.plural];
@@ -11484,7 +11519,7 @@ function () {
           forEach_default()(model.references, function (modelName, prop) {
             if (has_default()(entity, prop) && get_default()(entity, prop)) {
               try {
-                _this3.patchEntity(state, _this3.models[modelName], get_default()(entity, prop));
+                _this2.patchEntity(state, _this2.models[modelName], get_default()(entity, prop));
               } catch (e) {
                 // eslint-disable-next-line no-console
                 console.warn("Patch error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
@@ -11498,15 +11533,15 @@ function () {
   }, {
     key: "linkReferences",
     value: function linkReferences(data, state, references) {
-      var _this4 = this;
+      var _this3 = this;
 
       var setLink = function setLink(item, value, key) {
         try {
           var itemId = get_default()(item[key], 'id');
-          var itemStore = state[_this4.models[value].plural];
+          var itemStore = state[_this3.models[value].plural];
 
           if (itemId) {
-            _this4.storeOriginItem(itemStore.originItems, get_default()(item, key), itemStore.beforeQueue);
+            _this3.storeOriginItem(itemStore.originItems, get_default()(item, key), itemStore.beforeQueue);
 
             itemStore.items[itemId] = item[key];
           }
@@ -11529,24 +11564,194 @@ function () {
   }]);
 
   return ApiStore;
-}(); // Plugin
+}();
 
 
-var lib_ApiStorePlugin = function ApiStorePlugin(options) {
+// CONCATENATED MODULE: ./lib/ApiStorePlugin.ts
+
+
+
+
+/* harmony default export */ var ApiStorePlugin = (function (options) {
   var namespaced = get_default()(options, 'namespaced', true);
   var dataPath = get_default()(options, 'dataPath');
-  var apiStore = new lib_ApiStore(options.models, namespaced);
-  apiStore.actions = new lib_Actions(options.axios, options.models, dataPath);
+  var apiStore = new ApiStore_ApiStore(options.models, namespaced);
+  apiStore.actions = new Actions_Actions(options.axios, options.models, dataPath);
   return function (store) {
     return store.registerModule(options.name || 'api', apiStore);
   };
+});
+// CONCATENATED MODULE: ./lib/ActionQueue.ts
+
+
+var ActionQueue_ActionQueue = function ActionQueue() {
+  _classCallCheck(this, ActionQueue);
+
+  this.post = [];
+  this.patch = {};
+  this.delete = {};
 };
 
 
+// CONCATENATED MODULE: ./lib/ApiState.ts
+
+
+
+
+
+var ApiState_ApiState =
+/*#__PURE__*/
+function () {
+  function ApiState() {
+    _classCallCheck(this, ApiState);
+
+    this.lastLoad = new Date();
+    this.loaded = false;
+    this.items = create_default()(null);
+    this.originItems = create_default()(null);
+    this.actionQueue = new ActionQueue_ActionQueue();
+  }
+
+  _createClass(ApiState, [{
+    key: "reset",
+    value: function reset() {
+      this.lastLoad = new Date();
+      this.loaded = false;
+      this.items = create_default()(null);
+      this.originItems = create_default()(null);
+      this.actionQueue = new ActionQueue_ActionQueue();
+    }
+  }]);
+
+  return ApiState;
+}();
+
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/symbol/iterator.js
+var iterator = __webpack_require__("5d58");
+var iterator_default = /*#__PURE__*/__webpack_require__.n(iterator);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/symbol.js
+var symbol = __webpack_require__("67bb");
+var symbol_default = /*#__PURE__*/__webpack_require__.n(symbol);
+
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/typeof.js
+
+
+
+function typeof_typeof2(obj) { if (typeof symbol_default.a === "function" && typeof iterator_default.a === "symbol") { typeof_typeof2 = function _typeof2(obj) { return typeof obj; }; } else { typeof_typeof2 = function _typeof2(obj) { return obj && typeof symbol_default.a === "function" && obj.constructor === symbol_default.a && obj !== symbol_default.a.prototype ? "symbol" : typeof obj; }; } return typeof_typeof2(obj); }
+
+function typeof_typeof(obj) {
+  if (typeof symbol_default.a === "function" && typeof_typeof2(iterator_default.a) === "symbol") {
+    typeof_typeof = function _typeof(obj) {
+      return typeof_typeof2(obj);
+    };
+  } else {
+    typeof_typeof = function _typeof(obj) {
+      return obj && typeof symbol_default.a === "function" && obj.constructor === symbol_default.a && obj !== symbol_default.a.prototype ? "symbol" : typeof_typeof2(obj);
+    };
+  }
+
+  return typeof_typeof(obj);
+}
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/assertThisInitialized.js
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/possibleConstructorReturn.js
+
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof_typeof(call) === "object" || typeof call === "function")) {
+    return call;
+  }
+
+  return _assertThisInitialized(self);
+}
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/get-prototype-of.js
+var get_prototype_of = __webpack_require__("061b");
+var get_prototype_of_default = /*#__PURE__*/__webpack_require__.n(get_prototype_of);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/set-prototype-of.js
+var set_prototype_of = __webpack_require__("4d16");
+var set_prototype_of_default = /*#__PURE__*/__webpack_require__.n(set_prototype_of);
+
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/getPrototypeOf.js
+
+
+function getPrototypeOf_getPrototypeOf(o) {
+  getPrototypeOf_getPrototypeOf = set_prototype_of_default.a ? get_prototype_of_default.a : function _getPrototypeOf(o) {
+    return o.__proto__ || get_prototype_of_default()(o);
+  };
+  return getPrototypeOf_getPrototypeOf(o);
+}
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/setPrototypeOf.js
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = set_prototype_of_default.a || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/inherits.js
+
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  subClass.prototype = create_default()(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+// CONCATENATED MODULE: ./lib/DateTimeState.ts
+
+
+
+
+
+
+var DateTimeState_DateTimeState =
+/*#__PURE__*/
+function (_ApiState) {
+  _inherits(DateTimeState, _ApiState);
+
+  function DateTimeState() {
+    var _this;
+
+    _classCallCheck(this, DateTimeState);
+
+    _this = _possibleConstructorReturn(this, getPrototypeOf_getPrototypeOf(DateTimeState).call(this));
+    _this.from = null;
+    _this.to = null;
+    return _this;
+  }
+
+  return DateTimeState;
+}(ApiState_ApiState);
+
+
+// CONCATENATED MODULE: ./lib/index.ts
+
+
+
+
 // CONCATENATED MODULE: ./node_modules/@vue/cli-service/lib/commands/build/entry-lib-no-default.js
-/* concated harmony reexport ApiStorePlugin */__webpack_require__.d(__webpack_exports__, "ApiStorePlugin", function() { return lib_ApiStorePlugin; });
-/* concated harmony reexport ApiState */__webpack_require__.d(__webpack_exports__, "ApiState", function() { return lib_ApiState; });
-/* concated harmony reexport DateTimeState */__webpack_require__.d(__webpack_exports__, "DateTimeState", function() { return lib_DateTimeState; });
+/* concated harmony reexport ApiStorePlugin */__webpack_require__.d(__webpack_exports__, "ApiStorePlugin", function() { return ApiStorePlugin; });
+/* concated harmony reexport ApiState */__webpack_require__.d(__webpack_exports__, "ApiState", function() { return ApiState_ApiState; });
+/* concated harmony reexport DateTimeState */__webpack_require__.d(__webpack_exports__, "DateTimeState", function() { return DateTimeState_DateTimeState; });
 
 
 

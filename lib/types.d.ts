@@ -1,3 +1,5 @@
+import ApiState from './ApiState';
+
 export interface IndexedObject {
   id: string;
   [index: string]: any;
