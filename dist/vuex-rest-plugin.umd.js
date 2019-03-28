@@ -1362,17 +1362,6 @@ module.exports = isObject;
 
 /***/ }),
 
-/***/ "1af6":
-/***/ (function(module, exports, __webpack_require__) {
-
-// 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
-var $export = __webpack_require__("63b6");
-
-$export($export.S, 'Array', { isArray: __webpack_require__("9003") });
-
-
-/***/ }),
-
 /***/ "1bac":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1649,22 +1638,6 @@ function matchesStrictComparable(key, srcValue) {
 }
 
 module.exports = matchesStrictComparable;
-
-
-/***/ }),
-
-/***/ "20fd":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var $defineProperty = __webpack_require__("d9f6");
-var createDesc = __webpack_require__("aebd");
-
-module.exports = function (object, index, value) {
-  if (index in object) $defineProperty.f(object, index, createDesc(0, value));
-  else object[index] = value;
-};
 
 
 /***/ }),
@@ -4044,61 +4017,6 @@ module.exports = Object.getPrototypeOf || function (O) {
 
 /***/ }),
 
-/***/ "549b":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var ctx = __webpack_require__("d864");
-var $export = __webpack_require__("63b6");
-var toObject = __webpack_require__("241e");
-var call = __webpack_require__("b0dc");
-var isArrayIter = __webpack_require__("3702");
-var toLength = __webpack_require__("b447");
-var createProperty = __webpack_require__("20fd");
-var getIterFn = __webpack_require__("7cd6");
-
-$export($export.S + $export.F * !__webpack_require__("4ee1")(function (iter) { Array.from(iter); }), 'Array', {
-  // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
-  from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
-    var O = toObject(arrayLike);
-    var C = typeof this == 'function' ? this : Array;
-    var aLen = arguments.length;
-    var mapfn = aLen > 1 ? arguments[1] : undefined;
-    var mapping = mapfn !== undefined;
-    var index = 0;
-    var iterFn = getIterFn(O);
-    var length, result, step, iterator;
-    if (mapping) mapfn = ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
-    // if object isn't iterable or it's array with default iterator - use simple case
-    if (iterFn != undefined && !(C == Array && isArrayIter(iterFn))) {
-      for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
-        createProperty(result, index, mapping ? call(iterator, mapfn, [step.value, index], true) : step.value);
-      }
-    } else {
-      length = toLength(O.length);
-      for (result = new C(length); length > index; index++) {
-        createProperty(result, index, mapping ? mapfn(O[index], index) : O[index]);
-      }
-    }
-    result.length = index;
-    return result;
-  }
-});
-
-
-/***/ }),
-
-/***/ "54a1":
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__("6c1c");
-__webpack_require__("1654");
-module.exports = __webpack_require__("95d5");
-
-
-/***/ }),
-
 /***/ "54eb":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5425,13 +5343,6 @@ if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 
 /***/ }),
 
-/***/ "774e":
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__("d2d5");
-
-/***/ }),
-
 /***/ "77f1":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6324,23 +6235,6 @@ function isFunction(value) {
 }
 
 module.exports = isFunction;
-
-
-/***/ }),
-
-/***/ "95d5":
-/***/ (function(module, exports, __webpack_require__) {
-
-var classof = __webpack_require__("40c3");
-var ITERATOR = __webpack_require__("5168")('iterator');
-var Iterators = __webpack_require__("481b");
-module.exports = __webpack_require__("584a").isIterable = function (it) {
-  var O = Object(it);
-  return O[ITERATOR] !== undefined
-    || '@@iterator' in O
-    // eslint-disable-next-line no-prototype-builtins
-    || Iterators.hasOwnProperty(classof(O));
-};
 
 
 /***/ }),
@@ -7792,13 +7686,6 @@ module.exports = mapCacheHas;
 
 /***/ }),
 
-/***/ "a745":
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__("f410");
-
-/***/ }),
-
 /***/ "a994":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8835,13 +8722,6 @@ module.exports = g;
 
 /***/ }),
 
-/***/ "c8bb":
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__("54a1");
-
-/***/ }),
-
 /***/ "c8fe":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9170,16 +9050,6 @@ function stackSet(key, value) {
 }
 
 module.exports = stackSet;
-
-
-/***/ }),
-
-/***/ "d2d5":
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__("1654");
-__webpack_require__("549b");
-module.exports = __webpack_require__("584a").Array.from;
 
 
 /***/ }),
@@ -10282,15 +10152,6 @@ module.exports = shortOut;
 
 /***/ }),
 
-/***/ "f410":
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__("1af6");
-module.exports = __webpack_require__("584a").Array.isArray;
-
-
-/***/ }),
-
 /***/ "f4d6":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10616,48 +10477,7 @@ var map_default = /*#__PURE__*/__webpack_require__.n(map);
 var some = __webpack_require__("3092");
 var some_default = /*#__PURE__*/__webpack_require__.n(some);
 
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/array/is-array.js
-var is_array = __webpack_require__("a745");
-var is_array_default = /*#__PURE__*/__webpack_require__.n(is_array);
-
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/arrayWithoutHoles.js
-
-function _arrayWithoutHoles(arr) {
-  if (is_array_default()(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
-      arr2[i] = arr[i];
-    }
-
-    return arr2;
-  }
-}
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/array/from.js
-var from = __webpack_require__("774e");
-var from_default = /*#__PURE__*/__webpack_require__.n(from);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/is-iterable.js
-var is_iterable = __webpack_require__("c8bb");
-var is_iterable_default = /*#__PURE__*/__webpack_require__.n(is_iterable);
-
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/iterableToArray.js
-
-
-function _iterableToArray(iter) {
-  if (is_iterable_default()(Object(iter)) || Object.prototype.toString.call(iter) === "[object Arguments]") return from_default()(iter);
-}
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/nonIterableSpread.js
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
-}
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/toConsumableArray.js
-
-
-
-function _toConsumableArray(arr) {
-  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
-}
 // CONCATENATED MODULE: ./lib/utils.ts
-
 
 
 
@@ -10704,9 +10524,9 @@ function _applyModifier() {
               break;
             }
 
-            return _context.abrupt("return", promise_default.a.all(data.reduce(function (acc, v) {
-              return [].concat(_toConsumableArray(acc), [applyFn(v), applyRefFn(v)]);
-            }, [])));
+            return _context.abrupt("return", promise_default.a.all(data.map(applyRefFn)).then(function () {
+              return promise_default.a.all(data.map(applyFn));
+            }));
 
           case 5:
             return _context.abrupt("return", promise_default.a.resolve(applyRefFn(data)).then(function () {
