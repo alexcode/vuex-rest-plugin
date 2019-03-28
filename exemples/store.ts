@@ -16,6 +16,10 @@ export default new Vuex.Store({
           name: 'RESOURCE',
           plural: 'RESOURCES',
           type: new ApiState(),
+          afterGet: (v: any) => {
+            v.added_prop = 'This string is added in the afterGet hook';
+            return v;
+          },
           references: {
             user: 'user',
             vehicle: 'vehicle'
@@ -25,6 +29,10 @@ export default new Vuex.Store({
           name: 'USER',
           plural: 'USERS',
           type: new ApiState(),
+          afterGet: (v: any) => {
+            v.added_prop = 'This other string is added in the afterGet hook';
+            return v;
+          },
           references: {
             role: 'role'
           }

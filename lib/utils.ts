@@ -25,11 +25,8 @@ export async function applyModifier(
     });
 
   if (isArray(data)) {
-    return Promise.all(
-      data.reduce(
-        (acc: Array<any>, v) => [...acc, applyFn(v), applyRefFn(v)],
-        []
-      )
+    return Promise.all(data.map(applyRefFn)).then(() =>
+      Promise.all(data.map(applyFn))
     );
   }
   return Promise.resolve(applyRefFn(data)).then(() => applyFn(data));
