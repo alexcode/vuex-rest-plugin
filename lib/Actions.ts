@@ -26,7 +26,6 @@ import { applyModifier } from './utils';
 
 export default class Actions<S, R> implements ActionTree<S, R> {
   [key: string]: Action<S, R>;
-  init: Action<S, R>;
   get: Action<S, R>;
   post: Action<S, R>;
   patch: Action<S, R>;
@@ -127,12 +126,6 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       return axios.delete(_formatUrl(payload)).then(() => {
         commit(`DELETE_${model.name.toUpperCase()}`, id);
       });
-    };
-
-    this.init = (context: ActionContext<S, R>, payload: Payload) => {
-      const { commit, state } = context;
-      payload.id = 'create';
-      return _fetchEntity(commit, payload);
     };
 
     this.get = async (context: ActionContext<S, R>, payload: Payload) => {

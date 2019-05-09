@@ -11564,13 +11564,6 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
     };
   }();
 
-  this.init = function (context, payload) {
-    var commit = context.commit,
-        state = context.state;
-    payload.id = 'create';
-    return _fetchEntity(commit, payload);
-  };
-
   this.get =
   /*#__PURE__*/
   function () {
@@ -11876,11 +11869,6 @@ function () {
 
           myState[modelIdx].lastLoad = new Date();
         });
-      }; // adding INIT_* mutations
-
-
-      _this.mutations["INIT_".concat(model.name.toUpperCase())] = function (myState, item) {
-        external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(myState[modelIdx], 'init', item);
       }; // adding DELETE_* mutations
 
 
@@ -12013,11 +12001,6 @@ function () {
 
       _this.getters[modelIdx.toLowerCase()] = function (myState) {
         return myState[modelIdx];
-      }; // adding init getters
-
-
-      _this.getters["".concat(modelIdx.toLowerCase(), "_init")] = function (myState) {
-        return get_default()(myState, "".concat(modelIdx, ".init"), Object.create(null));
       };
     });
   } // storing Origin item copy

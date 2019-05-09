@@ -55,13 +55,6 @@ export default class ApiStore<S> implements StoreOptions<S> {
             myState[modelIdx].lastLoad = new Date();
           }
         );
-      // adding INIT_* mutations
-      this.mutations[`INIT_${model.name.toUpperCase()}`] = (
-        myState: ApiState,
-        item: IndexedObject
-      ) => {
-        Vue.set(myState[modelIdx], 'init', item);
-      };
       // adding DELETE_* mutations
       this.mutations[`DELETE_${model.name.toUpperCase()}`] = (
         myState: ApiState,
@@ -150,10 +143,6 @@ export default class ApiStore<S> implements StoreOptions<S> {
       // adding getters
       this.getters[modelIdx.toLowerCase()] = (myState: ApiState) =>
         myState[modelIdx];
-      // adding init getters
-      this.getters[`${modelIdx.toLowerCase()}_init`] = (myState: ApiState) => {
-        return get(myState, `${modelIdx}.init`, Object.create(null));
-      };
     });
   }
   // storing Origin item copy
