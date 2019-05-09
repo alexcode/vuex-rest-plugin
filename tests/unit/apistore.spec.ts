@@ -84,6 +84,7 @@ describe('ApiStore by default', function() {
         loaded: false,
         originItems: {}
       });
+      expect(state.hasAction).toEqual(false);
     });
   });
   it('test get Action (GET)', async () => {
@@ -264,20 +265,29 @@ describe('ApiStore by default', function() {
   });
 
   it('test cancelActionQueue', async () => {
+    await fillStore();
+    const resource = store.getters['api/resources'].items[data[0].id];
+    resource.name = 'new name';
     store.dispatch('api/queueAction', {
       action: 'patch',
       type: 'resource',
-      data: data[0]
+      data: resource
     });
-    mock.onPost(`/resource`).reply(200, data[0]);
+    await flushPromises();
+    expect(
+      store.getters['api/resources'].actionQueue.patch[resource.id]
+    ).toEqual(resource);
     store.dispatch('api/cancelActionQueue', ['resource']);
     await flushPromises();
     expect(
-      store.getters['api/resources'].actionQueue.patch[data[0].id]
+      store.getters['api/resources'].actionQueue.patch[resource.id]
     ).toBeUndefined();
+    // Object should comeback to initial state
+    expect(store.getters['api/resources'].items[resource.id]).toEqual(data[0]);
   });
 
   it('test cancelAction', async () => {
+    await fillStore();
     store.dispatch('api/queueAction', {
       action: 'patch',
       type: 'resource',
@@ -409,7 +419,7 @@ describe('ApiStore custom model', function() {
               plural: 'RESOURCES',
               type: new ApiState(),
               references: {
-                user: 'users',
+                fakeref: 'user',
                 vehicle: 'vehicle'
               }
             },
@@ -440,13 +450,50 @@ describe('ApiStore custom model', function() {
       type: 'resource',
       clear: true
     });
+    console.info('Start expected log');
     await flushPromises();
     expect(spyWarn).toHaveBeenCalledWith(
-      'Patch error: We could not find the model users for the reference user.'
+      'Patch error: We could not find the model fakeref for the reference user.'
     );
     expect(spyWarn).toHaveBeenCalledWith(
-      'Reference error: We could not find the model users for the reference user.'
+      'Reference error: We could not find the model fakeref for the reference user.'
     );
+    console.info('End expected log');
+  });
+
+  it('test reference', async () => {
+    await flushPromises();
+    const store = new Vuex.Store({
+      plugins: [
+        ApiStorePlugin({
+          axios: axiosInstance,
+          models: {
+            resource: {
+              name: 'RESOURCE',
+              plural: 'RESOURCES',
+              type: new ApiState(),
+              references: {
+                place: 'depot'
+              }
+            },
+            place: {
+              name: 'PLACE',
+              plural: 'PLACES',
+              type: new ApiState()
+            }
+          }
+        })
+      ]
+    });
+    const resource = data[0];
+    store.commit('api/ADD_RESOURCE', resource);
+    await flushPromises();
+    expect(
+      store.getters['api/places'].items[resource.depot[0].id]
+    ).toStrictEqual(resource.depot[0]);
+    expect(
+      store.getters['api/places'].originItems[resource.depot[0].id]
+    ).toStrictEqual(resource.depot[0]);
   });
 
   it('test nested reference', async () => {
@@ -462,7 +509,8 @@ describe('ApiStore custom model', function() {
               type: new ApiState(),
               references: {
                 user: 'user',
-                vehicle: 'vehicle'
+                vehicle: 'vehicle',
+                place: 'depot'
               }
             },
             user: {
@@ -485,6 +533,11 @@ describe('ApiStore custom model', function() {
               name: 'ROLE',
               plural: 'ROLES',
               type: new ApiState()
+            },
+            place: {
+              name: 'PLACE',
+              plural: 'PLACES',
+              type: new ApiState()
             }
           }
         })
@@ -505,6 +558,9 @@ describe('ApiStore custom model', function() {
     expect(resource.vehicle.user.role).toStrictEqual(
       store.getters['api/roles'].items[resource.vehicle.user.role.id]
     );
+    expect(
+      store.getters['api/places'].items[resource.depot[0].id]
+    ).toStrictEqual(resource.depot[0]);
   });
 
   it('test hooks with collection', async () => {
@@ -532,9 +588,6 @@ describe('ApiStore custom model', function() {
               afterGet: (v: any) => {
                 v.some_id = 'other_id_user';
                 return v;
-              },
-              references: {
-                role: 'role'
               }
             }
           }
@@ -580,9 +633,6 @@ describe('ApiStore custom model', function() {
               afterGet: (v: any) => {
                 v.some_id = 'other_id_user';
                 return v;
-              },
-              references: {
-                role: 'role'
               }
             }
           }

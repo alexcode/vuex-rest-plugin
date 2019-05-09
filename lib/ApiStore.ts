@@ -6,11 +6,9 @@ import get from 'lodash/get';
 import has from 'lodash/has';
 import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
-import isEmpty from 'lodash/isEmpty';
 import isFunction from 'lodash/isFunction';
 import isString from 'lodash/isString';
 import set from 'lodash/set';
-import some from 'lodash/some';
 import Actions from './Actions';
 import ApiState from './ApiState';
 import {
@@ -42,34 +40,34 @@ export default class ApiStore<S> implements StoreOptions<S> {
       this.state[modelIdx] = model.type;
       // adding ADD_* mutations
       this.mutations[`ADD_${model.name.toUpperCase()}`] = (
-        state: ApiState,
+        myState: ApiState,
         item: IndexedObject | Array<IndexedObject>
       ) =>
         applyModifier('afterGet', modelKey, this.models, item).then(
           (i: any) => {
             this.storeOriginItem(
-              get(state, `${modelIdx}.originItems`),
+              get(myState, `${modelIdx}.originItems`),
               i,
               model.beforeQueue
             );
-            this.patchEntity(state, model, i);
-            this.linkReferences(i, state, model.references);
-            state[modelIdx].lastLoad = new Date();
+            this.patchEntity(myState, model, i);
+            this.linkReferences(i, myState, model.references);
+            myState[modelIdx].lastLoad = new Date();
           }
         );
       // adding INIT_* mutations
       this.mutations[`INIT_${model.name.toUpperCase()}`] = (
-        state: ApiState,
+        myState: ApiState,
         item: IndexedObject
       ) => {
-        set(state[modelIdx], 'init', item);
+        Vue.set(myState[modelIdx], 'init', item);
       };
       // adding DELETE_* mutations
       this.mutations[`DELETE_${model.name.toUpperCase()}`] = (
-        state: ApiState,
+        myState: ApiState,
         item: string | Array<IndexedObject>
       ) => {
-        const store = state[modelIdx];
+        const store = myState[modelIdx];
         const deleteItem = (i: string | IndexedObject) => {
           if (isString(i)) {
             Vue.delete(store.originItems, i);
@@ -87,25 +85,26 @@ export default class ApiStore<S> implements StoreOptions<S> {
         }
       };
       // adding CLEAR_* mutations
-      this.mutations[`CLEAR_${model.name.toUpperCase()}`] = (state: ApiState) =>
-        state.reset;
+      this.mutations[`CLEAR_${model.name.toUpperCase()}`] = (
+        myState: ApiState
+      ) => myState.reset;
       this.mutations[`QUEUE_ACTION_${model.name.toUpperCase()}`] = (
-        state: ApiState,
+        myState: ApiState,
         obj: QueuePayload
       ) => {
-        const store = state[modelIdx];
+        const store = myState[modelIdx];
         const storeAction = async (d: IndexedObject) => {
           if (obj.action === 'post') {
-            set(
+            Vue.set(
               store.items,
               d.id,
-              await applyModifier('afterSave', modelKey, this.models, d)
+              await applyModifier('afterGet', modelKey, this.models, d)
             );
             store.actionQueue[obj.action].push(
               await applyModifier('beforeSave', modelKey, this.models, d)
             );
           } else {
-            set(
+            Vue.set(
               store.actionQueue[obj.action],
               d.id,
               await applyModifier('beforeSave', modelKey, this.models, d)
@@ -128,11 +127,11 @@ export default class ApiStore<S> implements StoreOptions<S> {
         }
       };
       this.mutations[`UNQUEUE_ACTION_${model.name.toUpperCase()}`] = (
-        state: ApiState,
+        myState: ApiState,
         obj: QueuePayload
       ) => {
         const deleteAction = (i: IndexedObject) =>
-          Vue.delete(state[model.plural].actionQueue[obj.action], i.id);
+          Vue.delete(myState[model.plural].actionQueue[obj.action], i.id);
         if (isArray(obj.data)) {
           forEach(obj.data, deleteAction);
         } else {
@@ -140,31 +139,22 @@ export default class ApiStore<S> implements StoreOptions<S> {
         }
       };
       this.mutations[`RESET_QUEUE_${model.name.toUpperCase()}`] = (
-        state: ApiState
+        myState: ApiState
       ) => {
-        forEach(state[model.plural].actionQueue, (actionList, action) => {
-          state[model.plural].actionQueue[action] = isArray(actionList)
+        forEach(myState[model.plural].actionQueue, (actionList, action) => {
+          myState[model.plural].actionQueue[action] = isArray(actionList)
             ? []
             : {};
         });
       };
       // adding getters
-      this.getters[modelIdx.toLowerCase()] = (state: ApiState) => {
-        const s = get(state, modelIdx);
-        s.hasAction = some(s.actionQueue, a => !isEmpty(a));
-        return s;
-      };
+      this.getters[modelIdx.toLowerCase()] = (myState: ApiState) =>
+        myState[modelIdx];
       // adding init getters
-      this.getters[`${modelIdx.toLowerCase()}_init`] = (state: ApiState) => {
-        return get(state, `${modelIdx}.init`, Object.create(null));
+      this.getters[`${modelIdx.toLowerCase()}_init`] = (myState: ApiState) => {
+        return get(myState, `${modelIdx}.init`, Object.create(null));
       };
     });
-  }
-  private async applyToArrayObject(
-    data: IndexedObject | Array<IndexedObject>,
-    fun: (value: IndexedObject) => any
-  ) {
-    return isArray(data) ? data.map(await fun) : await fun(data);
   }
   // storing Origin item copy
   async storeOriginItem(
@@ -172,13 +162,15 @@ export default class ApiStore<S> implements StoreOptions<S> {
     item: IndexedObject | Array<IndexedObject>,
     modifiers?: Modifier
   ) {
-    const data: IndexedObject | Array<IndexedObject> = modifiers
-      ? await this.applyToArrayObject(item, modifiers)
-      : item;
-
-    this.applyToArrayObject(data, (d: IndexedObject) => {
-      originItems[d.id] = cloneDeep(d);
-    });
+    if (isArray(item)) {
+      item.map(async i => {
+        const modified = modifiers ? await modifiers(i) : i;
+        Vue.set(originItems, i.id, cloneDeep(modified));
+      });
+    } else {
+      const modified = modifiers ? await modifiers(item) : item;
+      Vue.set(originItems, item.id, cloneDeep(modified));
+    }
   }
   // Removing original copy
   removeOriginItem(originItems: IndexedObject, item: IndexedObject) {
@@ -204,18 +196,14 @@ export default class ApiStore<S> implements StoreOptions<S> {
           }
         });
       } else {
-        Vue.set(store.items, entity.id, entity);
+        store.items = { ...store.items, [entity.id]: entity };
       }
 
       if (model.references) {
-        forEach(model.references, (modelName, prop) => {
+        forEach(model.references, (prop, modelName) => {
           if (has(entity, prop) && get(entity, prop)) {
             try {
-              this.patchEntity(
-                state,
-                this.models[modelName],
-                get(entity, prop)
-              );
+              this.patchEntity(state, this.models[modelName], entity[prop]);
             } catch (e) {
               // eslint-disable-next-line no-console
               console.warn(
@@ -233,31 +221,41 @@ export default class ApiStore<S> implements StoreOptions<S> {
     state: any,
     references?: ReferenceTree
   ) {
-    const setLink = (item: IndexedObject, value: any, key: string | number) => {
-      try {
-        const itemId = get(item[key], 'id');
-        const itemStore = state[this.models[value].plural];
-        if (itemId) {
-          this.storeOriginItem(
-            itemStore.originItems,
-            get(item, key),
-            itemStore.beforeQueue
+    const setLink = (
+      data: IndexedObject,
+      modelName: string,
+      prop?: string | number
+    ) => {
+      if (prop && isArray(data[prop])) {
+        forEach(data[prop], i => setLink(i, modelName));
+      } else {
+        try {
+          const item = prop ? data[prop] : data;
+          const itemId = get(item, 'id');
+          const model = this.models[modelName];
+          const itemStore = state[model.plural];
+          if (itemId) {
+            this.storeOriginItem(
+              itemStore.originItems,
+              item,
+              model.beforeQueue
+            );
+            itemStore.items = { ...itemStore.items, [itemId]: item };
+          }
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            `Reference error: We could not find the model ${modelName} for the reference ${prop}.`
           );
-          itemStore.items[itemId] = item[key];
         }
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `Reference error: We could not find the model ${value} for the reference ${key}.`
-        );
       }
     };
 
-    forEach(references, (value, key) => {
+    forEach(references, (prop, ref) => {
       if (isArray(data)) {
-        forEach(data, item => setLink(item, key, value));
+        forEach(data, item => setLink(item, ref, prop));
       } else {
-        setLink(data, value, key);
+        setLink(data, ref, prop);
       }
     });
   }

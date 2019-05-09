@@ -16,7 +16,6 @@ export interface ModelType {
   references?: ReferenceTree;
   afterGet?: Modifier;
   beforeSave?: Modifier;
-  afterSave?: Modifier;
   beforeQueue?: Modifier;
   afterQueue?: Modifier;
 }

@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty';
+import some from 'lodash/some';
 import ActionQueue from './ActionQueue';
 import { IndexedObjectTree, IndexedObject } from './types';
 
@@ -21,5 +23,8 @@ export default class ApiState {
     this.items = Object.create(null);
     this.originItems = Object.create(null);
     this.actionQueue = new ActionQueue();
+  }
+  get hasAction(): boolean {
+    return some(this.actionQueue, (a: Array<object> | object) => !isEmpty(a));
   }
 }

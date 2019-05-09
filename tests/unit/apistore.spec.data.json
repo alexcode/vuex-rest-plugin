@@ -49,22 +49,40 @@
         }
       }
     },
-    "depot": {
-      "id": "f34d1e05-4585-44ee-a31a-35cc6f29e215",
-      "name": "MTT Champigny",
-      "external_id": null,
-      "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
-      "street_number": "4",
-      "street_name": "4 Rue des Armoiries",
-      "secondary": null,
-      "city": "Champigny-sur-Marne",
-      "postcode": "94500",
-      "country_code": "FR",
-      "latitude": 48.82179,
-      "longitude": 2.52428,
-      "is_gecoded": true,
-      "is_approximate": true
-    }
+    "depot": [
+      {
+        "id": "1",
+        "name": "MTT Champigny",
+        "external_id": null,
+        "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+        "street_number": "4",
+        "street_name": "4 Rue des Armoiries",
+        "secondary": null,
+        "city": "Champigny-sur-Marne",
+        "postcode": "94500",
+        "country_code": "FR",
+        "latitude": 48.82179,
+        "longitude": 2.52428,
+        "is_gecoded": true,
+        "is_approximate": true
+      },
+      {
+        "id": "2",
+        "name": "MTT Champigny",
+        "external_id": null,
+        "display_address": "4, 4 Rue des Armoiries - 94500 Champigny-sur-Marne",
+        "street_number": "4",
+        "street_name": "4 Rue des Armoiries",
+        "secondary": null,
+        "city": "Champigny-sur-Marne",
+        "postcode": "94500",
+        "country_code": "FR",
+        "latitude": 48.82179,
+        "longitude": 2.52428,
+        "is_gecoded": true,
+        "is_approximate": true
+      }
+    ]
   },
   {
     "id": "8aa358b1-8914-46a8-874f-fabcdb0dbe14",

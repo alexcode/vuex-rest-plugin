@@ -85,6 +85,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       return axios.get(_formatUrl(payload)).then(async result => {
         const resultData = dataPath ? get(result.data, dataPath) : result.data;
         commit(`ADD_${_getModel(payload).name.toUpperCase()}`, resultData);
+        return resultData;
       });
     };
 
@@ -102,10 +103,8 @@ export default class Actions<S, R> implements ActionTree<S, R> {
         data: await applyModifier('beforeSave', payload.type, models, data)
       }).then(async result => {
         const resultData = dataPath ? get(result.data, dataPath) : result.data;
-        commit(
-          `ADD_${_getModel(payload).name.toUpperCase()}`,
-          await applyModifier('afterSave', payload.type, models, resultData)
-        );
+        commit(`ADD_${_getModel(payload).name.toUpperCase()}`, resultData);
+        return resultData;
       });
     };
 
