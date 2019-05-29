@@ -5,7 +5,7 @@ import isDate from 'lodash/isDate';
 import isFunction from 'lodash/isFunction';
 import isObject from 'lodash/isObject';
 import map from 'lodash/map';
-import { ModelTypeTree } from './types';
+import { ModelTypeTree, Payload } from './types';
 
 export async function applyModifier(
   modifier: string,

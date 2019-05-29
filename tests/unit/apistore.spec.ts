@@ -419,7 +419,7 @@ describe('ApiStore custom model', function() {
               plural: 'RESOURCES',
               type: new ApiState(),
               references: {
-                fakeref: 'user',
+                user: 'fakeref',
                 vehicle: 'vehicle'
               }
             },
@@ -473,7 +473,7 @@ describe('ApiStore custom model', function() {
               plural: 'RESOURCES',
               type: new ApiState(),
               references: {
-                place: 'depot'
+                depot: 'place'
               }
             },
             place: {
@@ -510,7 +510,7 @@ describe('ApiStore custom model', function() {
               references: {
                 user: 'user',
                 vehicle: 'vehicle',
-                place: 'depot'
+                depot: 'place'
               }
             },
             user: {

@@ -189,7 +189,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
       }
 
       if (model.references) {
-        forEach(model.references, (prop, modelName) => {
+        forEach(model.references, (modelName, prop) => {
           if (has(entity, prop) && get(entity, prop)) {
             try {
               this.patchEntity(state, this.models[modelName], entity[prop]);
@@ -240,7 +240,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
       }
     };
 
-    forEach(references, (prop, ref) => {
+    forEach(references, (ref, prop) => {
       if (isArray(data)) {
         forEach(data, item => setLink(item, ref, prop));
       } else {
