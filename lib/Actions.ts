@@ -6,10 +6,8 @@ import forEach from 'lodash/forEach';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import isArray from 'lodash/isArray';
-import isDate from 'lodash/isDate';
 import isEqual from 'lodash/isEqual';
 import isFunction from 'lodash/isFunction';
-import isObject from 'lodash/isObject';
 import keys from 'lodash/keys';
 import map from 'lodash/map';
 import some from 'lodash/some';
@@ -22,7 +20,7 @@ import {
   IndexedObject,
   IndexedObjectTree
 } from './types';
-import { applyModifier } from './utils';
+import { applyModifier, formatUrl } from './utils';
 
 export default class Actions<S, R> implements ActionTree<S, R> {
   [key: string]: Action<S, R>;
@@ -36,35 +34,6 @@ export default class Actions<S, R> implements ActionTree<S, R> {
   cancelAction: Action<S, R>;
   cancelActionQueue: Action<S, R>;
   constructor(axios: AxiosInstance, models: ModelTypeTree, dataPath?: string) {
-    const _formatUrl = (payload: Payload) => {
-      let url = payload.url || payload.type;
-
-      if (!payload.url) {
-        if (payload.id) {
-          url += `/${payload.id}`;
-        }
-
-        if (payload.transition) {
-          url += `/${payload.transition}`;
-        }
-      }
-
-      if (payload.query && isObject(payload.query)) {
-        const query = map(payload.query, (value: any, key: string) => {
-          let resquestValue = value;
-          if (isFunction(value.toISOString) || isDate(value)) {
-            resquestValue = new Date(value).toISOString();
-          }
-          return `${key}=${resquestValue}`;
-        });
-        payload.query = query.join('&');
-      }
-      if (payload.query) {
-        url += `?${payload.query}`;
-      }
-      return url;
-    };
-
     const _isAll = (p: Payload) => !has(p, 'id') && isArray(p.data);
 
     const _getModel = (p: Payload | QueuePayload): ModelType => models[p.type];
@@ -81,7 +50,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       if (get(payload, 'clear', _isAll(payload))) {
         commit(`CLEAR_${_getModel(payload).name.toUpperCase()}`);
       }
-      return axios.get(_formatUrl(payload)).then(async result => {
+      return axios.get(formatUrl(payload)).then(async result => {
         const resultData = dataPath ? get(result.data, dataPath) : result.data;
         commit(`ADD_${_getModel(payload).name.toUpperCase()}`, resultData);
         return resultData;
@@ -94,11 +63,10 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       payload: Payload,
       method: string = 'post'
     ) => {
-      // const model = _getModel(payload);
       const { data } = payload;
       return axios({
         method,
-        url: _formatUrl(payload),
+        url: formatUrl(payload),
         data: await applyModifier('beforeSave', payload.type, models, data)
       }).then(async result => {
         const resultData = dataPath ? get(result.data, dataPath) : result.data;
@@ -115,7 +83,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       if (_isAll(payload)) {
         return axios
           .patch(
-            `${_formatUrl(payload)}/delete`,
+            `${formatUrl(payload)}/delete`,
             await applyModifier('beforeSave', payload.type, models, data)
           )
           .then(() => {
@@ -123,7 +91,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
           });
       }
 
-      return axios.delete(_formatUrl(payload)).then(() => {
+      return axios.delete(formatUrl(payload)).then(() => {
         commit(`DELETE_${model.name.toUpperCase()}`, id);
       });
     };
