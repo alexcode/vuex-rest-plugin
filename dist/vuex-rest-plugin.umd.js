@@ -11242,21 +11242,9 @@ var has_default = /*#__PURE__*/__webpack_require__.n(has);
 var isArray = __webpack_require__("6747");
 var isArray_default = /*#__PURE__*/__webpack_require__.n(isArray);
 
-// EXTERNAL MODULE: ./node_modules/lodash/isDate.js
-var isDate = __webpack_require__("6220");
-var isDate_default = /*#__PURE__*/__webpack_require__.n(isDate);
-
 // EXTERNAL MODULE: ./node_modules/lodash/isEqual.js
 var isEqual = __webpack_require__("63ea");
 var isEqual_default = /*#__PURE__*/__webpack_require__.n(isEqual);
-
-// EXTERNAL MODULE: ./node_modules/lodash/isFunction.js
-var isFunction = __webpack_require__("9520");
-var isFunction_default = /*#__PURE__*/__webpack_require__.n(isFunction);
-
-// EXTERNAL MODULE: ./node_modules/lodash/isObject.js
-var isObject = __webpack_require__("1a8c");
-var isObject_default = /*#__PURE__*/__webpack_require__.n(isObject);
 
 // EXTERNAL MODULE: ./node_modules/lodash/keys.js
 var keys = __webpack_require__("ec69");
@@ -11270,7 +11258,21 @@ var map_default = /*#__PURE__*/__webpack_require__.n(map);
 var some = __webpack_require__("3092");
 var some_default = /*#__PURE__*/__webpack_require__.n(some);
 
+// EXTERNAL MODULE: ./node_modules/lodash/isDate.js
+var isDate = __webpack_require__("6220");
+var isDate_default = /*#__PURE__*/__webpack_require__.n(isDate);
+
+// EXTERNAL MODULE: ./node_modules/lodash/isFunction.js
+var isFunction = __webpack_require__("9520");
+var isFunction_default = /*#__PURE__*/__webpack_require__.n(isFunction);
+
+// EXTERNAL MODULE: ./node_modules/lodash/isObject.js
+var isObject = __webpack_require__("1a8c");
+var isObject_default = /*#__PURE__*/__webpack_require__.n(isObject);
+
 // CONCATENATED MODULE: ./lib/utils.ts
+
+
 
 
 
@@ -11335,10 +11337,34 @@ function _applyModifier() {
   }));
   return _applyModifier.apply(this, arguments);
 }
+
+function formatUrl(payload) {
+  var url = payload.url || payload.type;
+
+  if (!payload.url && payload.id) {
+    url += "/".concat(payload.id);
+  }
+
+  if (payload.query && isObject_default()(payload.query)) {
+    var query = map_default()(payload.query, function (value, key) {
+      var resquestValue = value;
+
+      if (isFunction_default()(value.toISOString) || isDate_default()(value)) {
+        resquestValue = new Date(value).toISOString();
+      }
+
+      return "".concat(key, "=").concat(resquestValue);
+    });
+    payload.query = query.join('&');
+  }
+
+  if (payload.query) {
+    url += "?".concat(payload.query);
+  }
+
+  return url;
+}
 // CONCATENATED MODULE: ./lib/Actions.ts
-
-
-
 
 
 
@@ -11361,39 +11387,6 @@ function _applyModifier() {
 
 var Actions_Actions = function Actions(axios, models, dataPath) {
   _classCallCheck(this, Actions);
-
-  var _formatUrl = function _formatUrl(payload) {
-    var url = payload.url || payload.type;
-
-    if (!payload.url) {
-      if (payload.id) {
-        url += "/".concat(payload.id);
-      }
-
-      if (payload.transition) {
-        url += "/".concat(payload.transition);
-      }
-    }
-
-    if (payload.query && isObject_default()(payload.query)) {
-      var query = map_default()(payload.query, function (value, key) {
-        var resquestValue = value;
-
-        if (isFunction_default()(value.toISOString) || isDate_default()(value)) {
-          resquestValue = new Date(value).toISOString();
-        }
-
-        return "".concat(key, "=").concat(resquestValue);
-      });
-      payload.query = query.join('&');
-    }
-
-    if (payload.query) {
-      url += "?".concat(payload.query);
-    }
-
-    return url;
-  };
 
   var _isAll = function _isAll(p) {
     return !has_default()(p, 'id') && isArray_default()(p.data);
@@ -11418,7 +11411,7 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
       commit("CLEAR_".concat(_getModel(payload).name.toUpperCase()));
     }
 
-    return axios.get(_formatUrl(payload)).then(
+    return axios.get(formatUrl(payload)).then(
     /*#__PURE__*/
     function () {
       var _ref = _asyncToGenerator(
@@ -11462,11 +11455,10 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
           switch (_context3.prev = _context3.next) {
             case 0:
               method = _args3.length > 2 && _args3[2] !== undefined ? _args3[2] : 'post';
-              // const model = _getModel(payload);
               data = payload.data;
               _context3.t0 = axios;
               _context3.t1 = method;
-              _context3.t2 = _formatUrl(payload);
+              _context3.t2 = formatUrl(payload);
               _context3.next = 7;
               return applyModifier('beforeSave', payload.type, models, data);
 
@@ -11542,7 +11534,7 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
               }
 
               _context4.t0 = axios;
-              _context4.t1 = "".concat(_formatUrl(payload), "/delete");
+              _context4.t1 = "".concat(formatUrl(payload), "/delete");
               _context4.next = 7;
               return applyModifier('beforeSave', payload.type, models, data);
 
@@ -11556,7 +11548,7 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
               return _context4.abrupt("return", _context4.t0.patch.call(_context4.t0, _context4.t1, _context4.t2).then(_context4.t3));
 
             case 10:
-              return _context4.abrupt("return", axios.delete(_formatUrl(payload)).then(function () {
+              return _context4.abrupt("return", axios.delete(formatUrl(payload)).then(function () {
                 commit("DELETE_".concat(model.name.toUpperCase()), id);
               }));
 
@@ -12145,7 +12137,7 @@ function () {
         }
 
         if (model.references) {
-          forEach_default()(model.references, function (prop, modelName) {
+          forEach_default()(model.references, function (modelName, prop) {
             if (has_default()(entity, prop) && get_default()(entity, prop)) {
               try {
                 _this2.patchEntity(state, _this2.models[modelName], entity[prop]);
@@ -12188,7 +12180,7 @@ function () {
         }
       };
 
-      forEach_default()(references, function (prop, ref) {
+      forEach_default()(references, function (ref, prop) {
         if (isArray_default()(data)) {
           forEach_default()(data, function (item) {
             return setLink(item, ref, prop);
