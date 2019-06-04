@@ -127,6 +127,22 @@ describe('ApiStore by default', function() {
     expect(storeRole).toMatchObject(singleResource.user.role);
   });
 
+  it('test force fetch', async () => {
+    const singleResource = data[0];
+    await fillStore();
+    // Uncomment the following line and set expect(mock.history.get.length).toBe(1);
+    // when the next axios-mock-adapter version (current v1.16.0) is released
+    // mock.resetHistory();
+    mock.onGet(`/resource/${singleResource.id}`).reply(200, singleResource);
+    store.dispatch('api/get', {
+      id: singleResource.id,
+      type: 'resource',
+      forceFetch: true
+    });
+    await flushPromises();
+    expect(mock.history.get.length).toBe(2);
+  });
+
   it('test if references are proper ref', async () => {
     mock.onGet('/resource').reply(200, data);
     store.dispatch('api/get', {

@@ -98,7 +98,11 @@ export default class Actions<S, R> implements ActionTree<S, R> {
 
     this.get = async (context: ActionContext<S, R>, payload: Payload) => {
       const { commit, state } = context;
-      return _getEntity(state, payload) || _fetchEntity(commit, payload);
+      const entity = _getEntity(state, payload);
+      if (payload.forceFetch || !entity) {
+        return _fetchEntity(commit, payload);
+      }
+      return entity;
     };
 
     this.post = (context: ActionContext<S, R>, payload: Payload) => {
@@ -215,9 +219,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
     ) => {
       const model = _getModel(payload);
       const { commit, state } = context;
-      // if (get(state, `${model.plural}.hasAction`)) {
       commit(`UNQUEUE_ACTION_${model.name}`, payload);
-      // }
     };
   }
 }

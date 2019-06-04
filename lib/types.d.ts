@@ -29,6 +29,7 @@ export interface Payload {
   type: string;
   transition?: string;
   url?: string;
+  forceFetch?: boolean;
   query?: any;
   data?: IndexedObject | Array<IndexedObject>;
   [index: string]: any;
