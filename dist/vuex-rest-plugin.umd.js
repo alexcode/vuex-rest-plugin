@@ -12134,10 +12134,10 @@ function () {
         var store = state[model.plural];
 
         if (has_default()(store.items, entity.id)) {
-          forEach_default()(store.items[entity.id], function (value, idx) {
+          forEach_default()(entity, function (value, idx) {
             if (!isFunction_default()(value)) {
-              if (has_default()(entity, idx) && !isEqual_default()(value, get_default()(entity, idx))) {
-                external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(store.items[entity.id], idx, get_default()(entity, idx));
+              if (!isEqual_default()(value, get_default()(store.items[entity.id], idx))) {
+                external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(store.items[entity.id], idx, value);
               }
             }
           });
