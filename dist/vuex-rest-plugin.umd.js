@@ -11571,15 +11571,25 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
     var _ref5 = _asyncToGenerator(
     /*#__PURE__*/
     regeneratorRuntime.mark(function _callee5(context, payload) {
-      var commit, state;
+      var commit, state, entity;
       return regeneratorRuntime.wrap(function _callee5$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
               commit = context.commit, state = context.state;
-              return _context5.abrupt("return", _getEntity(state, payload) || _fetchEntity(commit, payload));
+              entity = _getEntity(state, payload);
 
-            case 2:
+              if (!(payload.forceFetch || !entity)) {
+                _context5.next = 4;
+                break;
+              }
+
+              return _context5.abrupt("return", _fetchEntity(commit, payload));
+
+            case 4:
+              return _context5.abrupt("return", entity);
+
+            case 5:
             case "end":
               return _context5.stop();
           }
@@ -11729,9 +11739,8 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
     var model = _getModel(payload);
 
     var commit = context.commit,
-        state = context.state; // if (get(state, `${model.plural}.hasAction`)) {
-
-    commit("UNQUEUE_ACTION_".concat(model.name), payload); // }
+        state = context.state;
+    commit("UNQUEUE_ACTION_".concat(model.name), payload);
   };
 };
 
