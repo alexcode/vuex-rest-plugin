@@ -640,8 +640,11 @@ describe('ApiStore custom model', function() {
               plural: 'RESOURCES',
               type: new ApiState(),
               afterGet: (v: any) => {
-                v.some_id = 'other_id_resource';
-                return v;
+                return {
+                  id: v.id,
+                  user: v.user,
+                  some_id: 'other_id_resource'
+                };
               },
               references: {
                 user: 'user'
@@ -652,8 +655,10 @@ describe('ApiStore custom model', function() {
               plural: 'USERS',
               type: new ApiState(),
               afterGet: (v: any) => {
-                v.some_id = 'other_id_user';
-                return v;
+                return {
+                  id: v.id,
+                  some_id: 'other_id_user'
+                };
               }
             }
           }

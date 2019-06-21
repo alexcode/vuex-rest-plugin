@@ -7,7 +7,6 @@ import get from 'lodash/get';
 import has from 'lodash/has';
 import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
-import isFunction from 'lodash/isFunction';
 import keys from 'lodash/keys';
 import map from 'lodash/map';
 import some from 'lodash/some';
@@ -45,8 +44,6 @@ export default class Actions<S, R> implements ActionTree<S, R> {
 
     // fetch entity from API
     const _fetchEntity = (commit: Commit, payload: Payload) => {
-      const model = _getModel(payload);
-      const { data } = payload;
       if (get(payload, 'clear', _isAll(payload))) {
         commit(`CLEAR_${_getModel(payload).name.toUpperCase()}`);
       }
@@ -218,7 +215,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       payload: QueuePayload
     ) => {
       const model = _getModel(payload);
-      const { commit, state } = context;
+      const { commit } = context;
       commit(`UNQUEUE_ACTION_${model.name}`, payload);
     };
   }

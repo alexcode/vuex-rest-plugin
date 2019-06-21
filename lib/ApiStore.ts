@@ -8,7 +8,6 @@ import isArray from 'lodash/isArray';
 import isEqual from 'lodash/isEqual';
 import isFunction from 'lodash/isFunction';
 import isString from 'lodash/isString';
-import set from 'lodash/set';
 import Actions from './Actions';
 import ApiState from './ApiState';
 import {
@@ -191,14 +190,21 @@ export default class ApiStore<S> implements StoreOptions<S> {
       if (model.references) {
         forEach(model.references, (modelName, prop) => {
           if (has(entity, prop) && get(entity, prop)) {
-            try {
-              this.patchEntity(state, this.models[modelName], entity[prop]);
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.warn(
-                `Patch error: We could not find the model ${modelName} for the reference ${prop}.`
-              );
-            }
+            applyModifier(
+              'afterGet',
+              modelName,
+              this.models,
+              entity[prop]
+            ).then((i: any) => {
+              try {
+                this.patchEntity(state, this.models[modelName], i);
+              } catch (e) {
+                // eslint-disable-next-line no-console
+                console.warn(
+                  `Patch error: We could not find the model ${modelName} for the reference ${prop}.`
+                );
+              }
+            });
           }
         });
       }
