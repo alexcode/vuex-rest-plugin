@@ -11403,10 +11403,6 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
 
 
   var _fetchEntity = function _fetchEntity(commit, payload) {
-    var model = _getModel(payload);
-
-    var data = payload.data;
-
     if (get_default()(payload, 'clear', _isAll(payload))) {
       commit("CLEAR_".concat(_getModel(payload).name.toUpperCase()));
     }
@@ -11738,8 +11734,7 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
   this.cancelAction = function (context, payload) {
     var model = _getModel(payload);
 
-    var commit = context.commit,
-        state = context.state;
+    var commit = context.commit;
     commit("UNQUEUE_ACTION_".concat(model.name), payload);
   };
 };
@@ -12148,12 +12143,14 @@ function () {
         if (model.references) {
           forEach_default()(model.references, function (modelName, prop) {
             if (has_default()(entity, prop) && get_default()(entity, prop)) {
-              try {
-                _this2.patchEntity(state, _this2.models[modelName], entity[prop]);
-              } catch (e) {
-                // eslint-disable-next-line no-console
-                console.warn("Patch error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
-              }
+              applyModifier('afterGet', modelName, _this2.models, entity[prop]).then(function (i) {
+                try {
+                  _this2.patchEntity(state, _this2.models[modelName], i);
+                } catch (e) {
+                  // eslint-disable-next-line no-console
+                  console.warn("Patch error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
+                }
+              });
             }
           });
         }
