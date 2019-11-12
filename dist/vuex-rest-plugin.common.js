@@ -11891,7 +11891,7 @@ function () {
 
 
       _this.mutations["CLEAR_".concat(model.name.toUpperCase())] = function (myState) {
-        return myState.reset;
+        return myState[modelIdx].reset();
       };
 
       _this.mutations["QUEUE_ACTION_".concat(model.name.toUpperCase())] = function (myState, obj) {
