@@ -79,7 +79,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
       // adding CLEAR_* mutations
       this.mutations[`CLEAR_${model.name.toUpperCase()}`] = (
         myState: ApiState
-      ) => myState.reset;
+      ) => myState[modelIdx].reset();
       this.mutations[`QUEUE_ACTION_${model.name.toUpperCase()}`] = (
         myState: ApiState,
         obj: QueuePayload
