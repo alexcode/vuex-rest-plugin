@@ -18,7 +18,7 @@ import {
   Modifier,
   ReferenceTree
 } from './types';
-import { applyModifier } from './utils';
+import { equalEntity, applyModifier } from './utils';
 
 export default class ApiStore<S> implements StoreOptions<S> {
   namespaced: boolean;
@@ -50,7 +50,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
               model.beforeQueue
             );
             this.patchEntity(myState, model, i);
-            this.linkReferences(i, myState, model.references);
+            // this.linkReferences(i, myState, model.references);
             myState[modelIdx].lastLoad = new Date();
           }
         );
@@ -175,8 +175,12 @@ export default class ApiStore<S> implements StoreOptions<S> {
       forEach(entity, e => this.patchEntity(state, model, e));
     } else if (entity.id) {
       const store = state[model.plural];
-      if (has(store.items, entity.id)) {
+      if (
+        has(store.items, entity.id) &&
+        equalEntity(store.items[entity.id], entity)
+      ) {
         forEach(entity, (value, idx: string) => {
+          console.log('in loop', idx);
           if (!isFunction(value)) {
             if (!isEqual(value, get(store.items[entity.id], idx))) {
               Vue.set(store.items[entity.id], idx, value);
@@ -184,6 +188,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
           }
         });
       } else {
+        console.log('in patch', entity);
         store.items = { ...store.items, [entity.id]: entity };
       }
 
@@ -196,8 +201,14 @@ export default class ApiStore<S> implements StoreOptions<S> {
               this.models,
               entity[prop]
             ).then((i: any) => {
+              console.log('in patch ref', i);
               try {
                 this.patchEntity(state, this.models[modelName], i);
+                this.linkReferences(
+                  i,
+                  state,
+                  this.models[modelName].references
+                );
               } catch (e) {
                 // eslint-disable-next-line no-console
                 console.warn(
@@ -229,6 +240,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
           const itemId = get(item, 'id');
           const model = this.models[modelName];
           const itemStore = state[model.plural];
+          console.log('in ref', item, itemStore);
           if (itemId) {
             this.storeOriginItem(
               itemStore.originItems,

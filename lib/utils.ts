@@ -2,10 +2,11 @@ import get from 'lodash/get';
 import has from 'lodash/has';
 import isArray from 'lodash/isArray';
 import isDate from 'lodash/isDate';
+import isEqual from 'lodash/isEqual';
 import isFunction from 'lodash/isFunction';
 import isObject from 'lodash/isObject';
 import map from 'lodash/map';
-import { ModelTypeTree, Payload } from './types';
+import { IndexedObject, ModelTypeTree, Payload } from './types';
 
 export async function applyModifier(
   modifier: string,
@@ -56,4 +57,12 @@ export function formatUrl(payload: Payload) {
   }
 
   return url;
+}
+
+// We compare if entities have the same keys and instace type
+export function equalEntity(entityA: IndexedObject, entityB: IndexedObject) {
+  return (
+    isEqual(Object.keys(entityA), Object.keys(entityB)) &&
+    entityA instanceof entityB.constructor
+  );
 }
