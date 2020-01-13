@@ -1,6 +1,6 @@
 {
   "name": "vuex-rest-plugin",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "private": true,
   "main": "dist/vuex-rest-plugin.common.js",
   "scripts": {

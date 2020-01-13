@@ -163,12 +163,14 @@ var enumKeys = __webpack_require__("47ee");
 var isArray = __webpack_require__("9003");
 var anObject = __webpack_require__("e4ae");
 var isObject = __webpack_require__("f772");
+var toObject = __webpack_require__("241e");
 var toIObject = __webpack_require__("36c3");
 var toPrimitive = __webpack_require__("1bc3");
 var createDesc = __webpack_require__("aebd");
 var _create = __webpack_require__("a159");
 var gOPNExt = __webpack_require__("0395");
 var $GOPD = __webpack_require__("bf0b");
+var $GOPS = __webpack_require__("9aa9");
 var $DP = __webpack_require__("d9f6");
 var $keys = __webpack_require__("c3a1");
 var gOPD = $GOPD.f;
@@ -185,7 +187,7 @@ var SymbolRegistry = shared('symbol-registry');
 var AllSymbols = shared('symbols');
 var OPSymbols = shared('op-symbols');
 var ObjectProto = Object[PROTOTYPE];
-var USE_NATIVE = typeof $Symbol == 'function';
+var USE_NATIVE = typeof $Symbol == 'function' && !!$GOPS.f;
 var QObject = global.QObject;
 // Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
 var setter = !QObject || !QObject[PROTOTYPE] || !QObject[PROTOTYPE].findChild;
@@ -295,7 +297,7 @@ if (!USE_NATIVE) {
   $DP.f = $defineProperty;
   __webpack_require__("6abf").f = gOPNExt.f = $getOwnPropertyNames;
   __webpack_require__("355d").f = $propertyIsEnumerable;
-  __webpack_require__("9aa9").f = $getOwnPropertySymbols;
+  $GOPS.f = $getOwnPropertySymbols;
 
   if (DESCRIPTORS && !__webpack_require__("b8e3")) {
     redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
@@ -344,6 +346,16 @@ $export($export.S + $export.F * !USE_NATIVE, 'Object', {
   getOwnPropertyNames: $getOwnPropertyNames,
   // 19.1.2.8 Object.getOwnPropertySymbols(O)
   getOwnPropertySymbols: $getOwnPropertySymbols
+});
+
+// Chrome 38 and 39 `Object.getOwnPropertySymbols` fails on primitives
+// https://bugs.chromium.org/p/v8/issues/detail?id=3443
+var FAILS_ON_PRIMITIVES = $fails(function () { $GOPS.f(1); });
+
+$export($export.S + $export.F * FAILS_ON_PRIMITIVES, 'Object', {
+  getOwnPropertySymbols: function getOwnPropertySymbols(it) {
+    return $GOPS.f(toObject(it));
+  }
 });
 
 // 24.3.2 JSON.stringify(value [, replacer [, space]])
@@ -869,6 +881,29 @@ module.exports = function (it, Constructor, name, forbiddenField) {
   if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
     throw TypeError(name + ': incorrect invocation!');
   } return it;
+};
+
+
+/***/ }),
+
+/***/ "11e9":
+/***/ (function(module, exports, __webpack_require__) {
+
+var pIE = __webpack_require__("52a7");
+var createDesc = __webpack_require__("4630");
+var toIObject = __webpack_require__("6821");
+var toPrimitive = __webpack_require__("6a99");
+var has = __webpack_require__("69a8");
+var IE8_DOM_DEFINE = __webpack_require__("c69a");
+var gOPD = Object.getOwnPropertyDescriptor;
+
+exports.f = __webpack_require__("9e1e") ? gOPD : function getOwnPropertyDescriptor(O, P) {
+  O = toIObject(O);
+  P = toPrimitive(P, true);
+  if (IE8_DOM_DEFINE) try {
+    return gOPD(O, P);
+  } catch (e) { /* empty */ }
+  if (has(O, P)) return createDesc(!pIE.f.call(O, P), O[P]);
 };
 
 
@@ -2208,10 +2243,11 @@ module.exports = function (it) {
 
 /***/ }),
 
-/***/ "268f":
-/***/ (function(module, exports, __webpack_require__) {
+/***/ "2621":
+/***/ (function(module, exports) {
 
-module.exports = __webpack_require__("fde4");
+exports.f = Object.getOwnPropertySymbols;
+
 
 /***/ }),
 
@@ -2744,22 +2780,6 @@ module.exports = function (fn, args, that) {
 
 /***/ }),
 
-/***/ "32a6":
-/***/ (function(module, exports, __webpack_require__) {
-
-// 19.1.2.14 Object.keys(O)
-var toObject = __webpack_require__("241e");
-var $keys = __webpack_require__("c3a1");
-
-__webpack_require__("ce7e")('keys', function () {
-  return function keys(it) {
-    return $keys(toObject(it));
-  };
-});
-
-
-/***/ }),
-
 /***/ "32b3":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3218,16 +3238,10 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
     value.forEach(function(subValue) {
       result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
     });
-
-    return result;
-  }
-
-  if (isMap(value)) {
+  } else if (isMap(value)) {
     value.forEach(function(subValue, key) {
       result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
     });
-
-    return result;
   }
 
   var keysFunc = isFull
@@ -3792,6 +3806,22 @@ module.exports = function defineProperty(it, key, desc) {
 
 /***/ }),
 
+/***/ "456d":
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.14 Object.keys(O)
+var toObject = __webpack_require__("4bf8");
+var $keys = __webpack_require__("0d58");
+
+__webpack_require__("5eda")('keys', function () {
+  return function keys(it) {
+    return $keys(toObject(it));
+  };
+});
+
+
+/***/ }),
+
 /***/ "4588":
 /***/ (function(module, exports) {
 
@@ -4136,6 +4166,14 @@ var $exports = module.exports = function (name) {
 };
 
 $exports.store = store;
+
+
+/***/ }),
+
+/***/ "52a7":
+/***/ (function(module, exports) {
+
+exports.f = {}.propertyIsEnumerable;
 
 
 /***/ }),
@@ -4545,7 +4583,7 @@ module.exports = nativeKeys;
 /***/ "584a":
 /***/ (function(module, exports) {
 
-var core = module.exports = { version: '2.6.5' };
+var core = module.exports = { version: '2.6.11' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
@@ -4845,6 +4883,23 @@ ListCache.prototype.has = listCacheHas;
 ListCache.prototype.set = listCacheSet;
 
 module.exports = ListCache;
+
+
+/***/ }),
+
+/***/ "5eda":
+/***/ (function(module, exports, __webpack_require__) {
+
+// most Object methods by ES6 should accept primitives
+var $export = __webpack_require__("5ca1");
+var core = __webpack_require__("8378");
+var fails = __webpack_require__("79e5");
+module.exports = function (KEY, exec) {
+  var fn = (core.Object || {})[KEY] || Object[KEY];
+  var exp = {};
+  exp[KEY] = exec(fn);
+  $export($export.S + $export.F * fails(function () { fn(1); }), 'Object', exp);
+};
 
 
 /***/ }),
@@ -6403,7 +6458,7 @@ module.exports = function () {
 /***/ "8378":
 /***/ (function(module, exports) {
 
-var core = module.exports = { version: '2.6.5' };
+var core = module.exports = { version: '2.6.11' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
@@ -6556,15 +6611,6 @@ module.exports = baseAssignValue;
 
 /***/ }),
 
-/***/ "8aae":
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__("32a6");
-module.exports = __webpack_require__("584a").Object.keys;
-
-
-/***/ }),
-
 /***/ "8bbf":
 /***/ (function(module, exports) {
 
@@ -6578,6 +6624,35 @@ module.exports = require("vue");
 // Thank's IE8 for his funny defineProperty
 module.exports = !__webpack_require__("294c")(function () {
   return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
+});
+
+
+/***/ }),
+
+/***/ "8e6e":
+/***/ (function(module, exports, __webpack_require__) {
+
+// https://github.com/tc39/proposal-object-getownpropertydescriptors
+var $export = __webpack_require__("5ca1");
+var ownKeys = __webpack_require__("990b");
+var toIObject = __webpack_require__("6821");
+var gOPD = __webpack_require__("11e9");
+var createProperty = __webpack_require__("f1ae");
+
+$export($export.S, 'Object', {
+  getOwnPropertyDescriptors: function getOwnPropertyDescriptors(object) {
+    var O = toIObject(object);
+    var getDesc = gOPD.f;
+    var keys = ownKeys(O);
+    var result = {};
+    var i = 0;
+    var key, desc;
+    while (keys.length > i) {
+      desc = getDesc(O, key = keys[i++]);
+      if (desc !== undefined) createProperty(result, key, desc);
+    }
+    return result;
+  }
 });
 
 
@@ -6658,6 +6733,20 @@ module.exports = function (Constructor, NAME, next) {
 var cof = __webpack_require__("6b4c");
 module.exports = Array.isArray || function isArray(arg) {
   return cof(arg) == 'Array';
+};
+
+
+/***/ }),
+
+/***/ "9093":
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
+var $keys = __webpack_require__("ce10");
+var hiddenKeys = __webpack_require__("e11e").concat('length', 'prototype');
+
+exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
+  return $keys(O, hiddenKeys);
 };
 
 
@@ -7712,6 +7801,23 @@ module.exports = baseMap;
 
 /***/ }),
 
+/***/ "990b":
+/***/ (function(module, exports, __webpack_require__) {
+
+// all object keys, includes non-enumerable and symbols
+var gOPN = __webpack_require__("9093");
+var gOPS = __webpack_require__("2621");
+var anObject = __webpack_require__("cb7c");
+var Reflect = __webpack_require__("7726").Reflect;
+module.exports = Reflect && Reflect.ownKeys || function ownKeys(it) {
+  var keys = gOPN.f(anObject(it));
+  var getSymbols = gOPS.f;
+  return getSymbols ? keys.concat(getSymbols(it)) : keys;
+};
+
+
+/***/ }),
+
 /***/ "9934":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8262,13 +8368,6 @@ var baseSetToString = !defineProperty ? identity : function(func, string) {
 
 module.exports = baseSetToString;
 
-
-/***/ }),
-
-/***/ "a4bb":
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__("8aae");
 
 /***/ }),
 
@@ -8955,22 +9054,6 @@ exports.f = __webpack_require__("8e60") ? gOPD : function getOwnPropertyDescript
   } catch (e) { /* empty */ }
   if (has(O, P)) return createDesc(!pIE.f.call(O, P), O[P]);
 };
-
-
-/***/ }),
-
-/***/ "bf90":
-/***/ (function(module, exports, __webpack_require__) {
-
-// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-var toIObject = __webpack_require__("36c3");
-var $getOwnPropertyDescriptor = __webpack_require__("bf0b").f;
-
-__webpack_require__("ce7e")('getOwnPropertyDescriptor', function () {
-  return function getOwnPropertyDescriptor(it, key) {
-    return $getOwnPropertyDescriptor(toIObject(it), key);
-  };
-});
 
 
 /***/ }),
@@ -10176,13 +10259,6 @@ module.exports = Hash;
 
 /***/ }),
 
-/***/ "e265":
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__("ed33");
-
-/***/ }),
-
 /***/ "e2a0":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10729,15 +10805,6 @@ module.exports = nativeKeysIn;
 
 /***/ }),
 
-/***/ "ed33":
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__("014b");
-module.exports = __webpack_require__("584a").Object.getOwnPropertySymbols;
-
-
-/***/ }),
-
 /***/ "edfa":
 /***/ (function(module, exports) {
 
@@ -10802,6 +10869,22 @@ function stackClear() {
 }
 
 module.exports = stackClear;
+
+
+/***/ }),
+
+/***/ "f1ae":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $defineProperty = __webpack_require__("86cc");
+var createDesc = __webpack_require__("4630");
+
+module.exports = function (object, index, value) {
+  if (index in object) $defineProperty.f(object, index, createDesc(0, value));
+  else object[index] = value;
+};
 
 
 /***/ }),
@@ -11150,6 +11233,12 @@ var es6_function_name = __webpack_require__("7f7f");
 var lodash_get = __webpack_require__("9b02");
 var get_default = /*#__PURE__*/__webpack_require__.n(lodash_get);
 
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es7.object.get-own-property-descriptors.js
+var es7_object_get_own_property_descriptors = __webpack_require__("8e6e");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es6.object.keys.js
+var es6_object_keys = __webpack_require__("456d");
+
 // EXTERNAL MODULE: ./node_modules/core-js/modules/web.dom.iterable.js
 var web_dom_iterable = __webpack_require__("ac6a");
 
@@ -11162,6 +11251,26 @@ var es6_string_iterator = __webpack_require__("5df3");
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es6.promise.js
 var es6_promise = __webpack_require__("551c");
 
+// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/define-property.js
+var define_property = __webpack_require__("85f2");
+var define_property_default = /*#__PURE__*/__webpack_require__.n(define_property);
+
+// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/defineProperty.js
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    define_property_default()(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
 // EXTERNAL MODULE: ./node_modules/regenerator-runtime/runtime.js
 var runtime = __webpack_require__("96cf");
 
@@ -11368,6 +11477,14 @@ function formatUrl(payload) {
 
 
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+
+
+
+
 
 
 
@@ -11398,7 +11515,7 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
       commit("CLEAR_".concat(_getModel(payload).name.toUpperCase()));
     }
 
-    return axios.get(formatUrl(payload)).then(
+    return axios.get(formatUrl(payload), payload.axiosConfig).then(
     /*#__PURE__*/
     function () {
       var _ref = _asyncToGenerator(
@@ -11433,66 +11550,41 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
   function () {
     var _ref2 = _asyncToGenerator(
     /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee3(commit, payload) {
+    regeneratorRuntime.mark(function _callee2(commit, payload) {
       var method,
-          data,
-          _args3 = arguments;
-      return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          mainConfig,
+          config,
+          _args2 = arguments;
+      return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context2.prev = _context2.next) {
             case 0:
-              method = _args3.length > 2 && _args3[2] !== undefined ? _args3[2] : 'post';
-              data = payload.data;
-              _context3.t0 = axios;
-              _context3.t1 = method;
-              _context3.t2 = formatUrl(payload);
-              _context3.next = 7;
-              return applyModifier('beforeSave', payload.type, models, data);
+              method = _args2.length > 2 && _args2[2] !== undefined ? _args2[2] : 'post';
+              _context2.t0 = method;
+              _context2.t1 = formatUrl(payload);
+              _context2.next = 5;
+              return applyModifier('beforeSave', payload.type, models, payload.data);
 
-            case 7:
-              _context3.t3 = _context3.sent;
-              _context3.t4 = {
-                method: _context3.t1,
-                url: _context3.t2,
-                data: _context3.t3
+            case 5:
+              _context2.t2 = _context2.sent;
+              mainConfig = {
+                method: _context2.t0,
+                url: _context2.t1,
+                data: _context2.t2
               };
+              config = _objectSpread({}, mainConfig, {}, payload.axiosConfig);
+              return _context2.abrupt("return", axios(config).then(function (result) {
+                var resultData = dataPath ? get_default()(result.data, dataPath) : result.data;
+                commit("ADD_".concat(_getModel(payload).name.toUpperCase()), resultData);
+                return resultData;
+              }));
 
-              _context3.t5 =
-              /*#__PURE__*/
-              function () {
-                var _ref3 = _asyncToGenerator(
-                /*#__PURE__*/
-                regeneratorRuntime.mark(function _callee2(result) {
-                  var resultData;
-                  return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                      switch (_context2.prev = _context2.next) {
-                        case 0:
-                          resultData = dataPath ? get_default()(result.data, dataPath) : result.data;
-                          commit("ADD_".concat(_getModel(payload).name.toUpperCase()), resultData);
-                          return _context2.abrupt("return", resultData);
-
-                        case 3:
-                        case "end":
-                          return _context2.stop();
-                      }
-                    }
-                  }, _callee2);
-                }));
-
-                return function (_x4) {
-                  return _ref3.apply(this, arguments);
-                };
-              }();
-
-              return _context3.abrupt("return", (0, _context3.t0)(_context3.t4).then(_context3.t5));
-
-            case 11:
+            case 9:
             case "end":
-              return _context3.stop();
+              return _context2.stop();
           }
         }
-      }, _callee3);
+      }, _callee2);
     }));
 
     return function _storeEntity(_x2, _x3) {
@@ -11504,42 +11596,80 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
   var _deleteEntity =
   /*#__PURE__*/
   function () {
-    var _ref4 = _asyncToGenerator(
+    var _ref3 = _asyncToGenerator(
     /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee4(commit, payload) {
+    regeneratorRuntime.mark(function _callee3(commit, payload) {
       var model, id, data;
-      return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      return regeneratorRuntime.wrap(function _callee3$(_context3) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
               model = _getModel(payload);
               id = payload.id, data = payload.data;
 
               if (!_isAll(payload)) {
-                _context4.next = 10;
+                _context3.next = 11;
                 break;
               }
 
-              _context4.t0 = axios;
-              _context4.t1 = "".concat(formatUrl(payload), "/delete");
-              _context4.next = 7;
+              _context3.t0 = axios;
+              _context3.t1 = "".concat(formatUrl(payload), "/delete");
+              _context3.next = 7;
               return applyModifier('beforeSave', payload.type, models, data);
 
             case 7:
-              _context4.t2 = _context4.sent;
+              _context3.t2 = _context3.sent;
+              _context3.t3 = payload.axiosConfig;
 
-              _context4.t3 = function () {
+              _context3.t4 = function () {
                 commit("DELETE_".concat(model.name.toUpperCase()), data);
               };
 
-              return _context4.abrupt("return", _context4.t0.patch.call(_context4.t0, _context4.t1, _context4.t2).then(_context4.t3));
+              return _context3.abrupt("return", _context3.t0.patch.call(_context3.t0, _context3.t1, _context3.t2, _context3.t3).then(_context3.t4));
 
-            case 10:
-              return _context4.abrupt("return", axios.delete(formatUrl(payload)).then(function () {
+            case 11:
+              return _context3.abrupt("return", axios.delete(formatUrl(payload), payload.axiosConfig).then(function () {
                 commit("DELETE_".concat(model.name.toUpperCase()), id);
               }));
 
-            case 11:
+            case 12:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, _callee3);
+    }));
+
+    return function _deleteEntity(_x4, _x5) {
+      return _ref3.apply(this, arguments);
+    };
+  }();
+
+  this.get =
+  /*#__PURE__*/
+  function () {
+    var _ref4 = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee4(context, payload) {
+      var commit, state, entity;
+      return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              commit = context.commit, state = context.state;
+              entity = _getEntity(state, payload);
+
+              if (!(payload.forceFetch || !entity)) {
+                _context4.next = 4;
+                break;
+              }
+
+              return _context4.abrupt("return", _fetchEntity(commit, payload));
+
+            case 4:
+              return _context4.abrupt("return", entity);
+
+            case 5:
             case "end":
               return _context4.stop();
           }
@@ -11547,45 +11677,8 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
       }, _callee4);
     }));
 
-    return function _deleteEntity(_x5, _x6) {
+    return function (_x6, _x7) {
       return _ref4.apply(this, arguments);
-    };
-  }();
-
-  this.get =
-  /*#__PURE__*/
-  function () {
-    var _ref5 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee5(context, payload) {
-      var commit, state, entity;
-      return regeneratorRuntime.wrap(function _callee5$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              commit = context.commit, state = context.state;
-              entity = _getEntity(state, payload);
-
-              if (!(payload.forceFetch || !entity)) {
-                _context5.next = 4;
-                break;
-              }
-
-              return _context5.abrupt("return", _fetchEntity(commit, payload));
-
-            case 4:
-              return _context5.abrupt("return", entity);
-
-            case 5:
-            case "end":
-              return _context5.stop();
-          }
-        }
-      }, _callee5);
-    }));
-
-    return function (_x7, _x8) {
-      return _ref5.apply(this, arguments);
     };
   }();
 
@@ -11636,26 +11729,54 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
 
       if (get_default()(state, "".concat(model.plural, ".hasAction"))) {
         return flatMap_default()(get_default()(state, "".concat(model.plural, ".actionQueue")), function (entities, action) {
-          return map_default()(entities, function (e) {
-            if (action === 'post') {
-              return dispatch(action, {
-                type: queue,
-                data: e
-              }).then(function () {
-                return commit("DELETE_".concat(model.name), e);
-              }).then(function () {
-                return commit("RESET_QUEUE_".concat(model.name));
-              });
-            }
+          return map_default()(entities,
+          /*#__PURE__*/
+          function () {
+            var _ref5 = _asyncToGenerator(
+            /*#__PURE__*/
+            regeneratorRuntime.mark(function _callee5(e) {
+              return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                while (1) {
+                  switch (_context5.prev = _context5.next) {
+                    case 0:
+                      if (!(action === 'post')) {
+                        _context5.next = 5;
+                        break;
+                      }
 
-            return dispatch(action, {
-              type: queue,
-              id: e.id,
-              data: e
-            }).then(function () {
-              return commit("RESET_QUEUE_".concat(model.name));
-            });
-          });
+                      _context5.next = 3;
+                      return dispatch(action, {
+                        type: queue,
+                        data: e
+                      });
+
+                    case 3:
+                      commit("DELETE_".concat(model.name), e);
+                      return _context5.abrupt("return", commit("RESET_QUEUE_".concat(model.name)));
+
+                    case 5:
+                      _context5.next = 7;
+                      return dispatch(action, {
+                        type: queue,
+                        id: e.id,
+                        data: e
+                      });
+
+                    case 7:
+                      return _context5.abrupt("return", commit("RESET_QUEUE_".concat(model.name)));
+
+                    case 8:
+                    case "end":
+                      return _context5.stop();
+                  }
+                }
+              }, _callee5);
+            }));
+
+            return function (_x8) {
+              return _ref5.apply(this, arguments);
+            };
+          }());
         });
       }
 
@@ -11731,62 +11852,6 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
 };
 
 
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/define-property.js
-var define_property = __webpack_require__("85f2");
-var define_property_default = /*#__PURE__*/__webpack_require__.n(define_property);
-
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/defineProperty.js
-
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    define_property_default()(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/get-own-property-descriptor.js
-var get_own_property_descriptor = __webpack_require__("268f");
-var get_own_property_descriptor_default = /*#__PURE__*/__webpack_require__.n(get_own_property_descriptor);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/get-own-property-symbols.js
-var get_own_property_symbols = __webpack_require__("e265");
-var get_own_property_symbols_default = /*#__PURE__*/__webpack_require__.n(get_own_property_symbols);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime-corejs2/core-js/object/keys.js
-var object_keys = __webpack_require__("a4bb");
-var object_keys_default = /*#__PURE__*/__webpack_require__.n(object_keys);
-
-// CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/objectSpread.js
-
-
-
-
-function _objectSpread(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-
-    var ownKeys = object_keys_default()(source);
-
-    if (typeof get_own_property_symbols_default.a === 'function') {
-      ownKeys = ownKeys.concat(get_own_property_symbols_default()(source).filter(function (sym) {
-        return get_own_property_descriptor_default()(source, sym).enumerable;
-      }));
-    }
-
-    ownKeys.forEach(function (key) {
-      _defineProperty(target, key, source[key]);
-    });
-  }
-
-  return target;
-}
 // CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/createClass.js
 
 
@@ -11825,6 +11890,14 @@ var isString_default = /*#__PURE__*/__webpack_require__.n(isString);
 
 
 
+
+
+
+
+
+function ApiStore_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function ApiStore_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ApiStore_ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ApiStore_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 
 
@@ -12128,7 +12201,7 @@ function () {
             }
           });
         } else {
-          store.items = _objectSpread({}, store.items, _defineProperty({}, entity.id, entity));
+          store.items = ApiStore_objectSpread({}, store.items, _defineProperty({}, entity.id, entity));
         }
 
         if (model.references) {
@@ -12168,7 +12241,7 @@ function () {
             if (itemId) {
               _this3.storeOriginItem(itemStore.originItems, item, model.beforeQueue);
 
-              itemStore.items = _objectSpread({}, itemStore.items, _defineProperty({}, itemId, item));
+              itemStore.items = ApiStore_objectSpread({}, itemStore.items, _defineProperty({}, itemId, item));
             }
           } catch (e) {
             // eslint-disable-next-line no-console
@@ -12276,17 +12349,14 @@ var symbol_default = /*#__PURE__*/__webpack_require__.n(symbol);
 // CONCATENATED MODULE: ./node_modules/@babel/runtime-corejs2/helpers/esm/typeof.js
 
 
-
-function typeof_typeof2(obj) { if (typeof symbol_default.a === "function" && typeof iterator_default.a === "symbol") { typeof_typeof2 = function _typeof2(obj) { return typeof obj; }; } else { typeof_typeof2 = function _typeof2(obj) { return obj && typeof symbol_default.a === "function" && obj.constructor === symbol_default.a && obj !== symbol_default.a.prototype ? "symbol" : typeof obj; }; } return typeof_typeof2(obj); }
-
 function typeof_typeof(obj) {
-  if (typeof symbol_default.a === "function" && typeof_typeof2(iterator_default.a) === "symbol") {
+  if (typeof symbol_default.a === "function" && typeof iterator_default.a === "symbol") {
     typeof_typeof = function _typeof(obj) {
-      return typeof_typeof2(obj);
+      return typeof obj;
     };
   } else {
     typeof_typeof = function _typeof(obj) {
-      return obj && typeof symbol_default.a === "function" && obj.constructor === symbol_default.a && obj !== symbol_default.a.prototype ? "symbol" : typeof_typeof2(obj);
+      return obj && typeof symbol_default.a === "function" && obj.constructor === symbol_default.a && obj !== symbol_default.a.prototype ? "symbol" : typeof obj;
     };
   }
 
@@ -12419,18 +12489,6 @@ function listCacheHas(key) {
 }
 
 module.exports = listCacheHas;
-
-
-/***/ }),
-
-/***/ "fde4":
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__("bf90");
-var $Object = __webpack_require__("584a").Object;
-module.exports = function getOwnPropertyDescriptor(it, key) {
-  return $Object.getOwnPropertyDescriptor(it, key);
-};
 
 
 /***/ }),
