@@ -1,5 +1,5 @@
 import { ActionContext, Commit, ActionTree, Action } from 'vuex';
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, Method } from 'axios';
 import at from 'lodash/at';
 import flatMap from 'lodash/flatMap';
 import forEach from 'lodash/forEach';
@@ -47,25 +47,35 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       if (get(payload, 'clear', _isAll(payload))) {
         commit(`CLEAR_${_getModel(payload).name.toUpperCase()}`);
       }
-      return axios.get(formatUrl(payload)).then(async result => {
-        const resultData = dataPath ? get(result.data, dataPath) : result.data;
-        commit(`ADD_${_getModel(payload).name.toUpperCase()}`, resultData);
-        return resultData;
-      });
+      return axios
+        .get(formatUrl(payload), payload.axiosConfig)
+        .then(async result => {
+          const resultData = dataPath
+            ? get(result.data, dataPath)
+            : result.data;
+          commit(`ADD_${_getModel(payload).name.toUpperCase()}`, resultData);
+          return resultData;
+        });
     };
 
     // store entity to API
     const _storeEntity = async (
       commit: Commit,
       payload: Payload,
-      method: string = 'post'
+      method: Method = 'post'
     ) => {
-      const { data } = payload;
-      return axios({
+      const mainConfig = {
         method,
         url: formatUrl(payload),
-        data: await applyModifier('beforeSave', payload.type, models, data)
-      }).then(async result => {
+        data: await applyModifier(
+          'beforeSave',
+          payload.type,
+          models,
+          payload.data
+        )
+      };
+      const config = { ...mainConfig, ...payload.axiosConfig };
+      return axios(config).then((result: any) => {
         const resultData = dataPath ? get(result.data, dataPath) : result.data;
         commit(`ADD_${_getModel(payload).name.toUpperCase()}`, resultData);
         return resultData;
@@ -81,14 +91,15 @@ export default class Actions<S, R> implements ActionTree<S, R> {
         return axios
           .patch(
             `${formatUrl(payload)}/delete`,
-            await applyModifier('beforeSave', payload.type, models, data)
+            await applyModifier('beforeSave', payload.type, models, data),
+            payload.axiosConfig
           )
           .then(() => {
             commit(`DELETE_${model.name.toUpperCase()}`, data);
           });
       }
 
-      return axios.delete(formatUrl(payload)).then(() => {
+      return axios.delete(formatUrl(payload), payload.axiosConfig).then(() => {
         commit(`DELETE_${model.name.toUpperCase()}`, id);
       });
     };
@@ -153,17 +164,18 @@ export default class Actions<S, R> implements ActionTree<S, R> {
           return flatMap(
             get(state, `${model.plural}.actionQueue`),
             (entities: IndexedObjectTree, action: string) =>
-              map(entities, e => {
+              map(entities, async e => {
                 if (action === 'post') {
-                  return dispatch(action, { type: queue, data: e })
-                    .then(() => commit(`DELETE_${model.name}`, e))
-                    .then(() => commit(`RESET_QUEUE_${model.name}`));
+                  await dispatch(action, { type: queue, data: e });
+                  commit(`DELETE_${model.name}`, e);
+                  return commit(`RESET_QUEUE_${model.name}`);
                 }
-                return dispatch(action, {
+                await dispatch(action, {
                   type: queue,
                   id: e.id,
                   data: e
-                }).then(() => commit(`RESET_QUEUE_${model.name}`));
+                });
+                return commit(`RESET_QUEUE_${model.name}`);
               })
           );
         }

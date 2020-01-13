@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import ApiState from './ApiState';
 
 export interface IndexedObject {
@@ -32,6 +33,7 @@ export interface Payload {
   forceFetch?: boolean;
   query?: any;
   data?: IndexedObject | Array<IndexedObject>;
+  axiosConfig?: AxiosRequestConfig;
   [index: string]: any;
 }
 
