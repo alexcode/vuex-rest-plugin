@@ -2260,6 +2260,32 @@ exports.f = Object.getOwnPropertySymbols;
 
 /***/ }),
 
+/***/ "266a":
+/***/ (function(module, exports, __webpack_require__) {
+
+var arrayMap = __webpack_require__("7948");
+
+/**
+ * The base implementation of `_.values` and `_.valuesIn` which creates an
+ * array of `object` property values corresponding to the property names
+ * of `props`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Array} props The property names to get values for.
+ * @returns {Object} Returns the array of property values.
+ */
+function baseValues(object, props) {
+  return arrayMap(props, function(key) {
+    return object[key];
+  });
+}
+
+module.exports = baseValues;
+
+
+/***/ }),
+
 /***/ "26e8":
 /***/ (function(module, exports) {
 
@@ -3436,6 +3462,47 @@ $export($export.P + $export.R, 'Promise', { 'finally': function (onFinally) {
     } : onFinally
   );
 } });
+
+
+/***/ }),
+
+/***/ "3ff1":
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseValues = __webpack_require__("266a"),
+    keys = __webpack_require__("ec69");
+
+/**
+ * Creates an array of the own enumerable string keyed property values of `object`.
+ *
+ * **Note:** Non-object values are coerced to objects.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category Object
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property values.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ *   this.b = 2;
+ * }
+ *
+ * Foo.prototype.c = 3;
+ *
+ * _.values(new Foo);
+ * // => [1, 2] (iteration order is not guaranteed)
+ *
+ * _.values('hi');
+ * // => ['h', 'i']
+ */
+function values(object) {
+  return object == null ? [] : baseValues(object, keys(object));
+}
+
+module.exports = values;
 
 
 /***/ }),
@@ -11367,6 +11434,10 @@ var map_default = /*#__PURE__*/__webpack_require__.n(map);
 var some = __webpack_require__("3092");
 var some_default = /*#__PURE__*/__webpack_require__.n(some);
 
+// EXTERNAL MODULE: ./node_modules/lodash/values.js
+var values = __webpack_require__("3ff1");
+var values_default = /*#__PURE__*/__webpack_require__.n(values);
+
 // EXTERNAL MODULE: ./node_modules/lodash/isDate.js
 var isDate = __webpack_require__("6220");
 var isDate_default = /*#__PURE__*/__webpack_require__.n(isDate);
@@ -11489,6 +11560,7 @@ function formatUrl(payload) {
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
 
 
 
@@ -11857,6 +11929,12 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
 
     var commit = context.commit;
     commit("UNQUEUE_ACTION_".concat(model.name), payload);
+  };
+
+  this.reset = function (context) {
+    values_default()(context.state).forEach(function (s) {
+      return s.reset();
+    });
   };
 };
 
