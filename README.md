@@ -64,7 +64,6 @@ Vuex-rest actions accept a payload in params.
 {
   id?: string;
   type: string;
-  transition?: string;
   url?: string;
   query?: string | object;
   data?: IndexedObject | Array<IndexedObject>;
@@ -77,8 +76,6 @@ The payload will format the URL as `:type/:id?:query` or `:type?:query` dependin
 
 `type` (Required) is type of model.
 
-`transition` Legacy param to build the URI as `:type/:id/:transition?:query`. It will be remove in next version.
-
 `url` override of normal formating of the URI to `/:url?:query`.
 
 `query` can be a URL querystring as `my_param=1&my_second_param=2` or an object `{ my_param: 1, my_second_param: 2 }`.
@@ -89,29 +86,29 @@ The payload will format the URL as `:type/:id?:query` or `:type?:query` dependin
 
 ```js
 // fetch array
-this.$store.dispatch('get', { type: 'resource' });
+this.$store.dispatch('api/get', { type: 'resource' });
 // will return a single element
-this.$store.dispatch('get', { type: 'resource', id: 'my_id' });
+this.$store.dispatch('api/get', { type: 'resource', id: 'my_id' });
 ```
 
 ### `post`
 
 ```js
-this.$store.dispatch('post', { type: 'resource'  data: {...} });
-this.$store.dispatch('post', { type: 'resource'  data: [{...}] });
+this.$store.dispatch('api/post', { type: 'resource'  data: {...} });
+this.$store.dispatch('api/post', { type: 'resource'  data: [{...}] });
 ```
 
 ### `patch`
 
 ```js
-this.$store.dispatch('patch', { id: 'my_id', type: 'resource'  data: {...} });
-this.$store.dispatch('patch', { type: 'resource'  data: [{...}] });
+this.$store.dispatch('api/patch', { id: 'my_id', type: 'resource'  data: {...} });
+this.$store.dispatch('api/patch', { type: 'resource'  data: [{...}] });
 ```
 
 ### `delete`
 
 ```js
-this.$store.dispatch('delete', { id: 'my_id', type: 'resource' });
+this.$store.dispatch('api/delete', { id: 'my_id', type: 'resource' });
 ```
 
 Any of the above action can be queue and process/cancel at a later stage. Here are some helpers to help you with this.
@@ -119,7 +116,7 @@ Any of the above action can be queue and process/cancel at a later stage. Here a
 ### `queueAction`
 
 ```js
-this.$store.dispatch('queueAction', {
+this.$store.dispatch('api/queueAction', {
   action: 'delete',
   type: 'resource',
   data: data
@@ -129,7 +126,7 @@ this.$store.dispatch('queueAction', {
 ### `cancelAction`
 
 ```js
-this.$store.dispatch('cancelAction', {
+this.$store.dispatch('api/cancelAction', {
   action: 'delete',
   type: 'resource',
   data: data
@@ -139,15 +136,15 @@ this.$store.dispatch('cancelAction', {
 ### `processActionQueue`
 
 ```js
-this.$store.dispatch('processActionQueue', ['resource']);
-this.$store.dispatch('processActionQueue', ['resource', 'role']);
+this.$store.dispatch('api/processActionQueue', ['resource']);
+this.$store.dispatch('api/processActionQueue', ['resource', 'role']);
 ```
 
 ### `cancelActionQueue`
 
 ```js
-this.$store.dispatch('cancelActionQueue', ['resource']);
-this.$store.dispatch('cancelActionQueue', ['resource', 'role']);
+this.$store.dispatch('api/cancelActionQueue', ['resource']);
+this.$store.dispatch('api/cancelActionQueue', ['resource', 'role']);
 ```
 
 ### `queueActionWatcher`
@@ -155,11 +152,17 @@ this.$store.dispatch('cancelActionQueue', ['resource', 'role']);
 It can be called in a watcher to set the object to queue.
 
 ```js
-this.$store.dispatch('queueActionWatcher', {
+this.$store.dispatch('api/queueActionWatcher', {
   action: 'delete',
   type: 'resource',
   data: data
 });
+```
+
+The store can be emptied with the reset action.
+
+```js
+this.$store.dispatch('api/reset');
 ```
 
 # Contribute

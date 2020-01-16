@@ -10,6 +10,7 @@ import isEqual from 'lodash/isEqual';
 import keys from 'lodash/keys';
 import map from 'lodash/map';
 import some from 'lodash/some';
+import values from 'lodash/values';
 import ApiState from './ApiState';
 import {
   ModelTypeTree,
@@ -32,6 +33,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
   processActionQueue: Action<S, R>;
   cancelAction: Action<S, R>;
   cancelActionQueue: Action<S, R>;
+  reset: Action<S, R>;
   constructor(axios: AxiosInstance, models: ModelTypeTree, dataPath?: string) {
     const _isAll = (p: Payload) => !has(p, 'id') && isArray(p.data);
 
@@ -229,6 +231,10 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       const model = _getModel(payload);
       const { commit } = context;
       commit(`UNQUEUE_ACTION_${model.name}`, payload);
+    };
+
+    this.reset = (context: ActionContext<S, R>) => {
+      values(context.state).forEach(s => s.reset());
     };
   }
 }

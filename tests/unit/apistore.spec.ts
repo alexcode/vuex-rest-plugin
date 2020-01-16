@@ -88,6 +88,7 @@ describe('ApiStore by default', function() {
       expect(state.hasAction).toEqual(false);
     });
   });
+
   it('test get Action (GET)', async () => {
     mock.onGet('/resource').reply(200, data);
     store.dispatch('api/get', {
@@ -106,6 +107,7 @@ describe('ApiStore by default', function() {
       expect(storeRole).toMatchObject(resource.user.role);
     });
   });
+
   it('test get Action (GET) single object', async () => {
     const singleResource = data[0];
     mock.onGet(`/resource/${singleResource.id}`).reply(200, singleResource);
@@ -345,5 +347,11 @@ describe('ApiStore by default', function() {
     expect(
       store.getters['api/resources'].actionQueue.patch[data[1].id]
     ).not.toBeUndefined();
+  });
+
+  it('test reset store', async () => {
+    await fillStore();
+    store.dispatch('api/reset');
+    expect(store.getters['api/resources'].items).toEqual({});
   });
 });
