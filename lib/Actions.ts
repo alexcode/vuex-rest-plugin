@@ -106,8 +106,37 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       });
     };
 
-    this.get = async (context: ActionContext<S, R>, payload: Payload) => {
-      const { commit, state } = context;
+    const _confirmActionType = (
+      queue: string,
+      { state, commit, dispatch }: ActionContext<S, R>
+    ) => {
+      const model = models[queue];
+      if (get(state, `${model.plural}.hasAction`)) {
+        return flatMap(
+          get(state, `${model.plural}.actionQueue`),
+          (entities: IndexedObjectTree, action: string) =>
+            map(entities, async e => {
+              if (action === 'post') {
+                await dispatch(action, { type: queue, data: e });
+                commit(`DELETE_${model.name}`, e);
+                return commit(`RESET_QUEUE_${model.name}`);
+              }
+              await dispatch(action, {
+                type: queue,
+                id: e.id,
+                data: e
+              });
+              return commit(`RESET_QUEUE_${model.name}`);
+            })
+        );
+      }
+      return Promise.resolve();
+    };
+
+    this.get = async (
+      { commit, state }: ActionContext<S, R>,
+      payload: Payload
+    ) => {
       const entity = _getEntity(state, payload);
       if (payload.forceFetch || !entity) {
         return _fetchEntity(commit, payload);
@@ -115,27 +144,21 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       return entity;
     };
 
-    this.post = (context: ActionContext<S, R>, payload: Payload) => {
-      const { commit } = context;
-      return _storeEntity(commit, payload);
-    };
+    this.post = ({ commit }: ActionContext<S, R>, payload: Payload) =>
+      _storeEntity(commit, payload);
 
-    this.patch = (context: ActionContext<S, R>, payload: Payload) => {
-      const { commit } = context;
-      return _storeEntity(commit, payload, 'patch');
-    };
+    this.patch = ({ commit }: ActionContext<S, R>, payload: Payload) =>
+      _storeEntity(commit, payload, 'patch');
 
-    this.delete = (context: ActionContext<S, R>, payload: Payload) => {
-      const { commit } = context;
-      return _deleteEntity(commit, payload);
-    };
+    this.delete = ({ commit }: ActionContext<S, R>, payload: Payload) =>
+      _deleteEntity(commit, payload);
+
     // add watched changes to queue
     this.queueActionWatcher = (
-      context: ActionContext<S, R>,
+      { commit, state }: ActionContext<S, R>,
       payload: QueuePayload
     ) => {
       const model = _getModel(payload);
-      const { commit, state } = context;
       const checkChanged = (i: IndexedObject) =>
         has(get(state, `${model.plural}.originItems`), i.id) &&
         !isEqual(get(state, `${model.plural}.originItems.${i.id}`), i);
@@ -149,52 +172,26 @@ export default class Actions<S, R> implements ActionTree<S, R> {
     };
 
     this.queueAction = (
-      context: ActionContext<S, R>,
+      { commit }: ActionContext<S, R>,
       payload: QueuePayload
-    ) => {
-      context.commit(`QUEUE_ACTION_${_getModel(payload).name}`, payload);
-    };
+    ) => commit(`QUEUE_ACTION_${_getModel(payload).name}`, payload);
 
     this.processActionQueue = (
       context: ActionContext<S, R>,
       payload: string | Array<string>
     ) => {
-      const { commit, state, dispatch } = context;
-      const confirmActionType = (queue: string) => {
-        const model = models[queue];
-        if (get(state, `${model.plural}.hasAction`)) {
-          return flatMap(
-            get(state, `${model.plural}.actionQueue`),
-            (entities: IndexedObjectTree, action: string) =>
-              map(entities, async e => {
-                if (action === 'post') {
-                  await dispatch(action, { type: queue, data: e });
-                  commit(`DELETE_${model.name}`, e);
-                  return commit(`RESET_QUEUE_${model.name}`);
-                }
-                await dispatch(action, {
-                  type: queue,
-                  id: e.id,
-                  data: e
-                });
-                return commit(`RESET_QUEUE_${model.name}`);
-              })
-          );
-        }
-        return Promise.resolve();
-      };
-
       if (isArray(payload)) {
-        return Promise.all(flatMap(payload, confirmActionType));
+        return Promise.all(
+          flatMap(payload, p => _confirmActionType(p, context))
+        );
       }
-      return confirmActionType(payload);
+      return _confirmActionType(payload, context);
     };
 
     this.cancelActionQueue = (
-      context: ActionContext<S, R>,
+      { commit, state }: ActionContext<S, R>,
       payload: string | Array<string>
     ) => {
-      const { commit, state } = context;
       const cancelActionType = async (queue: string) => {
         const model = models[queue];
         if (get(state, `${model.plural}.hasAction`)) {
@@ -225,11 +222,10 @@ export default class Actions<S, R> implements ActionTree<S, R> {
     };
 
     this.cancelAction = (
-      context: ActionContext<S, R>,
+      { commit }: ActionContext<S, R>,
       payload: QueuePayload
     ) => {
       const model = _getModel(payload);
-      const { commit } = context;
       commit(`UNQUEUE_ACTION_${model.name}`, payload);
     };
 
