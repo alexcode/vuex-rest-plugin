@@ -1,16 +1,16 @@
 import { ActionContext, Commit, ActionTree, Action } from 'vuex';
 import { AxiosInstance, Method } from 'axios';
-import at from 'lodash/at';
-import flatMap from 'lodash/flatMap';
-import forEach from 'lodash/forEach';
-import get from 'lodash/get';
-import has from 'lodash/has';
-import isArray from 'lodash/isArray';
-import isEqual from 'lodash/isEqual';
-import keys from 'lodash/keys';
-import map from 'lodash/map';
-import some from 'lodash/some';
-import values from 'lodash/values';
+import at from 'lodash-es/at';
+import flatMap from 'lodash-es/flatMap';
+import forEach from 'lodash-es/forEach';
+import get from 'lodash-es/get';
+import has from 'lodash-es/has';
+import isArray from 'lodash-es/isArray';
+import isEqual from 'lodash-es/isEqual';
+import keys from 'lodash-es/keys';
+import map from 'lodash-es/map';
+import some from 'lodash-es/some';
+import values from 'lodash-es/values';
 import ApiState from './ApiState';
 import {
   ModelTypeTree,

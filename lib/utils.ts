@@ -1,10 +1,10 @@
-import get from 'lodash/get';
-import has from 'lodash/has';
-import isArray from 'lodash/isArray';
-import isDate from 'lodash/isDate';
-import isFunction from 'lodash/isFunction';
-import isObject from 'lodash/isObject';
-import map from 'lodash/map';
+import get from 'lodash-es/get';
+import has from 'lodash-es/has';
+import isArray from 'lodash-es/isArray';
+import isDate from 'lodash-es/isDate';
+import isFunction from 'lodash-es/isFunction';
+import isObject from 'lodash-es/isObject';
+import map from 'lodash-es/map';
 import { ModelTypeTree, Payload } from './types';
 
 export async function applyModifier(

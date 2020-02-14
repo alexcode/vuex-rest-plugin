@@ -1,13 +1,13 @@
 import { StoreOptions } from 'vuex';
 import Vue from 'vue';
-import cloneDeep from 'lodash/cloneDeep';
-import forEach from 'lodash/forEach';
-import get from 'lodash/get';
-import has from 'lodash/has';
-import isArray from 'lodash/isArray';
-import isEqual from 'lodash/isEqual';
-import isFunction from 'lodash/isFunction';
-import isString from 'lodash/isString';
+import cloneDeep from 'lodash-es/cloneDeep';
+import forEach from 'lodash-es/forEach';
+import get from 'lodash-es/get';
+import has from 'lodash-es/has';
+import isArray from 'lodash-es/isArray';
+import isEqual from 'lodash-es/isEqual';
+import isFunction from 'lodash-es/isFunction';
+import isString from 'lodash-es/isString';
 import Actions from './Actions';
 import ApiState from './ApiState';
 import {

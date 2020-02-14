@@ -1,5 +1,5 @@
-import isEmpty from 'lodash/isEmpty';
-import some from 'lodash/some';
+import isEmpty from 'lodash-es/isEmpty';
+import some from 'lodash-es/some';
 import ActionQueue from './ActionQueue';
 import { IndexedObjectTree, IndexedObject } from './types';
 

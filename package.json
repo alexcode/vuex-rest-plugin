@@ -1,8 +1,9 @@
 {
   "name": "vuex-rest-plugin",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "private": true,
   "main": "dist/vuex-rest-plugin.common.js",
+  "types": "./lib/types.d.ts",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --name vuex-rest-plugin lib/index.ts",
@@ -10,17 +11,17 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "axios": "^0.19.1",
+    "@types/lodash-es": "^4.17.3",
     "date-fns": "^1.30.1",
-    "lodash": "^4.17.11",
+    "lodash-es": "^4.17.15"
+  },
+  "peerDependencies": {
+    "axios": "^0.19.2",
     "vue": "^2.5.22",
-    "vue-class-component": "^6.0.0",
-    "vue-property-decorator": "^7.0.0",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@types/jest": "^23.1.4",
-    "@types/lodash": "^4.14.120",
     "@vue/cli-plugin-babel": "^3.4.0",
     "@vue/cli-plugin-eslint": "^3.4.0",
     "@vue/cli-plugin-typescript": "^3.4.0",
@@ -29,6 +30,7 @@
     "@vue/eslint-config-prettier": "^4.0.1",
     "@vue/eslint-config-typescript": "^4.0.0",
     "@vue/test-utils": "^1.0.0-beta.20",
+    "axios": "^0.19.2",
     "axios-mock-adapter": "^1.16.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
@@ -37,6 +39,8 @@
     "flush-promises": "^1.0.2",
     "ts-jest": "^23.0.0",
     "typescript": "~3.2.2",
-    "vue-template-compiler": "^2.5.21"
+    "vue-template-compiler": "^2.5.21",
+    "vue": "^2.5.22",
+    "vuex": "^3.0.1"
   }
 }

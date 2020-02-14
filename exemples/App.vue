@@ -9,22 +9,22 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+<script>
 const data = require('./../tests/unit/apistore.spec.data');
 
-@Component
-export default class App extends Vue {
-  populate(): void {
-    this.$store
-      .dispatch('api/post', {
-        url: 'https://httpbin.org/post',
-        type: 'resource',
-        data
-      })
-      .then(() => this.$forceUpdate());
+export default {
+  methods: {
+    populate() {
+      this.$store
+        .dispatch('api/post', {
+          url: 'https://httpbin.org/post',
+          type: 'resource',
+          data
+        })
+        .then(() => this.$forceUpdate());
+    }
   }
-}
+};
 </script>
 
 <style>
