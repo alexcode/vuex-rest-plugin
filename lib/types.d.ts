@@ -39,7 +39,7 @@ export interface Payload {
 
 export interface QueuePayload {
   type: string;
-  data: IndexedObject | Array<IndexedObject>;
+  payload: Payload;
   action: string;
   [index: string]: any;
 }

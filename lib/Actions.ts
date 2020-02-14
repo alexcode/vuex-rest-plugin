@@ -1,26 +1,26 @@
-import { ActionContext, Commit, ActionTree, Action } from 'vuex';
-import { AxiosInstance, Method } from 'axios';
-import at from 'lodash-es/at';
-import flatMap from 'lodash-es/flatMap';
-import forEach from 'lodash-es/forEach';
-import get from 'lodash-es/get';
-import has from 'lodash-es/has';
-import isArray from 'lodash-es/isArray';
-import isEqual from 'lodash-es/isEqual';
-import keys from 'lodash-es/keys';
-import map from 'lodash-es/map';
-import some from 'lodash-es/some';
-import values from 'lodash-es/values';
-import ApiState from './ApiState';
+import { ActionContext, Commit, ActionTree, Action } from "vuex";
+import { AxiosInstance, Method } from "axios";
+import at from "lodash-es/at";
+import flatMap from "lodash-es/flatMap";
+import forEach from "lodash-es/forEach";
+import get from "lodash-es/get";
+import has from "lodash-es/has";
+import isArray from "lodash-es/isArray";
+// import isEqual from 'lodash-es/isEqual';
+import keys from "lodash-es/keys";
+import map from "lodash-es/map";
+// import some from 'lodash-es/some';
+import values from "lodash-es/values";
+import ApiState from "./ApiState";
 import {
   ModelTypeTree,
   Payload,
   QueuePayload,
   ModelType,
-  IndexedObject,
+  // IndexedObject,
   IndexedObjectTree
-} from './types';
-import { applyModifier, formatUrl } from './utils';
+} from "./types";
+import { applyModifier, formatUrl } from "./utils";
 
 export default class Actions<S, R> implements ActionTree<S, R> {
   [key: string]: Action<S, R>;
@@ -28,14 +28,14 @@ export default class Actions<S, R> implements ActionTree<S, R> {
   post: Action<S, R>;
   patch: Action<S, R>;
   delete: Action<S, R>;
-  queueActionWatcher: Action<S, R>;
+  // queueActionWatcher: Action<S, R>;
   queueAction: Action<S, R>;
   processActionQueue: Action<S, R>;
   cancelAction: Action<S, R>;
   cancelActionQueue: Action<S, R>;
   reset: Action<S, R>;
   constructor(axios: AxiosInstance, models: ModelTypeTree, dataPath?: string) {
-    const _isAll = (p: Payload) => !has(p, 'id') && isArray(p.data);
+    const _isAll = (p: Payload) => !has(p, "id") && isArray(p.data);
 
     const _getModel = (p: Payload | QueuePayload): ModelType => models[p.type];
 
@@ -46,7 +46,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
 
     // fetch entity from API
     const _fetchEntity = (commit: Commit, payload: Payload) => {
-      if (get(payload, 'clear', _isAll(payload))) {
+      if (get(payload, "clear", _isAll(payload))) {
         commit(`CLEAR_${_getModel(payload).name.toUpperCase()}`);
       }
       return axios
@@ -64,13 +64,13 @@ export default class Actions<S, R> implements ActionTree<S, R> {
     const _storeEntity = async (
       commit: Commit,
       payload: Payload,
-      method: Method = 'post'
+      method: Method = "post"
     ) => {
       const mainConfig = {
         method,
         url: formatUrl(payload),
         data: await applyModifier(
-          'beforeSave',
+          "beforeSave",
           payload.type,
           models,
           payload.data
@@ -93,7 +93,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
         return axios
           .patch(
             `${formatUrl(payload)}/delete`,
-            await applyModifier('beforeSave', payload.type, models, data),
+            await applyModifier("beforeSave", payload.type, models, data),
             payload.axiosConfig
           )
           .then(() => {
@@ -116,7 +116,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
           get(state, `${model.plural}.actionQueue`),
           (entities: IndexedObjectTree, action: string) =>
             map(entities, async e => {
-              if (action === 'post') {
+              if (action === "post") {
                 await dispatch(action, { type: queue, data: e });
                 commit(`DELETE_${model.name}`, e);
                 return commit(`RESET_QUEUE_${model.name}`);
@@ -131,6 +131,27 @@ export default class Actions<S, R> implements ActionTree<S, R> {
         );
       }
       return Promise.resolve();
+    };
+
+    const _cancelActionType = async (
+      queue: string,
+      { state, commit }: ActionContext<S, R>
+    ) => {
+      const model = models[queue];
+      if (get(state, `${model.plural}.hasAction`)) {
+        const originIds = keys(
+          get(state, `${model.plural}.actionQueue.delete`, [])
+        ).concat(
+          keys(get(state, `${model.plural}.actionQueue.post`, [])),
+          keys(get(state, `${model.plural}.actionQueue.patch`, []))
+        );
+        const origin = at(get(state, `${model.plural}.originItems`), originIds);
+        commit(
+          `ADD_${model.name}`,
+          await applyModifier("afterQueue", queue, models, origin)
+        );
+        commit(`RESET_QUEUE_${model.name}`);
+      }
     };
 
     this.get = async (
@@ -148,28 +169,28 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       _storeEntity(commit, payload);
 
     this.patch = ({ commit }: ActionContext<S, R>, payload: Payload) =>
-      _storeEntity(commit, payload, 'patch');
+      _storeEntity(commit, payload, "patch");
 
     this.delete = ({ commit }: ActionContext<S, R>, payload: Payload) =>
       _deleteEntity(commit, payload);
 
     // add watched changes to queue
-    this.queueActionWatcher = (
-      { commit, state }: ActionContext<S, R>,
-      payload: QueuePayload
-    ) => {
-      const model = _getModel(payload);
-      const checkChanged = (i: IndexedObject) =>
-        has(get(state, `${model.plural}.originItems`), i.id) &&
-        !isEqual(get(state, `${model.plural}.originItems.${i.id}`), i);
-      const hasChanged =
-        isArray(payload.data) && payload.data
-          ? some(payload.data, checkChanged)
-          : checkChanged(payload.data);
-      if (hasChanged) {
-        commit(`QUEUE_ACTION_${model.name}`, payload);
-      }
-    };
+    // this.queueActionWatcher = (
+    //   { commit, state }: ActionContext<S, R>,
+    //   payload: QueuePayload
+    // ) => {
+    //   const model = _getModel(payload);
+    //   const checkChanged = (i: IndexedObject) =>
+    //     has(get(state, `${model.plural}.originItems`), i.id) &&
+    //     !isEqual(get(state, `${model.plural}.originItems.${i.id}`), i);
+    //   const hasChanged =
+    //     isArray(payload.data) && payload.data
+    //       ? some(payload.data, checkChanged)
+    //       : checkChanged(payload.data);
+    //   if (hasChanged) {
+    //     commit(`QUEUE_ACTION_${model.name}`, payload);
+    //   }
+    // };
 
     this.queueAction = (
       { commit }: ActionContext<S, R>,
@@ -178,46 +199,22 @@ export default class Actions<S, R> implements ActionTree<S, R> {
 
     this.processActionQueue = (
       context: ActionContext<S, R>,
-      payload: string | Array<string>
+      queue: string | Array<string>
     ) => {
-      if (isArray(payload)) {
-        return Promise.all(
-          flatMap(payload, p => _confirmActionType(p, context))
-        );
+      if (isArray(queue)) {
+        return Promise.all(flatMap(queue, q => _confirmActionType(q, context)));
       }
-      return _confirmActionType(payload, context);
+      return _confirmActionType(queue, context);
     };
 
     this.cancelActionQueue = (
-      { commit, state }: ActionContext<S, R>,
+      context: ActionContext<S, R>,
       payload: string | Array<string>
     ) => {
-      const cancelActionType = async (queue: string) => {
-        const model = models[queue];
-        if (get(state, `${model.plural}.hasAction`)) {
-          const origin = keys(
-            get(state, `${model.plural}.actionQueue.delete`, [])
-          ).concat(
-            keys(get(state, `${model.plural}.actionQueue.post`, [])),
-            keys(get(state, `${model.plural}.actionQueue.patch`, []))
-          );
-          commit(
-            `ADD_${model.name}`,
-            await applyModifier(
-              'afterQueue',
-              queue,
-              models,
-              at(get(state, `${model.plural}.originItems`), origin)
-            )
-          );
-          commit(`RESET_QUEUE_${model.name}`);
-        }
-      };
-
       if (isArray(payload)) {
-        forEach(payload, cancelActionType);
+        forEach(payload, p => _cancelActionType(p, context));
       } else {
-        cancelActionType(payload);
+        _cancelActionType(payload, context);
       }
     };
 

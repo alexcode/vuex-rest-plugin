@@ -1,15 +1,16 @@
-import { StoreOptions } from 'vuex';
-import Vue from 'vue';
-import cloneDeep from 'lodash-es/cloneDeep';
-import forEach from 'lodash-es/forEach';
-import get from 'lodash-es/get';
-import has from 'lodash-es/has';
-import isArray from 'lodash-es/isArray';
-import isEqual from 'lodash-es/isEqual';
-import isFunction from 'lodash-es/isFunction';
-import isString from 'lodash-es/isString';
-import Actions from './Actions';
-import ApiState from './ApiState';
+import { StoreOptions } from "vuex";
+import Vue from "vue";
+import cloneDeep from "lodash-es/cloneDeep";
+import forEach from "lodash-es/forEach";
+import get from "lodash-es/get";
+import has from "lodash-es/has";
+import isArray from "lodash-es/isArray";
+import isEqual from "lodash-es/isEqual";
+import isFunction from "lodash-es/isFunction";
+import isString from "lodash-es/isString";
+import omit from "lodash-es/omit";
+import Actions from "./Actions";
+import ApiState from "./ApiState";
 import {
   ModelTypeTree,
   QueuePayload,
@@ -17,8 +18,8 @@ import {
   ModelType,
   Modifier,
   ReferenceTree
-} from './types';
-import { applyModifier } from './utils';
+} from "./types";
+import { applyModifier } from "./utils";
 
 export default class ApiStore<S> implements StoreOptions<S> {
   namespaced: boolean;
@@ -35,14 +36,16 @@ export default class ApiStore<S> implements StoreOptions<S> {
     this.mutations = Object.create(null);
     forEach(this.models, (model, modelKey) => {
       const modelIdx = model.plural;
+
       // adding all states
       this.state[modelIdx] = model.type;
+
       // adding ADD_* mutations
       this.mutations[`ADD_${model.name.toUpperCase()}`] = (
         myState: ApiState,
         item: IndexedObject | Array<IndexedObject>
       ) =>
-        applyModifier('afterGet', modelKey, this.models, item).then(
+        applyModifier("afterGet", modelKey, this.models, item).then(
           (i: any) => {
             this.storeOriginItem(
               get(myState, `${modelIdx}.originItems`),
@@ -54,6 +57,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
             myState[modelIdx].lastLoad = new Date();
           }
         );
+
       // adding DELETE_* mutations
       this.mutations[`DELETE_${model.name.toUpperCase()}`] = (
         myState: ApiState,
@@ -76,60 +80,56 @@ export default class ApiStore<S> implements StoreOptions<S> {
           deleteItem(item);
         }
       };
+
       // adding CLEAR_* mutations
       this.mutations[`CLEAR_${model.name.toUpperCase()}`] = (
         myState: ApiState
       ) => myState[modelIdx].reset();
+
       this.mutations[`QUEUE_ACTION_${model.name.toUpperCase()}`] = (
         myState: ApiState,
-        obj: QueuePayload
+        payload: QueuePayload
       ) => {
         const store = myState[modelIdx];
-        const storeAction = async (d: IndexedObject) => {
-          if (obj.action === 'post') {
+        const storeAction = async (qp: QueuePayload) => {
+          const QToStore = omit(qp, "method", "action");
+          if (qp.action === "post") {
             Vue.set(
               store.items,
-              d.id,
-              await applyModifier('afterGet', modelKey, this.models, d)
+              qp.data.id,
+              await applyModifier("afterGet", modelKey, this.models, qp.data)
             );
-            store.actionQueue[obj.action].push(
-              await applyModifier('beforeSave', modelKey, this.models, d)
+            store.actionQueue[qp.action].push(
+              await applyModifier("beforeSave", modelKey, this.models, QToStore)
             );
           } else {
-            Vue.set(
-              store.actionQueue[obj.action],
-              d.id,
-              await applyModifier('beforeSave', modelKey, this.models, d)
-            );
-            if (obj.action === 'delete') {
-              Vue.delete(store.items, d.id);
+            if (qp.action === "delete") {
+              Vue.delete(store.items, qp.id);
             }
+            Vue.set(
+              store.actionQueue[qp.action],
+              qp.data.id,
+              await applyModifier("beforeSave", modelKey, this.models, QToStore)
+            );
           }
         };
 
-        if (has(store.actionQueue, obj.action)) {
-          if (isArray(obj.data)) {
-            forEach(obj.data, storeAction);
-          } else {
-            storeAction(obj.data);
-          }
+        if (has(store.actionQueue, payload.action)) {
+          storeAction(payload);
         } else {
           // eslint-disable-next-line no-console
-          console.warn(`action ${obj.action} is not storable`);
+          console.warn(`action ${payload.action} is not storable`);
         }
       };
+
       this.mutations[`UNQUEUE_ACTION_${model.name.toUpperCase()}`] = (
         myState: ApiState,
-        obj: QueuePayload
+        payload: QueuePayload
       ) => {
-        const deleteAction = (i: IndexedObject) =>
-          Vue.delete(myState[model.plural].actionQueue[obj.action], i.id);
-        if (isArray(obj.data)) {
-          forEach(obj.data, deleteAction);
-        } else {
-          deleteAction(obj.data);
-        }
+        const id = payload.id || payload.data.id;
+        Vue.delete(myState[model.plural].actionQueue[payload.action], id);
       };
+
       this.mutations[`RESET_QUEUE_${model.name.toUpperCase()}`] = (
         myState: ApiState
       ) => {
@@ -139,6 +139,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
             : {};
         });
       };
+
       // adding getters
       this.getters[modelIdx.toLowerCase()] = (myState: ApiState) =>
         myState[modelIdx];
@@ -191,7 +192,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
         forEach(model.references, (modelName, prop) => {
           if (has(entity, prop) && get(entity, prop)) {
             applyModifier(
-              'afterGet',
+              "afterGet",
               modelName,
               this.models,
               entity[prop]
@@ -226,7 +227,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
       } else {
         try {
           const item = prop ? data[prop] : data;
-          const itemId = get(item, 'id');
+          const itemId = get(item, "id");
           const model = this.models[modelName];
           const itemStore = state[model.plural];
           if (itemId) {
