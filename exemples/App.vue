@@ -10,15 +10,16 @@
 </template>
 
 <script>
-const data = require('./../tests/unit/apistore.spec.data');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const data = require("./../tests/unit/apistore.spec.data");
 
 export default {
   methods: {
     populate() {
       this.$store
-        .dispatch('api/post', {
-          url: 'https://httpbin.org/post',
-          type: 'resource',
+        .dispatch("api/post", {
+          url: "https://httpbin.org/post",
+          type: "resource",
           data
         })
         .then(() => this.$forceUpdate());
@@ -29,7 +30,7 @@ export default {
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

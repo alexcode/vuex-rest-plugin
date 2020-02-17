@@ -1,7 +1,7 @@
-import isEmpty from 'lodash-es/isEmpty';
-import some from 'lodash-es/some';
-import ActionQueue from './ActionQueue';
-import { IndexedObjectTree, IndexedObject } from './types';
+import isEmpty from "lodash-es/isEmpty";
+import some from "lodash-es/some";
+import ActionQueue from "./ActionQueue";
+import { IndexedObjectTree, IndexedObject } from "./types";
 
 export default class ApiState {
   [key: string]: any;

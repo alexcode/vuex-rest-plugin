@@ -13,7 +13,10 @@ Vue.use(Vuex);
 Vue.config.devtools = false;
 Vue.config.productionTip = false;
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 describe("ApiStore by default", function() {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const data = require("./apistore.spec.data.json");
   const models = {
     resource: {

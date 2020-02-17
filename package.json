@@ -1,7 +1,8 @@
 {
   "name": "vuex-rest-plugin",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "private": true,
+  "main": "dist/vuex-rest-plugin.common.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --name vuex-rest-plugin lib/index.ts",
@@ -11,7 +12,6 @@
   "dependencies": {
     "@types/lodash-es": "^4.17.3",
     "core-js": "^3.6.4",
-    "date-fns": "^2.9.0",
     "lodash-es": "^4.17.15",
     "vue": "^2.6.11"
   },

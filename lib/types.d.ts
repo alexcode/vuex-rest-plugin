@@ -1,5 +1,5 @@
-import { AxiosRequestConfig } from 'axios';
-import ApiState from './ApiState';
+import { AxiosRequestConfig, AxiosInstance } from "axios";
+import ApiState from "./ApiState";
 
 export interface IndexedObject {
   id: string;
@@ -46,6 +46,14 @@ export interface QueuePayload {
 
 export interface ReferenceTree {
   [index: string]: string;
+}
+
+export interface VuexRestOptions {
+  name?: string;
+  namespaced?: boolean;
+  models: ModelTypeTree;
+  axios: AxiosInstance;
+  dataPath?: string;
 }
 
 export type Modifier = (value: IndexedObject | Array<IndexedObject>) => void;

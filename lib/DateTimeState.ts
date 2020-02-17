@@ -1,4 +1,4 @@
-import ApiState from './ApiState';
+import ApiState from "./ApiState";
 
 export default class DateTimeState extends ApiState {
   from: Date | null;

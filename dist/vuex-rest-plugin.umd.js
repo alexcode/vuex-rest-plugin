@@ -6045,9 +6045,6 @@ var es_array_for_each = __webpack_require__("4160");
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.iterator.js
 var es_array_iterator = __webpack_require__("e260");
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.map.js
-var es_array_map = __webpack_require__("d81d");
-
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.to-string.js
 var es_object_to_string = __webpack_require__("d3b7");
 
@@ -6183,6 +6180,22 @@ function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
+}
+// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/createClass.js
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
 }
 // CONCATENATED MODULE: ./node_modules/lodash-es/_baseAt.js
 
@@ -8741,6 +8754,9 @@ function values_values(object) {
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.join.js
 var es_array_join = __webpack_require__("a15b");
 
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.map.js
+var es_array_map = __webpack_require__("d81d");
+
 // CONCATENATED MODULE: ./node_modules/lodash-es/_baseIsDate.js
 
 
@@ -8879,7 +8895,7 @@ function formatUrl(payload) {
 
       return "".concat(key, "=").concat(resquestValue);
     });
-    payload.query = query.join('&');
+    payload.query = query.join("&");
   }
 
   if (payload.query) {
@@ -8908,294 +8924,336 @@ function formatUrl(payload) {
 
 
 
- // import isEqual from 'lodash-es/isEqual';
-
-
- // import some from 'lodash-es/some';
 
 
 
+
+
+
+var Actions_ActionBase =
+/*#__PURE__*/
+function () {
+  function ActionBase(axios, models, dataPath) {
+    _classCallCheck(this, ActionBase);
+
+    this._axios = axios;
+    this._models = models;
+    this._dataPath = dataPath; // add watched changes to queue
+    // this.queueActionWatcher = (
+    //   { commit, state }: ActionContext<S, R>,
+    //   payload: QueuePayload
+    // ) => {
+    //   const model = _getModel(payload);
+    //   const checkChanged = (i: IndexedObject) =>
+    //     has(get(state, `${model.plural}.originItems`), i.id) &&
+    //     !isEqual(get(state, `${model.plural}.originItems.${i.id}`), i);
+    //   const hasChanged =
+    //     isArray(payload.data) && payload.data
+    //       ? some(payload.data, checkChanged)
+    //       : checkChanged(payload.data);
+    //   if (hasChanged) {
+    //     commit(`QUEUE_ACTION_${model.name}`, payload);
+    //   }
+    // };
+  }
+
+  _createClass(ActionBase, [{
+    key: "_isAll",
+    value: function _isAll(p) {
+      return !lodash_es_has(p, "id") && lodash_es_isArray(p.data);
+    }
+  }, {
+    key: "_getModel",
+    value: function _getModel(p) {
+      return this._models[p.type];
+    } // retrieve entity from Vuex store
+
+  }, {
+    key: "_getEntity",
+    value: function _getEntity(state, payload) {
+      return lodash_es_get(state, "".concat(this._getModel(payload).plural, ".items"))[payload.id];
+    } // fetch entity from API
+
+  }, {
+    key: "_fetchEntity",
+    value: function _fetchEntity(commit, payload) {
+      var _this = this;
+
+      if (lodash_es_get(payload, "clear", this._isAll(payload))) {
+        commit("CLEAR_".concat(this._getModel(payload).name.toUpperCase()));
+      }
+
+      return this._axios.get(formatUrl(payload), payload.axiosConfig).then(
+      /*#__PURE__*/
+      function () {
+        var _ref = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee(result) {
+          var resultData;
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  resultData = _this._dataPath ? lodash_es_get(result.data, _this._dataPath) : result.data;
+                  commit("ADD_".concat(_this._getModel(payload).name.toUpperCase()), resultData);
+                  return _context.abrupt("return", resultData);
+
+                case 3:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        }));
+
+        return function (_x) {
+          return _ref.apply(this, arguments);
+        };
+      }());
+    } // store entity to API
+
+  }, {
+    key: "_storeEntity",
+    value: function () {
+      var _storeEntity2 = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2(commit, payload) {
+        var _this2 = this;
+
+        var method,
+            mainConfig,
+            config,
+            _args2 = arguments;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                method = _args2.length > 2 && _args2[2] !== undefined ? _args2[2] : "post";
+                _context2.t0 = method;
+                _context2.t1 = formatUrl(payload);
+                _context2.next = 5;
+                return applyModifier("beforeSave", payload.type, this._models, payload.data);
+
+              case 5:
+                _context2.t2 = _context2.sent;
+                mainConfig = {
+                  method: _context2.t0,
+                  url: _context2.t1,
+                  data: _context2.t2
+                };
+                config = _objectSpread2({}, mainConfig, {}, payload.axiosConfig);
+                return _context2.abrupt("return", this._axios(config).then(function (result) {
+                  var resultData = _this2._dataPath ? lodash_es_get(result.data, _this2._dataPath) : result.data;
+                  commit("ADD_".concat(_this2._getModel(payload).name.toUpperCase()), resultData);
+                  return resultData;
+                }));
+
+              case 9:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function _storeEntity(_x2, _x3) {
+        return _storeEntity2.apply(this, arguments);
+      }
+
+      return _storeEntity;
+    }() // delete entity to API
+
+  }, {
+    key: "_deleteEntity",
+    value: function () {
+      var _deleteEntity2 = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3(commit, payload) {
+        var model, id, data;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                model = this._getModel(payload);
+                id = payload.id, data = payload.data;
+
+                if (!this._isAll(payload)) {
+                  _context3.next = 11;
+                  break;
+                }
+
+                _context3.t0 = this._axios;
+                _context3.t1 = "".concat(formatUrl(payload), "/delete");
+                _context3.next = 7;
+                return applyModifier("beforeSave", payload.type, this._models, data);
+
+              case 7:
+                _context3.t2 = _context3.sent;
+                _context3.t3 = payload.axiosConfig;
+
+                _context3.t4 = function () {
+                  commit("DELETE_".concat(model.name.toUpperCase()), data);
+                };
+
+                return _context3.abrupt("return", _context3.t0.patch.call(_context3.t0, _context3.t1, _context3.t2, _context3.t3).then(_context3.t4));
+
+              case 11:
+                return _context3.abrupt("return", this._axios.delete(formatUrl(payload), payload.axiosConfig).then(function () {
+                  commit("DELETE_".concat(model.name.toUpperCase()), id);
+                }));
+
+              case 12:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function _deleteEntity(_x4, _x5) {
+        return _deleteEntity2.apply(this, arguments);
+      }
+
+      return _deleteEntity;
+    }()
+  }, {
+    key: "_confirmActionType",
+    value: function _confirmActionType(queue, _ref2) {
+      var state = _ref2.state,
+          commit = _ref2.commit,
+          dispatch = _ref2.dispatch;
+      var model = this._models[queue];
+
+      if (lodash_es_get(state, "".concat(model.plural, ".hasAction"))) {
+        return lodash_es_flatMap(lodash_es_get(state, "".concat(model.plural, ".actionQueue")), function (entities, action) {
+          return lodash_es_map(entities,
+          /*#__PURE__*/
+          function () {
+            var _ref3 = _asyncToGenerator(
+            /*#__PURE__*/
+            regeneratorRuntime.mark(function _callee4(e) {
+              return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                while (1) {
+                  switch (_context4.prev = _context4.next) {
+                    case 0:
+                      if (!(action === "post")) {
+                        _context4.next = 5;
+                        break;
+                      }
+
+                      _context4.next = 3;
+                      return dispatch(action, {
+                        type: queue,
+                        data: e
+                      });
+
+                    case 3:
+                      commit("DELETE_".concat(model.name), e);
+                      return _context4.abrupt("return", commit("RESET_QUEUE_".concat(model.name)));
+
+                    case 5:
+                      _context4.next = 7;
+                      return dispatch(action, {
+                        type: queue,
+                        id: e.id,
+                        data: e
+                      });
+
+                    case 7:
+                      return _context4.abrupt("return", commit("RESET_QUEUE_".concat(model.name)));
+
+                    case 8:
+                    case "end":
+                      return _context4.stop();
+                  }
+                }
+              }, _callee4);
+            }));
+
+            return function (_x6) {
+              return _ref3.apply(this, arguments);
+            };
+          }());
+        });
+      }
+
+      return Promise.resolve();
+    }
+  }, {
+    key: "_cancelActionType",
+    value: function () {
+      var _cancelActionType2 = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee5(queue, _ref4) {
+        var state, commit, model, originIds, origin;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                state = _ref4.state, commit = _ref4.commit;
+                model = this._models[queue];
+
+                if (!lodash_es_get(state, "".concat(model.plural, ".hasAction"))) {
+                  _context5.next = 12;
+                  break;
+                }
+
+                originIds = lodash_es_keys(lodash_es_get(state, "".concat(model.plural, ".actionQueue.delete"), [])).concat(lodash_es_keys(lodash_es_get(state, "".concat(model.plural, ".actionQueue.post"), [])), lodash_es_keys(lodash_es_get(state, "".concat(model.plural, ".actionQueue.patch"), [])));
+                origin = lodash_es_at(lodash_es_get(state, "".concat(model.plural, ".originItems")), originIds);
+                _context5.t0 = commit;
+                _context5.t1 = "ADD_".concat(model.name);
+                _context5.next = 9;
+                return applyModifier("afterQueue", queue, this._models, origin);
+
+              case 9:
+                _context5.t2 = _context5.sent;
+                (0, _context5.t0)(_context5.t1, _context5.t2);
+                commit("RESET_QUEUE_".concat(model.name));
+
+              case 12:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function _cancelActionType(_x7, _x8) {
+        return _cancelActionType2.apply(this, arguments);
+      }
+
+      return _cancelActionType;
+    }()
+  }]);
+
+  return ActionBase;
+}();
 
 var Actions_Actions = function Actions(axios, models, dataPath) {
   _classCallCheck(this, Actions);
 
-  var _isAll = function _isAll(p) {
-    return !lodash_es_has(p, "id") && lodash_es_isArray(p.data);
-  };
-
-  var _getModel = function _getModel(p) {
-    return models[p.type];
-  }; // retrieve entity from Vuex store
-
-
-  var _getEntity = function _getEntity(state, payload) {
-    return lodash_es_get(state, "".concat(_getModel(payload).plural, ".items"))[payload.id];
-  }; // fetch entity from API
-
-
-  var _fetchEntity = function _fetchEntity(commit, payload) {
-    if (lodash_es_get(payload, "clear", _isAll(payload))) {
-      commit("CLEAR_".concat(_getModel(payload).name.toUpperCase()));
-    }
-
-    return axios.get(formatUrl(payload), payload.axiosConfig).then(
-    /*#__PURE__*/
-    function () {
-      var _ref = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee(result) {
-        var resultData;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                resultData = dataPath ? lodash_es_get(result.data, dataPath) : result.data;
-                commit("ADD_".concat(_getModel(payload).name.toUpperCase()), resultData);
-                return _context.abrupt("return", resultData);
-
-              case 3:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee);
-      }));
-
-      return function (_x) {
-        return _ref.apply(this, arguments);
-      };
-    }());
-  }; // store entity to API
-
-
-  var _storeEntity =
-  /*#__PURE__*/
-  function () {
-    var _ref2 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee2(commit, payload) {
-      var method,
-          mainConfig,
-          config,
-          _args2 = arguments;
-      return regeneratorRuntime.wrap(function _callee2$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              method = _args2.length > 2 && _args2[2] !== undefined ? _args2[2] : "post";
-              _context2.t0 = method;
-              _context2.t1 = formatUrl(payload);
-              _context2.next = 5;
-              return applyModifier("beforeSave", payload.type, models, payload.data);
-
-            case 5:
-              _context2.t2 = _context2.sent;
-              mainConfig = {
-                method: _context2.t0,
-                url: _context2.t1,
-                data: _context2.t2
-              };
-              config = _objectSpread2({}, mainConfig, {}, payload.axiosConfig);
-              return _context2.abrupt("return", axios(config).then(function (result) {
-                var resultData = dataPath ? lodash_es_get(result.data, dataPath) : result.data;
-                commit("ADD_".concat(_getModel(payload).name.toUpperCase()), resultData);
-                return resultData;
-              }));
-
-            case 9:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, _callee2);
-    }));
-
-    return function _storeEntity(_x2, _x3) {
-      return _ref2.apply(this, arguments);
-    };
-  }(); // delete entity to API
-
-
-  var _deleteEntity =
-  /*#__PURE__*/
-  function () {
-    var _ref3 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee3(commit, payload) {
-      var model, id, data;
-      return regeneratorRuntime.wrap(function _callee3$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              model = _getModel(payload);
-              id = payload.id, data = payload.data;
-
-              if (!_isAll(payload)) {
-                _context3.next = 11;
-                break;
-              }
-
-              _context3.t0 = axios;
-              _context3.t1 = "".concat(formatUrl(payload), "/delete");
-              _context3.next = 7;
-              return applyModifier("beforeSave", payload.type, models, data);
-
-            case 7:
-              _context3.t2 = _context3.sent;
-              _context3.t3 = payload.axiosConfig;
-
-              _context3.t4 = function () {
-                commit("DELETE_".concat(model.name.toUpperCase()), data);
-              };
-
-              return _context3.abrupt("return", _context3.t0.patch.call(_context3.t0, _context3.t1, _context3.t2, _context3.t3).then(_context3.t4));
-
-            case 11:
-              return _context3.abrupt("return", axios.delete(formatUrl(payload), payload.axiosConfig).then(function () {
-                commit("DELETE_".concat(model.name.toUpperCase()), id);
-              }));
-
-            case 12:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, _callee3);
-    }));
-
-    return function _deleteEntity(_x4, _x5) {
-      return _ref3.apply(this, arguments);
-    };
-  }();
-
-  var _confirmActionType = function _confirmActionType(queue, _ref4) {
-    var state = _ref4.state,
-        commit = _ref4.commit,
-        dispatch = _ref4.dispatch;
-    var model = models[queue];
-
-    if (lodash_es_get(state, "".concat(model.plural, ".hasAction"))) {
-      return lodash_es_flatMap(lodash_es_get(state, "".concat(model.plural, ".actionQueue")), function (entities, action) {
-        return lodash_es_map(entities,
-        /*#__PURE__*/
-        function () {
-          var _ref5 = _asyncToGenerator(
-          /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee4(e) {
-            return regeneratorRuntime.wrap(function _callee4$(_context4) {
-              while (1) {
-                switch (_context4.prev = _context4.next) {
-                  case 0:
-                    if (!(action === "post")) {
-                      _context4.next = 5;
-                      break;
-                    }
-
-                    _context4.next = 3;
-                    return dispatch(action, {
-                      type: queue,
-                      data: e
-                    });
-
-                  case 3:
-                    commit("DELETE_".concat(model.name), e);
-                    return _context4.abrupt("return", commit("RESET_QUEUE_".concat(model.name)));
-
-                  case 5:
-                    _context4.next = 7;
-                    return dispatch(action, {
-                      type: queue,
-                      id: e.id,
-                      data: e
-                    });
-
-                  case 7:
-                    return _context4.abrupt("return", commit("RESET_QUEUE_".concat(model.name)));
-
-                  case 8:
-                  case "end":
-                    return _context4.stop();
-                }
-              }
-            }, _callee4);
-          }));
-
-          return function (_x6) {
-            return _ref5.apply(this, arguments);
-          };
-        }());
-      });
-    }
-
-    return Promise.resolve();
-  };
-
-  var _cancelActionType =
-  /*#__PURE__*/
-  function () {
-    var _ref6 = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee5(queue, _ref7) {
-      var state, commit, model, originIds, origin;
-      return regeneratorRuntime.wrap(function _callee5$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              state = _ref7.state, commit = _ref7.commit;
-              model = models[queue];
-
-              if (!lodash_es_get(state, "".concat(model.plural, ".hasAction"))) {
-                _context5.next = 12;
-                break;
-              }
-
-              originIds = lodash_es_keys(lodash_es_get(state, "".concat(model.plural, ".actionQueue.delete"), [])).concat(lodash_es_keys(lodash_es_get(state, "".concat(model.plural, ".actionQueue.post"), [])), lodash_es_keys(lodash_es_get(state, "".concat(model.plural, ".actionQueue.patch"), [])));
-              origin = lodash_es_at(lodash_es_get(state, "".concat(model.plural, ".originItems")), originIds).map(function (p) {
-                return p.data;
-              });
-              _context5.t0 = commit;
-              _context5.t1 = "ADD_".concat(model.name);
-              _context5.next = 9;
-              return applyModifier("afterQueue", queue, models, origin);
-
-            case 9:
-              _context5.t2 = _context5.sent;
-              (0, _context5.t0)(_context5.t1, _context5.t2);
-              commit("RESET_QUEUE_".concat(model.name));
-
-            case 12:
-            case "end":
-              return _context5.stop();
-          }
-        }
-      }, _callee5);
-    }));
-
-    return function _cancelActionType(_x7, _x8) {
-      return _ref6.apply(this, arguments);
-    };
-  }();
+  var base = new Actions_ActionBase(axios, models, dataPath);
 
   this.get =
   /*#__PURE__*/
   function () {
-    var _ref8 = _asyncToGenerator(
+    var _ref5 = _asyncToGenerator(
     /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee6(_ref9, payload) {
+    regeneratorRuntime.mark(function _callee6(_ref6, payload) {
       var commit, state, entity;
       return regeneratorRuntime.wrap(function _callee6$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              commit = _ref9.commit, state = _ref9.state;
-              entity = _getEntity(state, payload);
+              commit = _ref6.commit, state = _ref6.state;
+              entity = base._getEntity(state, payload);
 
               if (!(payload.forceFetch || !entity)) {
                 _context6.next = 4;
                 break;
               }
 
-              return _context6.abrupt("return", _fetchEntity(commit, payload));
+              return _context6.abrupt("return", base._fetchEntity(commit, payload));
 
             case 4:
               return _context6.abrupt("return", entity);
@@ -9209,71 +9267,54 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
     }));
 
     return function (_x9, _x10) {
-      return _ref8.apply(this, arguments);
+      return _ref5.apply(this, arguments);
     };
   }();
 
-  this.post = function (_ref10, payload) {
+  this.post = function (_ref7, payload) {
+    var commit = _ref7.commit;
+    return base._storeEntity(commit, payload);
+  };
+
+  this.patch = function (_ref8, payload) {
+    var commit = _ref8.commit;
+    return base._storeEntity(commit, payload, "patch");
+  };
+
+  this.delete = function (_ref9, payload) {
+    var commit = _ref9.commit;
+    return base._deleteEntity(commit, payload);
+  };
+
+  this.queueAction = function (_ref10, payload) {
     var commit = _ref10.commit;
-    return _storeEntity(commit, payload);
-  };
-
-  this.patch = function (_ref11, payload) {
-    var commit = _ref11.commit;
-    return _storeEntity(commit, payload, "patch");
-  };
-
-  this.delete = function (_ref12, payload) {
-    var commit = _ref12.commit;
-    return _deleteEntity(commit, payload);
-  }; // add watched changes to queue
-  // this.queueActionWatcher = (
-  //   { commit, state }: ActionContext<S, R>,
-  //   payload: QueuePayload
-  // ) => {
-  //   const model = _getModel(payload);
-  //   const checkChanged = (i: IndexedObject) =>
-  //     has(get(state, `${model.plural}.originItems`), i.id) &&
-  //     !isEqual(get(state, `${model.plural}.originItems.${i.id}`), i);
-  //   const hasChanged =
-  //     isArray(payload.data) && payload.data
-  //       ? some(payload.data, checkChanged)
-  //       : checkChanged(payload.data);
-  //   if (hasChanged) {
-  //     commit(`QUEUE_ACTION_${model.name}`, payload);
-  //   }
-  // };
-
-
-  this.queueAction = function (_ref13, payload) {
-    var commit = _ref13.commit;
-    return commit("QUEUE_ACTION_".concat(_getModel(payload).name), payload);
+    return commit("QUEUE_ACTION_".concat(base._getModel(payload).name), payload);
   };
 
   this.processActionQueue = function (context, queue) {
     if (lodash_es_isArray(queue)) {
       return Promise.all(lodash_es_flatMap(queue, function (q) {
-        return _confirmActionType(q, context);
+        return base._confirmActionType(q, context);
       }));
     }
 
-    return _confirmActionType(queue, context);
+    return base._confirmActionType(queue, context);
   };
 
   this.cancelActionQueue = function (context, payload) {
     if (lodash_es_isArray(payload)) {
       lodash_es_forEach(payload, function (p) {
-        return _cancelActionType(p, context);
+        return base._cancelActionType(p, context);
       });
     } else {
-      _cancelActionType(payload, context);
+      base._cancelActionType(payload, context);
     }
   };
 
-  this.cancelAction = function (_ref14, payload) {
-    var commit = _ref14.commit;
+  this.cancelAction = function (_ref11, payload) {
+    var commit = _ref11.commit;
 
-    var model = _getModel(payload);
+    var model = base._getModel(payload);
 
     commit("UNQUEUE_ACTION_".concat(model.name), payload);
   };
@@ -9286,22 +9327,6 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
 };
 
 
-// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/createClass.js
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
 var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
@@ -10527,8 +10552,10 @@ var omit = _flatRest(function(object, paths) {
 var ApiStore_ApiStore =
 /*#__PURE__*/
 function () {
-  function ApiStore(models, namespaced) {
+  function ApiStore(models) {
     var _this = this;
+
+    var namespaced = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
     _classCallCheck(this, ApiStore);
 
@@ -10878,12 +10905,13 @@ function () {
 
 
 /* harmony default export */ var ApiStorePlugin = (function (options) {
-  var namespaced = lodash_es_get(options, 'namespaced', true);
-  var dataPath = lodash_es_get(options, 'dataPath');
+  var namespaced = lodash_es_get(options, "namespaced");
+  var dataPath = lodash_es_get(options, "dataPath");
   var apiStore = new ApiStore_ApiStore(options.models, namespaced);
-  apiStore.actions = new Actions_Actions(options.axios, options.models, dataPath);
+  apiStore.actions = new Actions_Actions(options.axios, options.models, dataPath); // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   return function (store) {
-    return store.registerModule(options.name || 'api', apiStore);
+    return store.registerModule(options.name || "api", apiStore);
   };
 });
 // CONCATENATED MODULE: ./node_modules/lodash-es/isEmpty.js

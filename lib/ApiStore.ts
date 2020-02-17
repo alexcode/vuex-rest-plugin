@@ -28,7 +28,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
   readonly models: ModelTypeTree;
   readonly getters?: any;
   readonly mutations?: any;
-  constructor(models: ModelTypeTree, namespaced: true) {
+  constructor(models: ModelTypeTree, namespaced = true) {
     this.namespaced = namespaced;
     this.models = models;
     this.state = Object.create(null);

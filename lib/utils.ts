@@ -1,11 +1,11 @@
-import get from 'lodash-es/get';
-import has from 'lodash-es/has';
-import isArray from 'lodash-es/isArray';
-import isDate from 'lodash-es/isDate';
-import isFunction from 'lodash-es/isFunction';
-import isObject from 'lodash-es/isObject';
-import map from 'lodash-es/map';
-import { ModelTypeTree, Payload } from './types';
+import get from "lodash-es/get";
+import has from "lodash-es/has";
+import isArray from "lodash-es/isArray";
+import isDate from "lodash-es/isDate";
+import isFunction from "lodash-es/isFunction";
+import isObject from "lodash-es/isObject";
+import map from "lodash-es/map";
+import { ModelTypeTree, Payload } from "./types";
 
 export async function applyModifier(
   modifier: string,
@@ -49,7 +49,7 @@ export function formatUrl(payload: Payload) {
       }
       return `${key}=${resquestValue}`;
     });
-    payload.query = query.join('&');
+    payload.query = query.join("&");
   }
   if (payload.query) {
     url += `?${payload.query}`;

@@ -24,5 +24,8 @@
     "tests/**/*.ts",
     "tests/**/*.tsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "entry": {
+    "app": ["./exemples/main.ts"]
+  }
 }
