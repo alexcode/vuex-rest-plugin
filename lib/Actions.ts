@@ -126,29 +126,20 @@ class ActionBase<S, R> {
       });
   }
 
-  _confirmActionType(
-    queue: string,
-    { state, commit, dispatch }: ActionContext<S, R>
-  ) {
+  _confirmActionType(queue: string, { state, commit }: ActionContext<S, R>) {
     const model = this._models[queue];
     if (get(state, `${model.plural}.hasAction`)) {
-      return flatMap(
-        get(state, `${model.plural}.actionQueue`),
-        (entities: IndexedObjectTree, action: string) =>
-          map(entities, async e => {
-            if (action === "post") {
-              await dispatch(action, { type: queue, data: e });
-              commit(`DELETE_${model.name}`, e);
-              return commit(`RESET_QUEUE_${model.name}`);
+      const queues = get(state, `${model.plural}.actionQueue`);
+      return Promise.all(
+        flatMap(queues, (entities: Array<Payload>, action: Method) =>
+          map(entities, async entity => {
+            if (action === "delete") {
+              return this._deleteEntity(commit, entity);
             }
-            await dispatch(action, {
-              type: queue,
-              id: e.id,
-              data: e
-            });
-            return commit(`RESET_QUEUE_${model.name}`);
+            return this._storeEntity(commit, entity, action);
           })
-      );
+        )
+      ).then(() => commit(`RESET_QUEUE_${model.name}`));
     }
     return Promise.resolve();
   }
