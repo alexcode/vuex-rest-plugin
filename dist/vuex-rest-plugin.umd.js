@@ -9134,21 +9134,26 @@ function () {
             var _ref3 = _asyncToGenerator(
             /*#__PURE__*/
             regeneratorRuntime.mark(function _callee4(entity) {
+              var payload;
               return regeneratorRuntime.wrap(function _callee4$(_context4) {
                 while (1) {
                   switch (_context4.prev = _context4.next) {
                     case 0:
+                      payload = _objectSpread2({
+                        id: entity.data.id
+                      }, entity);
+
                       if (!(action === "delete")) {
-                        _context4.next = 2;
+                        _context4.next = 3;
                         break;
                       }
 
-                      return _context4.abrupt("return", _this3._deleteEntity(commit, entity));
-
-                    case 2:
-                      return _context4.abrupt("return", _this3._storeEntity(commit, entity, action));
+                      return _context4.abrupt("return", _this3._deleteEntity(commit, payload));
 
                     case 3:
+                      return _context4.abrupt("return", _this3._storeEntity(commit, payload, action));
+
+                    case 4:
                     case "end":
                       return _context4.stop();
                   }

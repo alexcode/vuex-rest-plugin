@@ -283,18 +283,19 @@ describe("ApiStore by default", function() {
     });
   });
 
-  it("test processActionQueue", async () => {
+  it("test processActionQueue PATCH", async () => {
     store.dispatch("api/queueAction", {
       action: "patch",
       type: "resource",
       data: data[0]
     });
-    mock.onPost(`/resource`).reply(200, data[0]);
+    await flushPromises();
+    const url = `resource/${data[0].id}`;
+    mock.onPatch(url).reply(200, data[0]);
     store.dispatch("api/processActionQueue", ["resource"]);
     await flushPromises();
-    expect(
-      store.getters["api/resources"].actionQueue.patch[data[0].id]
-    ).toMatchObject({ type: "resource", data: data[0] });
+    expect(mock.history.patch[0].url).toBe(url);
+    expect(store.getters["api/resources"].actionQueue.patch).toMatchObject({});
   });
 
   it("test cancelActionQueue", async () => {

@@ -125,12 +125,13 @@ class ActionBase<S, R> {
     if (get(state, `${model.plural}.hasAction`)) {
       const queues = get(state, `${model.plural}.actionQueue`);
       return Promise.all(
-        flatMap(queues, (entities: Array<Payload>, action: Method) =>
+        flatMap(queues, (entities: Array<QueuePayload>, action: Method) =>
           map(entities, async entity => {
+            const payload = { id: entity.data.id, ...entity };
             if (action === "delete") {
-              return this._deleteEntity(commit, entity);
+              return this._deleteEntity(commit, payload);
             }
-            return this._storeEntity(commit, entity, action);
+            return this._storeEntity(commit, payload, action);
           })
         )
       ).then(() => commit(`RESET_QUEUE_${model.name}`));
