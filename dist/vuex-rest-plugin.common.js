@@ -9110,50 +9110,36 @@ function () {
   }, {
     key: "_confirmActionType",
     value: function _confirmActionType(queue, _ref2) {
+      var _this3 = this;
+
       var state = _ref2.state,
-          commit = _ref2.commit,
-          dispatch = _ref2.dispatch;
+          commit = _ref2.commit;
       var model = this._models[queue];
 
       if (lodash_es_get(state, "".concat(model.plural, ".hasAction"))) {
-        return lodash_es_flatMap(lodash_es_get(state, "".concat(model.plural, ".actionQueue")), function (entities, action) {
+        var queues = lodash_es_get(state, "".concat(model.plural, ".actionQueue"));
+        return Promise.all(lodash_es_flatMap(queues, function (entities, action) {
           return lodash_es_map(entities,
           /*#__PURE__*/
           function () {
             var _ref3 = _asyncToGenerator(
             /*#__PURE__*/
-            regeneratorRuntime.mark(function _callee4(e) {
+            regeneratorRuntime.mark(function _callee4(entity) {
               return regeneratorRuntime.wrap(function _callee4$(_context4) {
                 while (1) {
                   switch (_context4.prev = _context4.next) {
                     case 0:
-                      if (!(action === "post")) {
-                        _context4.next = 5;
+                      if (!(action === "delete")) {
+                        _context4.next = 2;
                         break;
                       }
 
-                      _context4.next = 3;
-                      return dispatch(action, {
-                        type: queue,
-                        data: e
-                      });
+                      return _context4.abrupt("return", _this3._deleteEntity(commit, entity));
+
+                    case 2:
+                      return _context4.abrupt("return", _this3._storeEntity(commit, entity, action));
 
                     case 3:
-                      commit("DELETE_".concat(model.name), e);
-                      return _context4.abrupt("return", commit("RESET_QUEUE_".concat(model.name)));
-
-                    case 5:
-                      _context4.next = 7;
-                      return dispatch(action, {
-                        type: queue,
-                        id: e.id,
-                        data: e
-                      });
-
-                    case 7:
-                      return _context4.abrupt("return", commit("RESET_QUEUE_".concat(model.name)));
-
-                    case 8:
                     case "end":
                       return _context4.stop();
                   }
@@ -9165,6 +9151,8 @@ function () {
               return _ref3.apply(this, arguments);
             };
           }());
+        })).then(function () {
+          return commit("RESET_QUEUE_".concat(model.name));
         });
       }
 

@@ -10,13 +10,7 @@ import keys from "lodash-es/keys";
 import map from "lodash-es/map";
 import values from "lodash-es/values";
 import ApiState from "./ApiState";
-import {
-  ModelTypeTree,
-  Payload,
-  QueuePayload,
-  ModelType,
-  IndexedObjectTree
-} from "./types";
+import { ModelTypeTree, Payload, QueuePayload, ModelType } from "./types";
 import { applyModifier, formatUrl } from "./utils";
 
 class ActionBase<S, R> {
