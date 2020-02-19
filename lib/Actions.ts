@@ -120,6 +120,13 @@ class ActionBase<S, R> {
       });
   }
 
+  _processAction(action: Method, payload: Payload, commit: Commit) {
+    if (action === "delete") {
+      return this._deleteEntity(commit, payload);
+    }
+    return this._storeEntity(commit, payload, action);
+  }
+
   _confirmActionType(queue: string, { state, commit }: ActionContext<S, R>) {
     const model = this._models[queue];
     if (get(state, `${model.plural}.hasAction`)) {
@@ -128,10 +135,7 @@ class ActionBase<S, R> {
         flatMap(queues, (entities: Array<QueuePayload>, action: Method) =>
           map(entities, async entity => {
             const payload = { id: entity.data.id, ...entity };
-            if (action === "delete") {
-              return this._deleteEntity(commit, payload);
-            }
-            return this._storeEntity(commit, payload, action);
+            this._processAction(action, payload, commit);
           })
         )
       ).then(() => commit(`RESET_QUEUE_${model.name}`));
@@ -203,6 +207,13 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       payload: QueuePayload
     ) => {
       return commit(`QUEUE_ACTION_${base._getModel(payload).name}`, payload);
+    };
+
+    this.processAction = (
+      { commit }: ActionContext<S, R>,
+      payload: QueuePayload
+    ) => {
+      return base._processAction(payload.action, payload.payload, commit);
     };
 
     this.processActionQueue = (

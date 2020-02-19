@@ -1,4 +1,4 @@
-import { AxiosRequestConfig, AxiosInstance } from "axios";
+import { AxiosRequestConfig, AxiosInstance, Method } from "axios";
 import ApiState from "./ApiState";
 
 export interface IndexedObject {
@@ -40,7 +40,7 @@ export interface Payload {
 export interface QueuePayload {
   type: string;
   payload: Payload;
-  action: string;
+  action: Method;
   [index: string]: any;
 }
 

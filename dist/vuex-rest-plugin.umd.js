@@ -9117,6 +9117,15 @@ function () {
       return _deleteEntity;
     }()
   }, {
+    key: "_processAction",
+    value: function _processAction(action, payload, commit) {
+      if (action === "delete") {
+        return this._deleteEntity(commit, payload);
+      }
+
+      return this._storeEntity(commit, payload, action);
+    }
+  }, {
     key: "_confirmActionType",
     value: function _confirmActionType(queue, _ref2) {
       var _this3 = this;
@@ -9143,17 +9152,9 @@ function () {
                         id: entity.data.id
                       }, entity);
 
-                      if (!(action === "delete")) {
-                        _context4.next = 3;
-                        break;
-                      }
+                      _this3._processAction(action, payload, commit);
 
-                      return _context4.abrupt("return", _this3._deleteEntity(commit, payload));
-
-                    case 3:
-                      return _context4.abrupt("return", _this3._storeEntity(commit, payload, action));
-
-                    case 4:
+                    case 2:
                     case "end":
                       return _context4.stop();
                   }
@@ -9284,6 +9285,11 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
     return commit("QUEUE_ACTION_".concat(base._getModel(payload).name), payload);
   };
 
+  this.processAction = function (_ref11, payload) {
+    var commit = _ref11.commit;
+    return base._processAction(payload.action, payload.payload, commit);
+  };
+
   this.processActionQueue = function (context, queue) {
     if (lodash_es_isArray(queue)) {
       return Promise.all(lodash_es_flatMap(queue, function (q) {
@@ -9304,8 +9310,8 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
     }
   };
 
-  this.cancelAction = function (_ref11, payload) {
-    var commit = _ref11.commit;
+  this.cancelAction = function (_ref12, payload) {
+    var commit = _ref12.commit;
 
     var model = base._getModel(payload);
 
