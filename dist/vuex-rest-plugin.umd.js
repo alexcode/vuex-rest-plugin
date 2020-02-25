@@ -9286,8 +9286,6 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
 
   this.processAction = function (_ref11, payload) {
     var commit = _ref11.commit;
-    // eslint-disable-next-line
-    console.log(payload);
     return base._processAction(payload.action, payload.payload, commit);
   };
 
@@ -11105,13 +11103,29 @@ function some(collection, predicate, guard) {
 // CONCATENATED MODULE: ./lib/ActionQueue.ts
 
 
-var ActionQueue_ActionQueue = function ActionQueue() {
-  _classCallCheck(this, ActionQueue);
 
-  this.post = [];
-  this.patch = {};
-  this.delete = {};
-};
+
+
+var ActionQueue_ActionQueue =
+/*#__PURE__*/
+function () {
+  function ActionQueue() {
+    _classCallCheck(this, ActionQueue);
+
+    this.post = [];
+    this.patch = {};
+    this.delete = {};
+  }
+
+  _createClass(ActionQueue, [{
+    key: "hasId",
+    value: function hasId(id) {
+      return lodash_es_has(this.delete, id) || lodash_es_has(this.patch, id) || lodash_es_some(this.post, ["id", id]);
+    }
+  }]);
+
+  return ActionQueue;
+}();
 
 
 // CONCATENATED MODULE: ./lib/ApiState.ts
