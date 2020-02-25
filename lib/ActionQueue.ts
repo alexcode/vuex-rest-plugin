@@ -1,3 +1,6 @@
+import some from "lodash-es/some";
+import has from "lodash-es/has";
+
 export default class ActionQueue {
   readonly post: Array<object>;
   readonly patch: object;
@@ -6,5 +9,11 @@ export default class ActionQueue {
     this.post = [];
     this.patch = {};
     this.delete = {};
+  }
+
+  hasId(id: string) {
+    return (
+      has(this.delete, id) || has(this.patch, id) || some(this.post, ["id", id])
+    );
   }
 }

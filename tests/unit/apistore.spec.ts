@@ -283,6 +283,21 @@ describe("ApiStore by default", function() {
     });
   });
 
+  it("test actionQueue hasId", async () => {
+    store.dispatch("api/queueAction", {
+      action: "patch",
+      type: "resource",
+      data: data[0]
+    });
+    await flushPromises();
+    expect(store.getters["api/resources"].actionQueue.hasId(data[0].id)).toBe(
+      true
+    );
+    expect(store.getters["api/resources"].actionQueue.hasId("fake")).toBe(
+      false
+    );
+  });
+
   it("test processActionQueue PATCH", async () => {
     store.dispatch("api/queueAction", {
       action: "patch",
