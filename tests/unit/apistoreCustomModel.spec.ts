@@ -361,7 +361,6 @@ describe("ApiStore custom model", function() {
       id: string;
       user?: CustomUser;
       someId: string;
-      localProp = false;
       constructor(o: any) {
         this.id = o.id;
         this.user = new CustomUser(o.user);
@@ -403,7 +402,6 @@ describe("ApiStore custom model", function() {
       ]
     });
     const resource = data[0];
-    const user = data[0].user;
     mock.onGet(`/resource/${resource.id}`).reply(200, resource);
     store.dispatch("api/get", {
       id: resource.id,
@@ -416,22 +414,13 @@ describe("ApiStore custom model", function() {
     expect(store.getters["api/users"].items[resource.user.id]).toBeInstanceOf(
       CustomUser
     );
-
-    store.getters["api/users"].items[user.id].localProp = true;
-
-    mock.onGet(`/user/${user.id}`).reply(200, user);
-    store.dispatch("api/get", {
-      id: user.id,
-      type: "user"
-    });
-    await flushPromises();
-    expect(store.getters["api/users"].items[user.id].localProp).toBe(true);
   });
 
   it("test class with local property", async () => {
     class CustomUser {
       id: string;
       someId: string;
+      localProp = false;
       constructor(o: any) {
         this.id = o.id;
         this.someId = o.someId;

@@ -207,12 +207,15 @@ export default class ApiStore<S> implements StoreOptions<S> {
             }
           }
         });
+
+        return store.items[entity.id];
       } else {
         store.items = { ...store.items, [entity.id]: entity };
         this.storeOriginItem(store.originItems, entity, model.beforeQueue);
+
+        return entity;
       }
     }
-    return entity;
   }
 
   private async patchReference(

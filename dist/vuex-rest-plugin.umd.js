@@ -10848,58 +10848,65 @@ function () {
                 })));
 
               case 4:
-                if (entity.id && model) {
-                  // Patch references
-                  if (model.references) {
-                    lodash_es_forEach(model.references,
-                    /*#__PURE__*/
-                    function () {
-                      var _ref3 = _asyncToGenerator(
-                      /*#__PURE__*/
-                      regeneratorRuntime.mark(function _callee4(modelName, prop) {
-                        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                          while (1) {
-                            switch (_context4.prev = _context4.next) {
-                              case 0:
-                                _context4.next = 2;
-                                return _this2.patchReference(state, entity, modelName, prop);
-
-                              case 2:
-                                entity[prop] = _context4.sent;
-
-                              case 3:
-                              case "end":
-                                return _context4.stop();
-                            }
-                          }
-                        }, _callee4);
-                      }));
-
-                      return function (_x9, _x10) {
-                        return _ref3.apply(this, arguments);
-                      };
-                    }());
-                  }
-
-                  store = state[model.plural];
-
-                  if (lodash_es_has(store.items, entity.id)) {
-                    lodash_es_forEach(entity, function (value, idx) {
-                      if (!lodash_es_isFunction(value)) {
-                        if (!lodash_es_isEqual(value, lodash_es_get(store.items[entity.id], idx))) {
-                          external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(store.items[entity.id], idx, value);
-                        }
-                      }
-                    });
-                  } else {
-                    store.items = _objectSpread2({}, store.items, _defineProperty({}, entity.id, entity));
-                    this.storeOriginItem(store.originItems, entity, model.beforeQueue);
-                  }
+                if (!(entity.id && model)) {
+                  _context5.next = 15;
+                  break;
                 }
 
+                // Patch references
+                if (model.references) {
+                  lodash_es_forEach(model.references,
+                  /*#__PURE__*/
+                  function () {
+                    var _ref3 = _asyncToGenerator(
+                    /*#__PURE__*/
+                    regeneratorRuntime.mark(function _callee4(modelName, prop) {
+                      return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                        while (1) {
+                          switch (_context4.prev = _context4.next) {
+                            case 0:
+                              _context4.next = 2;
+                              return _this2.patchReference(state, entity, modelName, prop);
+
+                            case 2:
+                              entity[prop] = _context4.sent;
+
+                            case 3:
+                            case "end":
+                              return _context4.stop();
+                          }
+                        }
+                      }, _callee4);
+                    }));
+
+                    return function (_x9, _x10) {
+                      return _ref3.apply(this, arguments);
+                    };
+                  }());
+                }
+
+                store = state[model.plural];
+
+                if (!lodash_es_has(store.items, entity.id)) {
+                  _context5.next = 12;
+                  break;
+                }
+
+                lodash_es_forEach(entity, function (value, idx) {
+                  if (!lodash_es_isFunction(value)) {
+                    if (!lodash_es_isEqual(value, lodash_es_get(store.items[entity.id], idx))) {
+                      external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(store.items[entity.id], idx, value);
+                    }
+                  }
+                });
+                return _context5.abrupt("return", store.items[entity.id]);
+
+              case 12:
+                store.items = _objectSpread2({}, store.items, _defineProperty({}, entity.id, entity));
+                this.storeOriginItem(store.originItems, entity, model.beforeQueue);
                 return _context5.abrupt("return", entity);
 
-              case 6:
+              case 15:
               case "end":
                 return _context5.stop();
             }
