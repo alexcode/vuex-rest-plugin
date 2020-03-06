@@ -177,6 +177,9 @@ export default class ApiStore<S> implements StoreOptions<S> {
     entity: IndexedObject | Array<IndexedObject>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
+    if (!entity) {
+      return;
+    }
     if (isArray(entity)) {
       return Promise.all(entity.map(e => this.patchEntity(state, model, e)));
     }

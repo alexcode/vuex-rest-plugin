@@ -10538,9 +10538,15 @@ var omit = _flatRest(function(object, paths) {
 
 
 
+
+
+
+ // type RootState<S> = S & { [index: string]: ApiState };
+
 var ApiStore_ApiStore =
 /*#__PURE__*/
 function () {
+  /* eslint-enable @typescript-eslint/no-explicit-any */
   function ApiStore(models) {
     var _this = this;
 
@@ -10562,9 +10568,8 @@ function () {
         return applyModifier("afterGet", modelKey, _this.models, item).then(function (i) {
           _this.storeOriginItem(lodash_es_get(myState, "".concat(modelIdx, ".originItems")), i, model.beforeQueue);
 
-          _this.patchEntity(myState, model, i);
+          _this.patchEntity(myState, model, i); // this.linkReferences(i, myState, model.references);
 
-          _this.linkReferences(i, myState, model.references);
 
           myState[modelIdx].lastLoad = new Date();
         });
@@ -10804,84 +10809,143 @@ function () {
     }
   }, {
     key: "patchEntity",
-    value: function patchEntity(state, model, entity) {
-      var _this2 = this;
+    value: function () {
+      var _patchEntity = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee5(state, model, entity // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ) {
+        var _this2 = this;
 
-      if (lodash_es_isArray(entity)) {
-        lodash_es_forEach(entity, function (e) {
-          return _this2.patchEntity(state, model, e);
-        });
-      } else if (entity.id) {
-        var store = state[model.plural];
-
-        if (lodash_es_has(store.items, entity.id)) {
-          lodash_es_forEach(entity, function (value, idx) {
-            if (!lodash_es_isFunction(value)) {
-              if (!lodash_es_isEqual(value, lodash_es_get(store.items[entity.id], idx))) {
-                external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(store.items[entity.id], idx, value);
-              }
-            }
-          });
-        } else {
-          store.items = _objectSpread2({}, store.items, _defineProperty({}, entity.id, entity));
-        }
-
-        if (model.references) {
-          lodash_es_forEach(model.references, function (modelName, prop) {
-            if (lodash_es_has(entity, prop) && lodash_es_get(entity, prop)) {
-              applyModifier("afterGet", modelName, _this2.models, entity[prop]).then(function (i) {
-                try {
-                  _this2.patchEntity(state, _this2.models[modelName], i);
-                } catch (e) {
-                  // eslint-disable-next-line no-console
-                  console.warn("Patch error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
+        var store;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                if (entity) {
+                  _context5.next = 2;
+                  break;
                 }
-              });
+
+                return _context5.abrupt("return");
+
+              case 2:
+                if (!lodash_es_isArray(entity)) {
+                  _context5.next = 4;
+                  break;
+                }
+
+                return _context5.abrupt("return", Promise.all(entity.map(function (e) {
+                  return _this2.patchEntity(state, model, e);
+                })));
+
+              case 4:
+                if (entity.id && model) {
+                  // Patch references
+                  if (model.references) {
+                    lodash_es_forEach(model.references,
+                    /*#__PURE__*/
+                    function () {
+                      var _ref3 = _asyncToGenerator(
+                      /*#__PURE__*/
+                      regeneratorRuntime.mark(function _callee4(modelName, prop) {
+                        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                          while (1) {
+                            switch (_context4.prev = _context4.next) {
+                              case 0:
+                                _context4.next = 2;
+                                return _this2.patchReference(state, entity, modelName, prop);
+
+                              case 2:
+                                entity[prop] = _context4.sent;
+
+                              case 3:
+                              case "end":
+                                return _context4.stop();
+                            }
+                          }
+                        }, _callee4);
+                      }));
+
+                      return function (_x9, _x10) {
+                        return _ref3.apply(this, arguments);
+                      };
+                    }());
+                  }
+
+                  store = state[model.plural];
+
+                  if (lodash_es_has(store.items, entity.id)) {
+                    lodash_es_forEach(entity, function (value, idx) {
+                      if (!lodash_es_isFunction(value)) {
+                        if (!lodash_es_isEqual(value, lodash_es_get(store.items[entity.id], idx))) {
+                          external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(store.items[entity.id], idx, value);
+                        }
+                      }
+                    });
+                  } else {
+                    store.items = _objectSpread2({}, store.items, _defineProperty({}, entity.id, entity));
+                    this.storeOriginItem(store.originItems, entity, model.beforeQueue);
+                  }
+                }
+
+                return _context5.abrupt("return", entity);
+
+              case 6:
+              case "end":
+                return _context5.stop();
             }
-          });
-        }
-      }
-    } // Replace objects by it's reference
-
-  }, {
-    key: "linkReferences",
-    value: function linkReferences(data, state, references) {
-      var _this3 = this;
-
-      var setLink = function setLink(data, modelName, prop) {
-        if (prop && lodash_es_isArray(data[prop])) {
-          lodash_es_forEach(data[prop], function (i) {
-            return setLink(i, modelName);
-          });
-        } else {
-          try {
-            var item = prop ? data[prop] : data;
-            var itemId = lodash_es_get(item, "id");
-            var model = _this3.models[modelName];
-            var itemStore = state[model.plural];
-
-            if (itemId) {
-              _this3.storeOriginItem(itemStore.originItems, item, model.beforeQueue);
-
-              itemStore.items = _objectSpread2({}, itemStore.items, _defineProperty({}, itemId, item));
-            }
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            console.warn("Reference error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
           }
-        }
-      };
+        }, _callee5, this);
+      }));
 
-      lodash_es_forEach(references, function (ref, prop) {
-        if (lodash_es_isArray(data)) {
-          lodash_es_forEach(data, function (item) {
-            return setLink(item, ref, prop);
-          });
-        } else {
-          setLink(data, ref, prop);
-        }
-      });
-    }
+      function patchEntity(_x6, _x7, _x8) {
+        return _patchEntity.apply(this, arguments);
+      }
+
+      return patchEntity;
+    }()
+  }, {
+    key: "patchReference",
+    value: function () {
+      var _patchReference = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee6(state, entity, modelName, prop) {
+        var refEntity;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return applyModifier("afterGet", modelName, this.models, entity[prop]);
+
+              case 2:
+                refEntity = _context6.sent;
+
+                if (!lodash_es_has(this.models, modelName)) {
+                  _context6.next = 7;
+                  break;
+                }
+
+                return _context6.abrupt("return", this.patchEntity(state, this.models[modelName], refEntity));
+
+              case 7:
+                // eslint-disable-next-line no-console
+                console.warn("Patch error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
+
+              case 8:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function patchReference(_x11, _x12, _x13, _x14) {
+        return _patchReference.apply(this, arguments);
+      }
+
+      return patchReference;
+    }()
   }]);
 
   return ApiStore;
