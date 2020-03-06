@@ -4,8 +4,9 @@ import isArray from "lodash-es/isArray";
 import isDate from "lodash-es/isDate";
 import isFunction from "lodash-es/isFunction";
 import isObject from "lodash-es/isObject";
+import isEqual from "lodash-es/isEqual";
 import map from "lodash-es/map";
-import { ModelTypeTree, Payload } from "./types";
+import { ModelTypeTree, Payload, IndexedObject } from "./types";
 
 export async function applyModifier(
   modifier: string,

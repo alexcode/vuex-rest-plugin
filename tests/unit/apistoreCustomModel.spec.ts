@@ -67,9 +67,6 @@ describe("ApiStore custom model", function() {
     expect(spyWarn).toHaveBeenCalledWith(
       "Patch error: We could not find the model fakeref for the reference user."
     );
-    expect(spyWarn).toHaveBeenCalledWith(
-      "Reference error: We could not find the model fakeref for the reference user."
-    );
     console.info("End expected log");
   });
 
@@ -269,5 +266,213 @@ describe("ApiStore custom model", function() {
     expect(
       store.getters["api/users"].items[singleResource.user.id].someId
     ).toBe("other_id_user");
+  });
+
+  it("test hooks with class", async () => {
+    class CustomUser {
+      id: string;
+      someId: string;
+      constructor(o: any) {
+        this.id = o.id;
+        this.someId = o.someId;
+      }
+    }
+    class CustomResource {
+      id: string;
+      user?: CustomUser;
+      someId: string;
+      localProp = false;
+      constructor(o: any) {
+        this.id = o.id;
+        this.user = o.user;
+        this.someId = o.someId;
+      }
+    }
+
+    const store = new Vuex.Store({
+      plugins: [
+        ApiStorePlugin({
+          axios: axiosInstance,
+          models: {
+            resource: {
+              name: "RESOURCE",
+              plural: "RESOURCES",
+              type: new ApiState(),
+              afterGet: (v: any) =>
+                new CustomResource({
+                  id: v.id,
+                  user: v.user,
+                  someId: "other_id_resource"
+                }),
+              references: {
+                user: "user"
+              }
+            },
+            user: {
+              name: "USER",
+              plural: "USERS",
+              type: new ApiState(),
+              afterGet: (v: any) =>
+                new CustomUser({
+                  id: v.id,
+                  someId: "other_id_user"
+                })
+            }
+          }
+        })
+      ]
+    });
+    const resource = data[0];
+    const user = data[0].user;
+    mock.onGet(`/resource/${resource.id}`).reply(200, resource);
+    store.dispatch("api/get", {
+      id: resource.id,
+      type: "resource"
+    });
+    await flushPromises();
+    expect(store.getters["api/resources"].items[resource.id]).toBeInstanceOf(
+      CustomResource
+    );
+    expect(store.getters["api/users"].items[resource.user.id]).toBeInstanceOf(
+      CustomUser
+    );
+
+    store.getters["api/users"].items[user.id].localProp = true;
+
+    mock.onGet(`/user/${user.id}`).reply(200, user);
+    store.dispatch("api/get", {
+      id: user.id,
+      type: "user"
+    });
+    await flushPromises();
+    expect(store.getters["api/users"].items[user.id].localProp).toBe(true);
+  });
+
+  it("test hooks with subclass", async () => {
+    class CustomUser {
+      id: string;
+      someId: string;
+      constructor(o: any) {
+        this.id = o.id;
+        this.someId = o.someId;
+      }
+    }
+    class CustomResource {
+      id: string;
+      user?: CustomUser;
+      someId: string;
+      localProp = false;
+      constructor(o: any) {
+        this.id = o.id;
+        this.user = new CustomUser(o.user);
+        this.someId = o.someId;
+      }
+    }
+
+    const store = new Vuex.Store({
+      plugins: [
+        ApiStorePlugin({
+          axios: axiosInstance,
+          models: {
+            resource: {
+              name: "RESOURCE",
+              plural: "RESOURCES",
+              type: new ApiState(),
+              afterGet: (v: any) =>
+                new CustomResource({
+                  id: v.id,
+                  user: v.user,
+                  someId: "other_id_resource"
+                }),
+              references: {
+                user: "user"
+              }
+            },
+            user: {
+              name: "USER",
+              plural: "USERS",
+              type: new ApiState(),
+              afterGet: (v: any) =>
+                new CustomUser({
+                  id: v.id,
+                  someId: "other_id_user"
+                })
+            }
+          }
+        })
+      ]
+    });
+    const resource = data[0];
+    const user = data[0].user;
+    mock.onGet(`/resource/${resource.id}`).reply(200, resource);
+    store.dispatch("api/get", {
+      id: resource.id,
+      type: "resource"
+    });
+    await flushPromises();
+    expect(store.getters["api/resources"].items[resource.id]).toBeInstanceOf(
+      CustomResource
+    );
+    expect(store.getters["api/users"].items[resource.user.id]).toBeInstanceOf(
+      CustomUser
+    );
+
+    store.getters["api/users"].items[user.id].localProp = true;
+
+    mock.onGet(`/user/${user.id}`).reply(200, user);
+    store.dispatch("api/get", {
+      id: user.id,
+      type: "user"
+    });
+    await flushPromises();
+    expect(store.getters["api/users"].items[user.id].localProp).toBe(true);
+  });
+
+  it("test class with local property", async () => {
+    class CustomUser {
+      id: string;
+      someId: string;
+      constructor(o: any) {
+        this.id = o.id;
+        this.someId = o.someId;
+      }
+    }
+
+    const store = new Vuex.Store({
+      plugins: [
+        ApiStorePlugin({
+          axios: axiosInstance,
+          models: {
+            user: {
+              name: "USER",
+              plural: "USERS",
+              type: new ApiState(),
+              afterGet: (v: any) =>
+                new CustomUser({
+                  id: v.id,
+                  someId: "other_id_user"
+                })
+            }
+          }
+        })
+      ]
+    });
+    const user = data[0].user;
+    mock.onGet(`/user/${user.id}`).reply(200, user);
+    store.dispatch("api/get", {
+      id: user.id,
+      type: "user"
+    });
+    await flushPromises();
+
+    store.getters["api/users"].items[user.id].localProp = true;
+
+    mock.onGet(`/user/${user.id}`).reply(200, user);
+    store.dispatch("api/get", {
+      id: user.id,
+      type: "user"
+    });
+    await flushPromises();
+    expect(store.getters["api/users"].items[user.id].localProp).toBe(true);
   });
 });

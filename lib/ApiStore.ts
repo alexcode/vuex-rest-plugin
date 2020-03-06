@@ -16,8 +16,7 @@ import {
   QueuePayload,
   IndexedObject,
   ModelType,
-  Modifier,
-  ReferenceTree
+  Modifier
 } from "./types";
 import { applyModifier } from "./utils";
 
@@ -53,7 +52,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
               model.beforeQueue
             );
             this.patchEntity(myState, model, i);
-            this.linkReferences(i, myState, model.references);
+            // this.linkReferences(i, myState, model.references);
             myState[modelIdx].lastLoad = new Date();
           }
         );
@@ -146,7 +145,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
     });
   }
   // storing Origin item copy
-  async storeOriginItem(
+  private async storeOriginItem(
     originItems: IndexedObject,
     item: IndexedObject | Array<IndexedObject>,
     modifiers?: Modifier
@@ -162,20 +161,36 @@ export default class ApiStore<S> implements StoreOptions<S> {
     }
   }
   // Removing original copy
-  removeOriginItem(originItems: IndexedObject, item: IndexedObject) {
+  private removeOriginItem(originItems: IndexedObject, item: IndexedObject) {
     if (item && has(originItems, item.id)) {
       Vue.delete(originItems, item.id);
     }
   }
-  patchEntity(
+
+  private async patchEntity(
     state: any,
     model: ModelType,
     entity: IndexedObject | Array<IndexedObject>
-  ) {
+  ): Promise<any> {
     if (isArray(entity)) {
-      forEach(entity, e => this.patchEntity(state, model, e));
-    } else if (entity.id) {
+      return Promise.all(entity.map(e => this.patchEntity(state, model, e)));
+    }
+
+    if (entity.id && model) {
+      // Patch references
+      if (model.references) {
+        forEach(model.references, async (modelName, prop) => {
+          entity[prop] = await this.patchReference(
+            state,
+            entity,
+            modelName,
+            prop
+          );
+        });
+      }
+
       const store = state[model.plural];
+
       if (has(store.items, entity.id)) {
         forEach(entity, (value, idx: string) => {
           if (!isFunction(value)) {
@@ -186,73 +201,32 @@ export default class ApiStore<S> implements StoreOptions<S> {
         });
       } else {
         store.items = { ...store.items, [entity.id]: entity };
-      }
-
-      if (model.references) {
-        forEach(model.references, (modelName, prop) => {
-          if (has(entity, prop) && get(entity, prop)) {
-            applyModifier(
-              "afterGet",
-              modelName,
-              this.models,
-              entity[prop]
-            ).then((i: any) => {
-              try {
-                this.patchEntity(state, this.models[modelName], i);
-              } catch (e) {
-                // eslint-disable-next-line no-console
-                console.warn(
-                  `Patch error: We could not find the model ${modelName} for the reference ${prop}.`
-                );
-              }
-            });
-          }
-        });
+        this.storeOriginItem(store.originItems, entity, model.beforeQueue);
       }
     }
+    return entity;
   }
-  // Replace objects by it's reference
-  linkReferences(
-    data: IndexedObject | Array<IndexedObject>,
-    state: any,
-    references?: ReferenceTree
-  ) {
-    const setLink = (
-      data: IndexedObject,
-      modelName: string,
-      prop?: string | number
-    ) => {
-      if (prop && isArray(data[prop])) {
-        forEach(data[prop], i => setLink(i, modelName));
-      } else {
-        try {
-          const item = prop ? data[prop] : data;
-          const itemId = get(item, "id");
-          const model = this.models[modelName];
-          const itemStore = state[model.plural];
-          if (itemId) {
-            this.storeOriginItem(
-              itemStore.originItems,
-              item,
-              model.beforeQueue
-            );
-            itemStore.items = { ...itemStore.items, [itemId]: item };
-          }
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.warn(
-            `Reference error: We could not find the model ${modelName} for the reference ${prop}.`
-          );
-        }
-      }
-    };
 
-    forEach(references, (ref, prop) => {
-      if (isArray(data)) {
-        forEach(data, item => setLink(item, ref, prop));
-      } else {
-        setLink(data, ref, prop);
-      }
-    });
+  private async patchReference(
+    state: any,
+    entity: IndexedObject,
+    modelName: string,
+    prop: string
+  ) {
+    const refEntity = await applyModifier(
+      "afterGet",
+      modelName,
+      this.models,
+      entity[prop]
+    );
+
+    if (has(this.models, modelName)) {
+      return this.patchEntity(state, this.models[modelName], refEntity);
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Patch error: We could not find the model ${modelName} for the reference ${prop}.`
+      );
+    }
   }
 }

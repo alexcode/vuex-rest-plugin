@@ -44,7 +44,7 @@ export interface QueuePayload {
   [index: string]: any;
 }
 
-export interface ReferenceTree {
+interface ReferenceTree {
   [index: string]: string;
 }
 
