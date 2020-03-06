@@ -20,13 +20,17 @@ import {
 } from "./types";
 import { applyModifier } from "./utils";
 
+// type RootState<S> = S & { [index: string]: ApiState };
+
 export default class ApiStore<S> implements StoreOptions<S> {
   namespaced: boolean;
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   state: any;
   actions?: Actions<S, S>;
   readonly models: ModelTypeTree;
   readonly getters?: any;
   readonly mutations?: any;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
   constructor(models: ModelTypeTree, namespaced = true) {
     this.namespaced = namespaced;
     this.models = models;
@@ -45,7 +49,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
         item: IndexedObject | Array<IndexedObject>
       ) =>
         applyModifier("afterGet", modelKey, this.models, item).then(
-          (i: any) => {
+          (i: IndexedObject) => {
             this.storeOriginItem(
               get(myState, `${modelIdx}.originItems`),
               i,
@@ -168,9 +172,10 @@ export default class ApiStore<S> implements StoreOptions<S> {
   }
 
   private async patchEntity(
-    state: any,
+    state: ApiState,
     model: ModelType,
     entity: IndexedObject | Array<IndexedObject>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     if (isArray(entity)) {
       return Promise.all(entity.map(e => this.patchEntity(state, model, e)));
@@ -208,7 +213,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
   }
 
   private async patchReference(
-    state: any,
+    state: ApiState,
     entity: IndexedObject,
     modelName: string,
     prop: string
