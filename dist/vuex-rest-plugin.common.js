@@ -6759,464 +6759,128 @@ Stack.prototype.set = _stackSet;
 
 /* harmony default export */ var _Stack = (Stack);
 
-// CONCATENATED MODULE: ./node_modules/lodash-es/_setCacheAdd.js
-/** Used to stand-in for `undefined` hash values. */
-var _setCacheAdd_HASH_UNDEFINED = '__lodash_hash_undefined__';
-
+// CONCATENATED MODULE: ./node_modules/lodash-es/_arrayEach.js
 /**
- * Adds `value` to the array cache.
- *
- * @private
- * @name add
- * @memberOf SetCache
- * @alias push
- * @param {*} value The value to cache.
- * @returns {Object} Returns the cache instance.
- */
-function setCacheAdd(value) {
-  this.__data__.set(value, _setCacheAdd_HASH_UNDEFINED);
-  return this;
-}
-
-/* harmony default export */ var _setCacheAdd = (setCacheAdd);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_setCacheHas.js
-/**
- * Checks if `value` is in the array cache.
- *
- * @private
- * @name has
- * @memberOf SetCache
- * @param {*} value The value to search for.
- * @returns {number} Returns `true` if `value` is found, else `false`.
- */
-function setCacheHas(value) {
-  return this.__data__.has(value);
-}
-
-/* harmony default export */ var _setCacheHas = (setCacheHas);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_SetCache.js
-
-
-
-
-/**
- *
- * Creates an array cache object to store unique values.
- *
- * @private
- * @constructor
- * @param {Array} [values] The values to cache.
- */
-function SetCache(values) {
-  var index = -1,
-      length = values == null ? 0 : values.length;
-
-  this.__data__ = new _MapCache;
-  while (++index < length) {
-    this.add(values[index]);
-  }
-}
-
-// Add methods to `SetCache`.
-SetCache.prototype.add = SetCache.prototype.push = _setCacheAdd;
-SetCache.prototype.has = _setCacheHas;
-
-/* harmony default export */ var _SetCache = (SetCache);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_arraySome.js
-/**
- * A specialized version of `_.some` for arrays without support for iteratee
- * shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} predicate The function invoked per iteration.
- * @returns {boolean} Returns `true` if any element passes the predicate check,
- *  else `false`.
- */
-function arraySome(array, predicate) {
-  var index = -1,
-      length = array == null ? 0 : array.length;
-
-  while (++index < length) {
-    if (predicate(array[index], index, array)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/* harmony default export */ var _arraySome = (arraySome);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_cacheHas.js
-/**
- * Checks if a `cache` value for `key` exists.
- *
- * @private
- * @param {Object} cache The cache to query.
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function cacheHas(cache, key) {
-  return cache.has(key);
-}
-
-/* harmony default export */ var _cacheHas = (cacheHas);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_equalArrays.js
-
-
-
-
-/** Used to compose bitmasks for value comparisons. */
-var COMPARE_PARTIAL_FLAG = 1,
-    COMPARE_UNORDERED_FLAG = 2;
-
-/**
- * A specialized version of `baseIsEqualDeep` for arrays with support for
- * partial deep comparisons.
- *
- * @private
- * @param {Array} array The array to compare.
- * @param {Array} other The other array to compare.
- * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
- * @param {Function} customizer The function to customize comparisons.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Object} stack Tracks traversed `array` and `other` objects.
- * @returns {boolean} Returns `true` if the arrays are equivalent, else `false`.
- */
-function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
-  var isPartial = bitmask & COMPARE_PARTIAL_FLAG,
-      arrLength = array.length,
-      othLength = other.length;
-
-  if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
-    return false;
-  }
-  // Assume cyclic values are equal.
-  var stacked = stack.get(array);
-  if (stacked && stack.get(other)) {
-    return stacked == other;
-  }
-  var index = -1,
-      result = true,
-      seen = (bitmask & COMPARE_UNORDERED_FLAG) ? new _SetCache : undefined;
-
-  stack.set(array, other);
-  stack.set(other, array);
-
-  // Ignore non-index properties.
-  while (++index < arrLength) {
-    var arrValue = array[index],
-        othValue = other[index];
-
-    if (customizer) {
-      var compared = isPartial
-        ? customizer(othValue, arrValue, index, other, array, stack)
-        : customizer(arrValue, othValue, index, array, other, stack);
-    }
-    if (compared !== undefined) {
-      if (compared) {
-        continue;
-      }
-      result = false;
-      break;
-    }
-    // Recursively compare arrays (susceptible to call stack limits).
-    if (seen) {
-      if (!_arraySome(other, function(othValue, othIndex) {
-            if (!_cacheHas(seen, othIndex) &&
-                (arrValue === othValue || equalFunc(arrValue, othValue, bitmask, customizer, stack))) {
-              return seen.push(othIndex);
-            }
-          })) {
-        result = false;
-        break;
-      }
-    } else if (!(
-          arrValue === othValue ||
-            equalFunc(arrValue, othValue, bitmask, customizer, stack)
-        )) {
-      result = false;
-      break;
-    }
-  }
-  stack['delete'](array);
-  stack['delete'](other);
-  return result;
-}
-
-/* harmony default export */ var _equalArrays = (equalArrays);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_Uint8Array.js
-
-
-/** Built-in value references. */
-var Uint8Array = _root["a" /* default */].Uint8Array;
-
-/* harmony default export */ var _Uint8Array = (Uint8Array);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_mapToArray.js
-/**
- * Converts `map` to its key-value pairs.
- *
- * @private
- * @param {Object} map The map to convert.
- * @returns {Array} Returns the key-value pairs.
- */
-function mapToArray(map) {
-  var index = -1,
-      result = Array(map.size);
-
-  map.forEach(function(value, key) {
-    result[++index] = [key, value];
-  });
-  return result;
-}
-
-/* harmony default export */ var _mapToArray = (mapToArray);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_setToArray.js
-/**
- * Converts `set` to an array of its values.
- *
- * @private
- * @param {Object} set The set to convert.
- * @returns {Array} Returns the values.
- */
-function setToArray(set) {
-  var index = -1,
-      result = Array(set.size);
-
-  set.forEach(function(value) {
-    result[++index] = value;
-  });
-  return result;
-}
-
-/* harmony default export */ var _setToArray = (setToArray);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_equalByTag.js
-
-
-
-
-
-
-
-/** Used to compose bitmasks for value comparisons. */
-var _equalByTag_COMPARE_PARTIAL_FLAG = 1,
-    _equalByTag_COMPARE_UNORDERED_FLAG = 2;
-
-/** `Object#toString` result references. */
-var boolTag = '[object Boolean]',
-    dateTag = '[object Date]',
-    errorTag = '[object Error]',
-    mapTag = '[object Map]',
-    numberTag = '[object Number]',
-    regexpTag = '[object RegExp]',
-    setTag = '[object Set]',
-    stringTag = '[object String]',
-    _equalByTag_symbolTag = '[object Symbol]';
-
-var arrayBufferTag = '[object ArrayBuffer]',
-    dataViewTag = '[object DataView]';
-
-/** Used to convert symbols to primitives and strings. */
-var _equalByTag_symbolProto = _Symbol ? _Symbol.prototype : undefined,
-    symbolValueOf = _equalByTag_symbolProto ? _equalByTag_symbolProto.valueOf : undefined;
-
-/**
- * A specialized version of `baseIsEqualDeep` for comparing objects of
- * the same `toStringTag`.
- *
- * **Note:** This function only supports comparing values with tags of
- * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
- *
- * @private
- * @param {Object} object The object to compare.
- * @param {Object} other The other object to compare.
- * @param {string} tag The `toStringTag` of the objects to compare.
- * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
- * @param {Function} customizer The function to customize comparisons.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Object} stack Tracks traversed `object` and `other` objects.
- * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
- */
-function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
-  switch (tag) {
-    case dataViewTag:
-      if ((object.byteLength != other.byteLength) ||
-          (object.byteOffset != other.byteOffset)) {
-        return false;
-      }
-      object = object.buffer;
-      other = other.buffer;
-
-    case arrayBufferTag:
-      if ((object.byteLength != other.byteLength) ||
-          !equalFunc(new _Uint8Array(object), new _Uint8Array(other))) {
-        return false;
-      }
-      return true;
-
-    case boolTag:
-    case dateTag:
-    case numberTag:
-      // Coerce booleans to `1` or `0` and dates to milliseconds.
-      // Invalid dates are coerced to `NaN`.
-      return lodash_es_eq(+object, +other);
-
-    case errorTag:
-      return object.name == other.name && object.message == other.message;
-
-    case regexpTag:
-    case stringTag:
-      // Coerce regexes to strings and treat strings, primitives and objects,
-      // as equal. See http://www.ecma-international.org/ecma-262/7.0/#sec-regexp.prototype.tostring
-      // for more details.
-      return object == (other + '');
-
-    case mapTag:
-      var convert = _mapToArray;
-
-    case setTag:
-      var isPartial = bitmask & _equalByTag_COMPARE_PARTIAL_FLAG;
-      convert || (convert = _setToArray);
-
-      if (object.size != other.size && !isPartial) {
-        return false;
-      }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(object);
-      if (stacked) {
-        return stacked == other;
-      }
-      bitmask |= _equalByTag_COMPARE_UNORDERED_FLAG;
-
-      // Recursively compare objects (susceptible to call stack limits).
-      stack.set(object, other);
-      var result = _equalArrays(convert(object), convert(other), bitmask, customizer, equalFunc, stack);
-      stack['delete'](object);
-      return result;
-
-    case _equalByTag_symbolTag:
-      if (symbolValueOf) {
-        return symbolValueOf.call(object) == symbolValueOf.call(other);
-      }
-  }
-  return false;
-}
-
-/* harmony default export */ var _equalByTag = (equalByTag);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseGetAllKeys.js
-
-
-
-/**
- * The base implementation of `getAllKeys` and `getAllKeysIn` which uses
- * `keysFunc` and `symbolsFunc` to get the enumerable property names and
- * symbols of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {Function} keysFunc The function to get the keys of `object`.
- * @param {Function} symbolsFunc The function to get the symbols of `object`.
- * @returns {Array} Returns the array of property names and symbols.
- */
-function baseGetAllKeys(object, keysFunc, symbolsFunc) {
-  var result = keysFunc(object);
-  return lodash_es_isArray(object) ? result : _arrayPush(result, symbolsFunc(object));
-}
-
-/* harmony default export */ var _baseGetAllKeys = (baseGetAllKeys);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_arrayFilter.js
-/**
- * A specialized version of `_.filter` for arrays without support for
+ * A specialized version of `_.forEach` for arrays without support for
  * iteratee shorthands.
  *
  * @private
  * @param {Array} [array] The array to iterate over.
- * @param {Function} predicate The function invoked per iteration.
- * @returns {Array} Returns the new filtered array.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Array} Returns `array`.
  */
-function arrayFilter(array, predicate) {
+function arrayEach(array, iteratee) {
   var index = -1,
-      length = array == null ? 0 : array.length,
-      resIndex = 0,
-      result = [];
+      length = array == null ? 0 : array.length;
 
   while (++index < length) {
-    var value = array[index];
-    if (predicate(value, index, array)) {
-      result[resIndex++] = value;
+    if (iteratee(array[index], index, array) === false) {
+      break;
     }
   }
-  return result;
+  return array;
 }
 
-/* harmony default export */ var _arrayFilter = (arrayFilter);
+/* harmony default export */ var _arrayEach = (arrayEach);
 
-// CONCATENATED MODULE: ./node_modules/lodash-es/stubArray.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseAssignValue.js
+
+
 /**
- * This method returns a new empty array.
+ * The base implementation of `assignValue` and `assignMergeValue` without
+ * value checks.
  *
- * @static
- * @memberOf _
- * @since 4.13.0
- * @category Util
- * @returns {Array} Returns the new empty array.
- * @example
- *
- * var arrays = _.times(2, _.stubArray);
- *
- * console.log(arrays);
- * // => [[], []]
- *
- * console.log(arrays[0] === arrays[1]);
- * // => false
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {string} key The key of the property to assign.
+ * @param {*} value The value to assign.
  */
-function stubArray() {
-  return [];
+function baseAssignValue(object, key, value) {
+  if (key == '__proto__' && lodash_es_defineProperty) {
+    lodash_es_defineProperty(object, key, {
+      'configurable': true,
+      'enumerable': true,
+      'value': value,
+      'writable': true
+    });
+  } else {
+    object[key] = value;
+  }
 }
 
-/* harmony default export */ var lodash_es_stubArray = (stubArray);
+/* harmony default export */ var _baseAssignValue = (baseAssignValue);
 
-// CONCATENATED MODULE: ./node_modules/lodash-es/_getSymbols.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_assignValue.js
 
 
 
 /** Used for built-in method references. */
-var _getSymbols_objectProto = Object.prototype;
+var _assignValue_objectProto = Object.prototype;
 
-/** Built-in value references. */
-var _getSymbols_propertyIsEnumerable = _getSymbols_objectProto.propertyIsEnumerable;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeGetSymbols = Object.getOwnPropertySymbols;
+/** Used to check objects for own properties. */
+var _assignValue_hasOwnProperty = _assignValue_objectProto.hasOwnProperty;
 
 /**
- * Creates an array of the own enumerable symbols of `object`.
+ * Assigns `value` to `key` of `object` if the existing value is not equivalent
+ * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * for equality comparisons.
  *
  * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of symbols.
+ * @param {Object} object The object to modify.
+ * @param {string} key The key of the property to assign.
+ * @param {*} value The value to assign.
  */
-var getSymbols = !nativeGetSymbols ? lodash_es_stubArray : function(object) {
-  if (object == null) {
-    return [];
+function assignValue(object, key, value) {
+  var objValue = object[key];
+  if (!(_assignValue_hasOwnProperty.call(object, key) && lodash_es_eq(objValue, value)) ||
+      (value === undefined && !(key in object))) {
+    _baseAssignValue(object, key, value);
   }
-  object = Object(object);
-  return _arrayFilter(nativeGetSymbols(object), function(symbol) {
-    return _getSymbols_propertyIsEnumerable.call(object, symbol);
-  });
-};
+}
 
-/* harmony default export */ var _getSymbols = (getSymbols);
+/* harmony default export */ var _assignValue = (assignValue);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_copyObject.js
+
+
+
+/**
+ * Copies properties of `source` to `object`.
+ *
+ * @private
+ * @param {Object} source The object to copy properties from.
+ * @param {Array} props The property identifiers to copy.
+ * @param {Object} [object={}] The object to copy properties to.
+ * @param {Function} [customizer] The function to customize copied values.
+ * @returns {Object} Returns `object`.
+ */
+function copyObject(source, props, object, customizer) {
+  var isNew = !object;
+  object || (object = {});
+
+  var index = -1,
+      length = props.length;
+
+  while (++index < length) {
+    var key = props[index];
+
+    var newValue = customizer
+      ? customizer(object[key], source[key], key, object, source)
+      : undefined;
+
+    if (newValue === undefined) {
+      newValue = source[key];
+    }
+    if (isNew) {
+      _baseAssignValue(object, key, newValue);
+    } else {
+      _assignValue(object, key, newValue);
+    }
+  }
+  return object;
+}
+
+/* harmony default export */ var _copyObject = (copyObject);
 
 // CONCATENATED MODULE: ./node_modules/lodash-es/_baseTimes.js
 /**
@@ -7315,20 +6979,20 @@ function isLength(value) {
 /** `Object#toString` result references. */
 var _baseIsTypedArray_argsTag = '[object Arguments]',
     arrayTag = '[object Array]',
-    _baseIsTypedArray_boolTag = '[object Boolean]',
-    _baseIsTypedArray_dateTag = '[object Date]',
-    _baseIsTypedArray_errorTag = '[object Error]',
+    boolTag = '[object Boolean]',
+    dateTag = '[object Date]',
+    errorTag = '[object Error]',
     _baseIsTypedArray_funcTag = '[object Function]',
-    _baseIsTypedArray_mapTag = '[object Map]',
-    _baseIsTypedArray_numberTag = '[object Number]',
+    mapTag = '[object Map]',
+    numberTag = '[object Number]',
     objectTag = '[object Object]',
-    _baseIsTypedArray_regexpTag = '[object RegExp]',
-    _baseIsTypedArray_setTag = '[object Set]',
-    _baseIsTypedArray_stringTag = '[object String]',
+    regexpTag = '[object RegExp]',
+    setTag = '[object Set]',
+    stringTag = '[object String]',
     weakMapTag = '[object WeakMap]';
 
-var _baseIsTypedArray_arrayBufferTag = '[object ArrayBuffer]',
-    _baseIsTypedArray_dataViewTag = '[object DataView]',
+var arrayBufferTag = '[object ArrayBuffer]',
+    dataViewTag = '[object DataView]',
     float32Tag = '[object Float32Array]',
     float64Tag = '[object Float64Array]',
     int8Tag = '[object Int8Array]',
@@ -7347,12 +7011,12 @@ typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] =
 typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] =
 typedArrayTags[uint32Tag] = true;
 typedArrayTags[_baseIsTypedArray_argsTag] = typedArrayTags[arrayTag] =
-typedArrayTags[_baseIsTypedArray_arrayBufferTag] = typedArrayTags[_baseIsTypedArray_boolTag] =
-typedArrayTags[_baseIsTypedArray_dataViewTag] = typedArrayTags[_baseIsTypedArray_dateTag] =
-typedArrayTags[_baseIsTypedArray_errorTag] = typedArrayTags[_baseIsTypedArray_funcTag] =
-typedArrayTags[_baseIsTypedArray_mapTag] = typedArrayTags[_baseIsTypedArray_numberTag] =
-typedArrayTags[objectTag] = typedArrayTags[_baseIsTypedArray_regexpTag] =
-typedArrayTags[_baseIsTypedArray_setTag] = typedArrayTags[_baseIsTypedArray_stringTag] =
+typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] =
+typedArrayTags[dataViewTag] = typedArrayTags[dateTag] =
+typedArrayTags[errorTag] = typedArrayTags[_baseIsTypedArray_funcTag] =
+typedArrayTags[mapTag] = typedArrayTags[numberTag] =
+typedArrayTags[objectTag] = typedArrayTags[regexpTag] =
+typedArrayTags[setTag] = typedArrayTags[stringTag] =
 typedArrayTags[weakMapTag] = false;
 
 /**
@@ -7619,6 +7283,337 @@ function keys(object) {
 
 /* harmony default export */ var lodash_es_keys = (keys);
 
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseAssign.js
+
+
+
+/**
+ * The base implementation of `_.assign` without support for multiple sources
+ * or `customizer` functions.
+ *
+ * @private
+ * @param {Object} object The destination object.
+ * @param {Object} source The source object.
+ * @returns {Object} Returns `object`.
+ */
+function baseAssign(object, source) {
+  return object && _copyObject(source, lodash_es_keys(source), object);
+}
+
+/* harmony default export */ var _baseAssign = (baseAssign);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_nativeKeysIn.js
+/**
+ * This function is like
+ * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
+ * except that it includes inherited enumerable properties.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ */
+function nativeKeysIn(object) {
+  var result = [];
+  if (object != null) {
+    for (var key in Object(object)) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+/* harmony default export */ var _nativeKeysIn = (nativeKeysIn);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseKeysIn.js
+
+
+
+
+/** Used for built-in method references. */
+var _baseKeysIn_objectProto = Object.prototype;
+
+/** Used to check objects for own properties. */
+var _baseKeysIn_hasOwnProperty = _baseKeysIn_objectProto.hasOwnProperty;
+
+/**
+ * The base implementation of `_.keysIn` which doesn't treat sparse arrays as dense.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ */
+function baseKeysIn(object) {
+  if (!lodash_es_isObject(object)) {
+    return _nativeKeysIn(object);
+  }
+  var isProto = _isPrototype(object),
+      result = [];
+
+  for (var key in object) {
+    if (!(key == 'constructor' && (isProto || !_baseKeysIn_hasOwnProperty.call(object, key)))) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+/* harmony default export */ var _baseKeysIn = (baseKeysIn);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/keysIn.js
+
+
+
+
+/**
+ * Creates an array of the own and inherited enumerable property names of `object`.
+ *
+ * **Note:** Non-object values are coerced to objects.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category Object
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ *   this.b = 2;
+ * }
+ *
+ * Foo.prototype.c = 3;
+ *
+ * _.keysIn(new Foo);
+ * // => ['a', 'b', 'c'] (iteration order is not guaranteed)
+ */
+function keysIn_keysIn(object) {
+  return lodash_es_isArrayLike(object) ? _arrayLikeKeys(object, true) : _baseKeysIn(object);
+}
+
+/* harmony default export */ var lodash_es_keysIn = (keysIn_keysIn);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseAssignIn.js
+
+
+
+/**
+ * The base implementation of `_.assignIn` without support for multiple sources
+ * or `customizer` functions.
+ *
+ * @private
+ * @param {Object} object The destination object.
+ * @param {Object} source The source object.
+ * @returns {Object} Returns `object`.
+ */
+function baseAssignIn(object, source) {
+  return object && _copyObject(source, lodash_es_keysIn(source), object);
+}
+
+/* harmony default export */ var _baseAssignIn = (baseAssignIn);
+
+// EXTERNAL MODULE: ./node_modules/lodash-es/_cloneBuffer.js
+var _cloneBuffer = __webpack_require__("dff1");
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_copyArray.js
+/**
+ * Copies the values of `source` to `array`.
+ *
+ * @private
+ * @param {Array} source The array to copy values from.
+ * @param {Array} [array=[]] The array to copy values to.
+ * @returns {Array} Returns `array`.
+ */
+function copyArray(source, array) {
+  var index = -1,
+      length = source.length;
+
+  array || (array = Array(length));
+  while (++index < length) {
+    array[index] = source[index];
+  }
+  return array;
+}
+
+/* harmony default export */ var _copyArray = (copyArray);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_arrayFilter.js
+/**
+ * A specialized version of `_.filter` for arrays without support for
+ * iteratee shorthands.
+ *
+ * @private
+ * @param {Array} [array] The array to iterate over.
+ * @param {Function} predicate The function invoked per iteration.
+ * @returns {Array} Returns the new filtered array.
+ */
+function arrayFilter(array, predicate) {
+  var index = -1,
+      length = array == null ? 0 : array.length,
+      resIndex = 0,
+      result = [];
+
+  while (++index < length) {
+    var value = array[index];
+    if (predicate(value, index, array)) {
+      result[resIndex++] = value;
+    }
+  }
+  return result;
+}
+
+/* harmony default export */ var _arrayFilter = (arrayFilter);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/stubArray.js
+/**
+ * This method returns a new empty array.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.13.0
+ * @category Util
+ * @returns {Array} Returns the new empty array.
+ * @example
+ *
+ * var arrays = _.times(2, _.stubArray);
+ *
+ * console.log(arrays);
+ * // => [[], []]
+ *
+ * console.log(arrays[0] === arrays[1]);
+ * // => false
+ */
+function stubArray() {
+  return [];
+}
+
+/* harmony default export */ var lodash_es_stubArray = (stubArray);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_getSymbols.js
+
+
+
+/** Used for built-in method references. */
+var _getSymbols_objectProto = Object.prototype;
+
+/** Built-in value references. */
+var _getSymbols_propertyIsEnumerable = _getSymbols_objectProto.propertyIsEnumerable;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeGetSymbols = Object.getOwnPropertySymbols;
+
+/**
+ * Creates an array of the own enumerable symbols of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of symbols.
+ */
+var getSymbols = !nativeGetSymbols ? lodash_es_stubArray : function(object) {
+  if (object == null) {
+    return [];
+  }
+  object = Object(object);
+  return _arrayFilter(nativeGetSymbols(object), function(symbol) {
+    return _getSymbols_propertyIsEnumerable.call(object, symbol);
+  });
+};
+
+/* harmony default export */ var _getSymbols = (getSymbols);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_copySymbols.js
+
+
+
+/**
+ * Copies own symbols of `source` to `object`.
+ *
+ * @private
+ * @param {Object} source The object to copy symbols from.
+ * @param {Object} [object={}] The object to copy symbols to.
+ * @returns {Object} Returns `object`.
+ */
+function copySymbols(source, object) {
+  return _copyObject(source, _getSymbols(source), object);
+}
+
+/* harmony default export */ var _copySymbols = (copySymbols);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_getPrototype.js
+
+
+/** Built-in value references. */
+var getPrototype = _overArg(Object.getPrototypeOf, Object);
+
+/* harmony default export */ var _getPrototype = (getPrototype);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_getSymbolsIn.js
+
+
+
+
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var _getSymbolsIn_nativeGetSymbols = Object.getOwnPropertySymbols;
+
+/**
+ * Creates an array of the own and inherited enumerable symbols of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of symbols.
+ */
+var getSymbolsIn = !_getSymbolsIn_nativeGetSymbols ? lodash_es_stubArray : function(object) {
+  var result = [];
+  while (object) {
+    _arrayPush(result, _getSymbols(object));
+    object = _getPrototype(object);
+  }
+  return result;
+};
+
+/* harmony default export */ var _getSymbolsIn = (getSymbolsIn);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_copySymbolsIn.js
+
+
+
+/**
+ * Copies own and inherited symbols of `source` to `object`.
+ *
+ * @private
+ * @param {Object} source The object to copy symbols from.
+ * @param {Object} [object={}] The object to copy symbols to.
+ * @returns {Object} Returns `object`.
+ */
+function copySymbolsIn(source, object) {
+  return _copyObject(source, _getSymbolsIn(source), object);
+}
+
+/* harmony default export */ var _copySymbolsIn = (copySymbolsIn);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseGetAllKeys.js
+
+
+
+/**
+ * The base implementation of `getAllKeys` and `getAllKeysIn` which uses
+ * `keysFunc` and `symbolsFunc` to get the enumerable property names and
+ * symbols of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Function} keysFunc The function to get the keys of `object`.
+ * @param {Function} symbolsFunc The function to get the symbols of `object`.
+ * @returns {Array} Returns the array of property names and symbols.
+ */
+function baseGetAllKeys(object, keysFunc, symbolsFunc) {
+  var result = keysFunc(object);
+  return lodash_es_isArray(object) ? result : _arrayPush(result, symbolsFunc(object));
+}
+
+/* harmony default export */ var _baseGetAllKeys = (baseGetAllKeys);
+
 // CONCATENATED MODULE: ./node_modules/lodash-es/_getAllKeys.js
 
 
@@ -7637,96 +7632,24 @@ function getAllKeys(object) {
 
 /* harmony default export */ var _getAllKeys = (getAllKeys);
 
-// CONCATENATED MODULE: ./node_modules/lodash-es/_equalObjects.js
+// CONCATENATED MODULE: ./node_modules/lodash-es/_getAllKeysIn.js
 
 
-/** Used to compose bitmasks for value comparisons. */
-var _equalObjects_COMPARE_PARTIAL_FLAG = 1;
 
-/** Used for built-in method references. */
-var _equalObjects_objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var _equalObjects_hasOwnProperty = _equalObjects_objectProto.hasOwnProperty;
 
 /**
- * A specialized version of `baseIsEqualDeep` for objects with support for
- * partial deep comparisons.
+ * Creates an array of own and inherited enumerable property names and
+ * symbols of `object`.
  *
  * @private
- * @param {Object} object The object to compare.
- * @param {Object} other The other object to compare.
- * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
- * @param {Function} customizer The function to customize comparisons.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Object} stack Tracks traversed `object` and `other` objects.
- * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names and symbols.
  */
-function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
-  var isPartial = bitmask & _equalObjects_COMPARE_PARTIAL_FLAG,
-      objProps = _getAllKeys(object),
-      objLength = objProps.length,
-      othProps = _getAllKeys(other),
-      othLength = othProps.length;
-
-  if (objLength != othLength && !isPartial) {
-    return false;
-  }
-  var index = objLength;
-  while (index--) {
-    var key = objProps[index];
-    if (!(isPartial ? key in other : _equalObjects_hasOwnProperty.call(other, key))) {
-      return false;
-    }
-  }
-  // Assume cyclic values are equal.
-  var stacked = stack.get(object);
-  if (stacked && stack.get(other)) {
-    return stacked == other;
-  }
-  var result = true;
-  stack.set(object, other);
-  stack.set(other, object);
-
-  var skipCtor = isPartial;
-  while (++index < objLength) {
-    key = objProps[index];
-    var objValue = object[key],
-        othValue = other[key];
-
-    if (customizer) {
-      var compared = isPartial
-        ? customizer(othValue, objValue, key, other, object, stack)
-        : customizer(objValue, othValue, key, object, other, stack);
-    }
-    // Recursively compare objects (susceptible to call stack limits).
-    if (!(compared === undefined
-          ? (objValue === othValue || equalFunc(objValue, othValue, bitmask, customizer, stack))
-          : compared
-        )) {
-      result = false;
-      break;
-    }
-    skipCtor || (skipCtor = key == 'constructor');
-  }
-  if (result && !skipCtor) {
-    var objCtor = object.constructor,
-        othCtor = other.constructor;
-
-    // Non `Object` object instances with different constructors are not equal.
-    if (objCtor != othCtor &&
-        ('constructor' in object && 'constructor' in other) &&
-        !(typeof objCtor == 'function' && objCtor instanceof objCtor &&
-          typeof othCtor == 'function' && othCtor instanceof othCtor)) {
-      result = false;
-    }
-  }
-  stack['delete'](object);
-  stack['delete'](other);
-  return result;
+function getAllKeysIn(object) {
+  return _baseGetAllKeys(object, lodash_es_keysIn, _getSymbolsIn);
 }
 
-/* harmony default export */ var _equalObjects = (equalObjects);
+/* harmony default export */ var _getAllKeysIn = (getAllKeysIn);
 
 // CONCATENATED MODULE: ./node_modules/lodash-es/_DataView.js
 
@@ -7823,6 +7746,998 @@ if ((_DataView && getTag(new _DataView(new ArrayBuffer(1))) != _getTag_dataViewT
 }
 
 /* harmony default export */ var _getTag = (getTag);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_initCloneArray.js
+/** Used for built-in method references. */
+var _initCloneArray_objectProto = Object.prototype;
+
+/** Used to check objects for own properties. */
+var _initCloneArray_hasOwnProperty = _initCloneArray_objectProto.hasOwnProperty;
+
+/**
+ * Initializes an array clone.
+ *
+ * @private
+ * @param {Array} array The array to clone.
+ * @returns {Array} Returns the initialized clone.
+ */
+function initCloneArray(array) {
+  var length = array.length,
+      result = new array.constructor(length);
+
+  // Add properties assigned by `RegExp#exec`.
+  if (length && typeof array[0] == 'string' && _initCloneArray_hasOwnProperty.call(array, 'index')) {
+    result.index = array.index;
+    result.input = array.input;
+  }
+  return result;
+}
+
+/* harmony default export */ var _initCloneArray = (initCloneArray);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_Uint8Array.js
+
+
+/** Built-in value references. */
+var Uint8Array = _root["a" /* default */].Uint8Array;
+
+/* harmony default export */ var _Uint8Array = (Uint8Array);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneArrayBuffer.js
+
+
+/**
+ * Creates a clone of `arrayBuffer`.
+ *
+ * @private
+ * @param {ArrayBuffer} arrayBuffer The array buffer to clone.
+ * @returns {ArrayBuffer} Returns the cloned array buffer.
+ */
+function cloneArrayBuffer(arrayBuffer) {
+  var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
+  new _Uint8Array(result).set(new _Uint8Array(arrayBuffer));
+  return result;
+}
+
+/* harmony default export */ var _cloneArrayBuffer = (cloneArrayBuffer);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneDataView.js
+
+
+/**
+ * Creates a clone of `dataView`.
+ *
+ * @private
+ * @param {Object} dataView The data view to clone.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @returns {Object} Returns the cloned data view.
+ */
+function cloneDataView(dataView, isDeep) {
+  var buffer = isDeep ? _cloneArrayBuffer(dataView.buffer) : dataView.buffer;
+  return new dataView.constructor(buffer, dataView.byteOffset, dataView.byteLength);
+}
+
+/* harmony default export */ var _cloneDataView = (cloneDataView);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneRegExp.js
+/** Used to match `RegExp` flags from their coerced string values. */
+var reFlags = /\w*$/;
+
+/**
+ * Creates a clone of `regexp`.
+ *
+ * @private
+ * @param {Object} regexp The regexp to clone.
+ * @returns {Object} Returns the cloned regexp.
+ */
+function cloneRegExp(regexp) {
+  var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
+  result.lastIndex = regexp.lastIndex;
+  return result;
+}
+
+/* harmony default export */ var _cloneRegExp = (cloneRegExp);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneSymbol.js
+
+
+/** Used to convert symbols to primitives and strings. */
+var _cloneSymbol_symbolProto = _Symbol ? _Symbol.prototype : undefined,
+    symbolValueOf = _cloneSymbol_symbolProto ? _cloneSymbol_symbolProto.valueOf : undefined;
+
+/**
+ * Creates a clone of the `symbol` object.
+ *
+ * @private
+ * @param {Object} symbol The symbol object to clone.
+ * @returns {Object} Returns the cloned symbol object.
+ */
+function cloneSymbol(symbol) {
+  return symbolValueOf ? Object(symbolValueOf.call(symbol)) : {};
+}
+
+/* harmony default export */ var _cloneSymbol = (cloneSymbol);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneTypedArray.js
+
+
+/**
+ * Creates a clone of `typedArray`.
+ *
+ * @private
+ * @param {Object} typedArray The typed array to clone.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @returns {Object} Returns the cloned typed array.
+ */
+function cloneTypedArray(typedArray, isDeep) {
+  var buffer = isDeep ? _cloneArrayBuffer(typedArray.buffer) : typedArray.buffer;
+  return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
+}
+
+/* harmony default export */ var _cloneTypedArray = (cloneTypedArray);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_initCloneByTag.js
+
+
+
+
+
+
+/** `Object#toString` result references. */
+var _initCloneByTag_boolTag = '[object Boolean]',
+    _initCloneByTag_dateTag = '[object Date]',
+    _initCloneByTag_mapTag = '[object Map]',
+    _initCloneByTag_numberTag = '[object Number]',
+    _initCloneByTag_regexpTag = '[object RegExp]',
+    _initCloneByTag_setTag = '[object Set]',
+    _initCloneByTag_stringTag = '[object String]',
+    _initCloneByTag_symbolTag = '[object Symbol]';
+
+var _initCloneByTag_arrayBufferTag = '[object ArrayBuffer]',
+    _initCloneByTag_dataViewTag = '[object DataView]',
+    _initCloneByTag_float32Tag = '[object Float32Array]',
+    _initCloneByTag_float64Tag = '[object Float64Array]',
+    _initCloneByTag_int8Tag = '[object Int8Array]',
+    _initCloneByTag_int16Tag = '[object Int16Array]',
+    _initCloneByTag_int32Tag = '[object Int32Array]',
+    _initCloneByTag_uint8Tag = '[object Uint8Array]',
+    _initCloneByTag_uint8ClampedTag = '[object Uint8ClampedArray]',
+    _initCloneByTag_uint16Tag = '[object Uint16Array]',
+    _initCloneByTag_uint32Tag = '[object Uint32Array]';
+
+/**
+ * Initializes an object clone based on its `toStringTag`.
+ *
+ * **Note:** This function only supports cloning values with tags of
+ * `Boolean`, `Date`, `Error`, `Map`, `Number`, `RegExp`, `Set`, or `String`.
+ *
+ * @private
+ * @param {Object} object The object to clone.
+ * @param {string} tag The `toStringTag` of the object to clone.
+ * @param {boolean} [isDeep] Specify a deep clone.
+ * @returns {Object} Returns the initialized clone.
+ */
+function initCloneByTag(object, tag, isDeep) {
+  var Ctor = object.constructor;
+  switch (tag) {
+    case _initCloneByTag_arrayBufferTag:
+      return _cloneArrayBuffer(object);
+
+    case _initCloneByTag_boolTag:
+    case _initCloneByTag_dateTag:
+      return new Ctor(+object);
+
+    case _initCloneByTag_dataViewTag:
+      return _cloneDataView(object, isDeep);
+
+    case _initCloneByTag_float32Tag: case _initCloneByTag_float64Tag:
+    case _initCloneByTag_int8Tag: case _initCloneByTag_int16Tag: case _initCloneByTag_int32Tag:
+    case _initCloneByTag_uint8Tag: case _initCloneByTag_uint8ClampedTag: case _initCloneByTag_uint16Tag: case _initCloneByTag_uint32Tag:
+      return _cloneTypedArray(object, isDeep);
+
+    case _initCloneByTag_mapTag:
+      return new Ctor;
+
+    case _initCloneByTag_numberTag:
+    case _initCloneByTag_stringTag:
+      return new Ctor(object);
+
+    case _initCloneByTag_regexpTag:
+      return _cloneRegExp(object);
+
+    case _initCloneByTag_setTag:
+      return new Ctor;
+
+    case _initCloneByTag_symbolTag:
+      return _cloneSymbol(object);
+  }
+}
+
+/* harmony default export */ var _initCloneByTag = (initCloneByTag);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseCreate.js
+
+
+/** Built-in value references. */
+var objectCreate = Object.create;
+
+/**
+ * The base implementation of `_.create` without support for assigning
+ * properties to the created object.
+ *
+ * @private
+ * @param {Object} proto The object to inherit from.
+ * @returns {Object} Returns the new object.
+ */
+var baseCreate = (function() {
+  function object() {}
+  return function(proto) {
+    if (!lodash_es_isObject(proto)) {
+      return {};
+    }
+    if (objectCreate) {
+      return objectCreate(proto);
+    }
+    object.prototype = proto;
+    var result = new object;
+    object.prototype = undefined;
+    return result;
+  };
+}());
+
+/* harmony default export */ var _baseCreate = (baseCreate);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_initCloneObject.js
+
+
+
+
+/**
+ * Initializes an object clone.
+ *
+ * @private
+ * @param {Object} object The object to clone.
+ * @returns {Object} Returns the initialized clone.
+ */
+function initCloneObject(object) {
+  return (typeof object.constructor == 'function' && !_isPrototype(object))
+    ? _baseCreate(_getPrototype(object))
+    : {};
+}
+
+/* harmony default export */ var _initCloneObject = (initCloneObject);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseIsMap.js
+
+
+
+/** `Object#toString` result references. */
+var _baseIsMap_mapTag = '[object Map]';
+
+/**
+ * The base implementation of `_.isMap` without Node.js optimizations.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a map, else `false`.
+ */
+function baseIsMap(value) {
+  return lodash_es_isObjectLike(value) && _getTag(value) == _baseIsMap_mapTag;
+}
+
+/* harmony default export */ var _baseIsMap = (baseIsMap);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/isMap.js
+
+
+
+
+/* Node.js helper references. */
+var nodeIsMap = _nodeUtil["a" /* default */] && _nodeUtil["a" /* default */].isMap;
+
+/**
+ * Checks if `value` is classified as a `Map` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.3.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a map, else `false`.
+ * @example
+ *
+ * _.isMap(new Map);
+ * // => true
+ *
+ * _.isMap(new WeakMap);
+ * // => false
+ */
+var isMap = nodeIsMap ? _baseUnary(nodeIsMap) : _baseIsMap;
+
+/* harmony default export */ var lodash_es_isMap = (isMap);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseIsSet.js
+
+
+
+/** `Object#toString` result references. */
+var _baseIsSet_setTag = '[object Set]';
+
+/**
+ * The base implementation of `_.isSet` without Node.js optimizations.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a set, else `false`.
+ */
+function baseIsSet(value) {
+  return lodash_es_isObjectLike(value) && _getTag(value) == _baseIsSet_setTag;
+}
+
+/* harmony default export */ var _baseIsSet = (baseIsSet);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/isSet.js
+
+
+
+
+/* Node.js helper references. */
+var nodeIsSet = _nodeUtil["a" /* default */] && _nodeUtil["a" /* default */].isSet;
+
+/**
+ * Checks if `value` is classified as a `Set` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.3.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a set, else `false`.
+ * @example
+ *
+ * _.isSet(new Set);
+ * // => true
+ *
+ * _.isSet(new WeakSet);
+ * // => false
+ */
+var isSet = nodeIsSet ? _baseUnary(nodeIsSet) : _baseIsSet;
+
+/* harmony default export */ var lodash_es_isSet = (isSet);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseClone.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/** Used to compose bitmasks for cloning. */
+var CLONE_DEEP_FLAG = 1,
+    CLONE_FLAT_FLAG = 2,
+    CLONE_SYMBOLS_FLAG = 4;
+
+/** `Object#toString` result references. */
+var _baseClone_argsTag = '[object Arguments]',
+    _baseClone_arrayTag = '[object Array]',
+    _baseClone_boolTag = '[object Boolean]',
+    _baseClone_dateTag = '[object Date]',
+    _baseClone_errorTag = '[object Error]',
+    _baseClone_funcTag = '[object Function]',
+    _baseClone_genTag = '[object GeneratorFunction]',
+    _baseClone_mapTag = '[object Map]',
+    _baseClone_numberTag = '[object Number]',
+    _baseClone_objectTag = '[object Object]',
+    _baseClone_regexpTag = '[object RegExp]',
+    _baseClone_setTag = '[object Set]',
+    _baseClone_stringTag = '[object String]',
+    _baseClone_symbolTag = '[object Symbol]',
+    _baseClone_weakMapTag = '[object WeakMap]';
+
+var _baseClone_arrayBufferTag = '[object ArrayBuffer]',
+    _baseClone_dataViewTag = '[object DataView]',
+    _baseClone_float32Tag = '[object Float32Array]',
+    _baseClone_float64Tag = '[object Float64Array]',
+    _baseClone_int8Tag = '[object Int8Array]',
+    _baseClone_int16Tag = '[object Int16Array]',
+    _baseClone_int32Tag = '[object Int32Array]',
+    _baseClone_uint8Tag = '[object Uint8Array]',
+    _baseClone_uint8ClampedTag = '[object Uint8ClampedArray]',
+    _baseClone_uint16Tag = '[object Uint16Array]',
+    _baseClone_uint32Tag = '[object Uint32Array]';
+
+/** Used to identify `toStringTag` values supported by `_.clone`. */
+var cloneableTags = {};
+cloneableTags[_baseClone_argsTag] = cloneableTags[_baseClone_arrayTag] =
+cloneableTags[_baseClone_arrayBufferTag] = cloneableTags[_baseClone_dataViewTag] =
+cloneableTags[_baseClone_boolTag] = cloneableTags[_baseClone_dateTag] =
+cloneableTags[_baseClone_float32Tag] = cloneableTags[_baseClone_float64Tag] =
+cloneableTags[_baseClone_int8Tag] = cloneableTags[_baseClone_int16Tag] =
+cloneableTags[_baseClone_int32Tag] = cloneableTags[_baseClone_mapTag] =
+cloneableTags[_baseClone_numberTag] = cloneableTags[_baseClone_objectTag] =
+cloneableTags[_baseClone_regexpTag] = cloneableTags[_baseClone_setTag] =
+cloneableTags[_baseClone_stringTag] = cloneableTags[_baseClone_symbolTag] =
+cloneableTags[_baseClone_uint8Tag] = cloneableTags[_baseClone_uint8ClampedTag] =
+cloneableTags[_baseClone_uint16Tag] = cloneableTags[_baseClone_uint32Tag] = true;
+cloneableTags[_baseClone_errorTag] = cloneableTags[_baseClone_funcTag] =
+cloneableTags[_baseClone_weakMapTag] = false;
+
+/**
+ * The base implementation of `_.clone` and `_.cloneDeep` which tracks
+ * traversed objects.
+ *
+ * @private
+ * @param {*} value The value to clone.
+ * @param {boolean} bitmask The bitmask flags.
+ *  1 - Deep clone
+ *  2 - Flatten inherited properties
+ *  4 - Clone symbols
+ * @param {Function} [customizer] The function to customize cloning.
+ * @param {string} [key] The key of `value`.
+ * @param {Object} [object] The parent object of `value`.
+ * @param {Object} [stack] Tracks traversed objects and their clone counterparts.
+ * @returns {*} Returns the cloned value.
+ */
+function baseClone(value, bitmask, customizer, key, object, stack) {
+  var result,
+      isDeep = bitmask & CLONE_DEEP_FLAG,
+      isFlat = bitmask & CLONE_FLAT_FLAG,
+      isFull = bitmask & CLONE_SYMBOLS_FLAG;
+
+  if (customizer) {
+    result = object ? customizer(value, key, object, stack) : customizer(value);
+  }
+  if (result !== undefined) {
+    return result;
+  }
+  if (!lodash_es_isObject(value)) {
+    return value;
+  }
+  var isArr = lodash_es_isArray(value);
+  if (isArr) {
+    result = _initCloneArray(value);
+    if (!isDeep) {
+      return _copyArray(value, result);
+    }
+  } else {
+    var tag = _getTag(value),
+        isFunc = tag == _baseClone_funcTag || tag == _baseClone_genTag;
+
+    if (Object(isBuffer["a" /* default */])(value)) {
+      return Object(_cloneBuffer["a" /* default */])(value, isDeep);
+    }
+    if (tag == _baseClone_objectTag || tag == _baseClone_argsTag || (isFunc && !object)) {
+      result = (isFlat || isFunc) ? {} : _initCloneObject(value);
+      if (!isDeep) {
+        return isFlat
+          ? _copySymbolsIn(value, _baseAssignIn(result, value))
+          : _copySymbols(value, _baseAssign(result, value));
+      }
+    } else {
+      if (!cloneableTags[tag]) {
+        return object ? value : {};
+      }
+      result = _initCloneByTag(value, tag, isDeep);
+    }
+  }
+  // Check for circular references and return its corresponding clone.
+  stack || (stack = new _Stack);
+  var stacked = stack.get(value);
+  if (stacked) {
+    return stacked;
+  }
+  stack.set(value, result);
+
+  if (lodash_es_isSet(value)) {
+    value.forEach(function(subValue) {
+      result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
+    });
+  } else if (lodash_es_isMap(value)) {
+    value.forEach(function(subValue, key) {
+      result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
+    });
+  }
+
+  var keysFunc = isFull
+    ? (isFlat ? _getAllKeysIn : _getAllKeys)
+    : (isFlat ? keysIn : lodash_es_keys);
+
+  var props = isArr ? undefined : keysFunc(value);
+  _arrayEach(props || value, function(subValue, key) {
+    if (props) {
+      key = subValue;
+      subValue = value[key];
+    }
+    // Recursively populate clone (susceptible to call stack limits).
+    _assignValue(result, key, baseClone(subValue, bitmask, customizer, key, value, stack));
+  });
+  return result;
+}
+
+/* harmony default export */ var _baseClone = (baseClone);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/cloneDeep.js
+
+
+/** Used to compose bitmasks for cloning. */
+var cloneDeep_CLONE_DEEP_FLAG = 1,
+    cloneDeep_CLONE_SYMBOLS_FLAG = 4;
+
+/**
+ * This method is like `_.clone` except that it recursively clones `value`.
+ *
+ * @static
+ * @memberOf _
+ * @since 1.0.0
+ * @category Lang
+ * @param {*} value The value to recursively clone.
+ * @returns {*} Returns the deep cloned value.
+ * @see _.clone
+ * @example
+ *
+ * var objects = [{ 'a': 1 }, { 'b': 2 }];
+ *
+ * var deep = _.cloneDeep(objects);
+ * console.log(deep[0] === objects[0]);
+ * // => false
+ */
+function cloneDeep(value) {
+  return _baseClone(value, cloneDeep_CLONE_DEEP_FLAG | cloneDeep_CLONE_SYMBOLS_FLAG);
+}
+
+/* harmony default export */ var lodash_es_cloneDeep = (cloneDeep);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_setCacheAdd.js
+/** Used to stand-in for `undefined` hash values. */
+var _setCacheAdd_HASH_UNDEFINED = '__lodash_hash_undefined__';
+
+/**
+ * Adds `value` to the array cache.
+ *
+ * @private
+ * @name add
+ * @memberOf SetCache
+ * @alias push
+ * @param {*} value The value to cache.
+ * @returns {Object} Returns the cache instance.
+ */
+function setCacheAdd(value) {
+  this.__data__.set(value, _setCacheAdd_HASH_UNDEFINED);
+  return this;
+}
+
+/* harmony default export */ var _setCacheAdd = (setCacheAdd);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_setCacheHas.js
+/**
+ * Checks if `value` is in the array cache.
+ *
+ * @private
+ * @name has
+ * @memberOf SetCache
+ * @param {*} value The value to search for.
+ * @returns {number} Returns `true` if `value` is found, else `false`.
+ */
+function setCacheHas(value) {
+  return this.__data__.has(value);
+}
+
+/* harmony default export */ var _setCacheHas = (setCacheHas);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_SetCache.js
+
+
+
+
+/**
+ *
+ * Creates an array cache object to store unique values.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [values] The values to cache.
+ */
+function SetCache(values) {
+  var index = -1,
+      length = values == null ? 0 : values.length;
+
+  this.__data__ = new _MapCache;
+  while (++index < length) {
+    this.add(values[index]);
+  }
+}
+
+// Add methods to `SetCache`.
+SetCache.prototype.add = SetCache.prototype.push = _setCacheAdd;
+SetCache.prototype.has = _setCacheHas;
+
+/* harmony default export */ var _SetCache = (SetCache);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_arraySome.js
+/**
+ * A specialized version of `_.some` for arrays without support for iteratee
+ * shorthands.
+ *
+ * @private
+ * @param {Array} [array] The array to iterate over.
+ * @param {Function} predicate The function invoked per iteration.
+ * @returns {boolean} Returns `true` if any element passes the predicate check,
+ *  else `false`.
+ */
+function arraySome(array, predicate) {
+  var index = -1,
+      length = array == null ? 0 : array.length;
+
+  while (++index < length) {
+    if (predicate(array[index], index, array)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* harmony default export */ var _arraySome = (arraySome);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_cacheHas.js
+/**
+ * Checks if a `cache` value for `key` exists.
+ *
+ * @private
+ * @param {Object} cache The cache to query.
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function cacheHas(cache, key) {
+  return cache.has(key);
+}
+
+/* harmony default export */ var _cacheHas = (cacheHas);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_equalArrays.js
+
+
+
+
+/** Used to compose bitmasks for value comparisons. */
+var COMPARE_PARTIAL_FLAG = 1,
+    COMPARE_UNORDERED_FLAG = 2;
+
+/**
+ * A specialized version of `baseIsEqualDeep` for arrays with support for
+ * partial deep comparisons.
+ *
+ * @private
+ * @param {Array} array The array to compare.
+ * @param {Array} other The other array to compare.
+ * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
+ * @param {Function} customizer The function to customize comparisons.
+ * @param {Function} equalFunc The function to determine equivalents of values.
+ * @param {Object} stack Tracks traversed `array` and `other` objects.
+ * @returns {boolean} Returns `true` if the arrays are equivalent, else `false`.
+ */
+function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
+  var isPartial = bitmask & COMPARE_PARTIAL_FLAG,
+      arrLength = array.length,
+      othLength = other.length;
+
+  if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
+    return false;
+  }
+  // Assume cyclic values are equal.
+  var stacked = stack.get(array);
+  if (stacked && stack.get(other)) {
+    return stacked == other;
+  }
+  var index = -1,
+      result = true,
+      seen = (bitmask & COMPARE_UNORDERED_FLAG) ? new _SetCache : undefined;
+
+  stack.set(array, other);
+  stack.set(other, array);
+
+  // Ignore non-index properties.
+  while (++index < arrLength) {
+    var arrValue = array[index],
+        othValue = other[index];
+
+    if (customizer) {
+      var compared = isPartial
+        ? customizer(othValue, arrValue, index, other, array, stack)
+        : customizer(arrValue, othValue, index, array, other, stack);
+    }
+    if (compared !== undefined) {
+      if (compared) {
+        continue;
+      }
+      result = false;
+      break;
+    }
+    // Recursively compare arrays (susceptible to call stack limits).
+    if (seen) {
+      if (!_arraySome(other, function(othValue, othIndex) {
+            if (!_cacheHas(seen, othIndex) &&
+                (arrValue === othValue || equalFunc(arrValue, othValue, bitmask, customizer, stack))) {
+              return seen.push(othIndex);
+            }
+          })) {
+        result = false;
+        break;
+      }
+    } else if (!(
+          arrValue === othValue ||
+            equalFunc(arrValue, othValue, bitmask, customizer, stack)
+        )) {
+      result = false;
+      break;
+    }
+  }
+  stack['delete'](array);
+  stack['delete'](other);
+  return result;
+}
+
+/* harmony default export */ var _equalArrays = (equalArrays);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_mapToArray.js
+/**
+ * Converts `map` to its key-value pairs.
+ *
+ * @private
+ * @param {Object} map The map to convert.
+ * @returns {Array} Returns the key-value pairs.
+ */
+function mapToArray(map) {
+  var index = -1,
+      result = Array(map.size);
+
+  map.forEach(function(value, key) {
+    result[++index] = [key, value];
+  });
+  return result;
+}
+
+/* harmony default export */ var _mapToArray = (mapToArray);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_setToArray.js
+/**
+ * Converts `set` to an array of its values.
+ *
+ * @private
+ * @param {Object} set The set to convert.
+ * @returns {Array} Returns the values.
+ */
+function setToArray(set) {
+  var index = -1,
+      result = Array(set.size);
+
+  set.forEach(function(value) {
+    result[++index] = value;
+  });
+  return result;
+}
+
+/* harmony default export */ var _setToArray = (setToArray);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_equalByTag.js
+
+
+
+
+
+
+
+/** Used to compose bitmasks for value comparisons. */
+var _equalByTag_COMPARE_PARTIAL_FLAG = 1,
+    _equalByTag_COMPARE_UNORDERED_FLAG = 2;
+
+/** `Object#toString` result references. */
+var _equalByTag_boolTag = '[object Boolean]',
+    _equalByTag_dateTag = '[object Date]',
+    _equalByTag_errorTag = '[object Error]',
+    _equalByTag_mapTag = '[object Map]',
+    _equalByTag_numberTag = '[object Number]',
+    _equalByTag_regexpTag = '[object RegExp]',
+    _equalByTag_setTag = '[object Set]',
+    _equalByTag_stringTag = '[object String]',
+    _equalByTag_symbolTag = '[object Symbol]';
+
+var _equalByTag_arrayBufferTag = '[object ArrayBuffer]',
+    _equalByTag_dataViewTag = '[object DataView]';
+
+/** Used to convert symbols to primitives and strings. */
+var _equalByTag_symbolProto = _Symbol ? _Symbol.prototype : undefined,
+    _equalByTag_symbolValueOf = _equalByTag_symbolProto ? _equalByTag_symbolProto.valueOf : undefined;
+
+/**
+ * A specialized version of `baseIsEqualDeep` for comparing objects of
+ * the same `toStringTag`.
+ *
+ * **Note:** This function only supports comparing values with tags of
+ * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
+ *
+ * @private
+ * @param {Object} object The object to compare.
+ * @param {Object} other The other object to compare.
+ * @param {string} tag The `toStringTag` of the objects to compare.
+ * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
+ * @param {Function} customizer The function to customize comparisons.
+ * @param {Function} equalFunc The function to determine equivalents of values.
+ * @param {Object} stack Tracks traversed `object` and `other` objects.
+ * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
+ */
+function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
+  switch (tag) {
+    case _equalByTag_dataViewTag:
+      if ((object.byteLength != other.byteLength) ||
+          (object.byteOffset != other.byteOffset)) {
+        return false;
+      }
+      object = object.buffer;
+      other = other.buffer;
+
+    case _equalByTag_arrayBufferTag:
+      if ((object.byteLength != other.byteLength) ||
+          !equalFunc(new _Uint8Array(object), new _Uint8Array(other))) {
+        return false;
+      }
+      return true;
+
+    case _equalByTag_boolTag:
+    case _equalByTag_dateTag:
+    case _equalByTag_numberTag:
+      // Coerce booleans to `1` or `0` and dates to milliseconds.
+      // Invalid dates are coerced to `NaN`.
+      return lodash_es_eq(+object, +other);
+
+    case _equalByTag_errorTag:
+      return object.name == other.name && object.message == other.message;
+
+    case _equalByTag_regexpTag:
+    case _equalByTag_stringTag:
+      // Coerce regexes to strings and treat strings, primitives and objects,
+      // as equal. See http://www.ecma-international.org/ecma-262/7.0/#sec-regexp.prototype.tostring
+      // for more details.
+      return object == (other + '');
+
+    case _equalByTag_mapTag:
+      var convert = _mapToArray;
+
+    case _equalByTag_setTag:
+      var isPartial = bitmask & _equalByTag_COMPARE_PARTIAL_FLAG;
+      convert || (convert = _setToArray);
+
+      if (object.size != other.size && !isPartial) {
+        return false;
+      }
+      // Assume cyclic values are equal.
+      var stacked = stack.get(object);
+      if (stacked) {
+        return stacked == other;
+      }
+      bitmask |= _equalByTag_COMPARE_UNORDERED_FLAG;
+
+      // Recursively compare objects (susceptible to call stack limits).
+      stack.set(object, other);
+      var result = _equalArrays(convert(object), convert(other), bitmask, customizer, equalFunc, stack);
+      stack['delete'](object);
+      return result;
+
+    case _equalByTag_symbolTag:
+      if (_equalByTag_symbolValueOf) {
+        return _equalByTag_symbolValueOf.call(object) == _equalByTag_symbolValueOf.call(other);
+      }
+  }
+  return false;
+}
+
+/* harmony default export */ var _equalByTag = (equalByTag);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_equalObjects.js
+
+
+/** Used to compose bitmasks for value comparisons. */
+var _equalObjects_COMPARE_PARTIAL_FLAG = 1;
+
+/** Used for built-in method references. */
+var _equalObjects_objectProto = Object.prototype;
+
+/** Used to check objects for own properties. */
+var _equalObjects_hasOwnProperty = _equalObjects_objectProto.hasOwnProperty;
+
+/**
+ * A specialized version of `baseIsEqualDeep` for objects with support for
+ * partial deep comparisons.
+ *
+ * @private
+ * @param {Object} object The object to compare.
+ * @param {Object} other The other object to compare.
+ * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
+ * @param {Function} customizer The function to customize comparisons.
+ * @param {Function} equalFunc The function to determine equivalents of values.
+ * @param {Object} stack Tracks traversed `object` and `other` objects.
+ * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
+ */
+function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
+  var isPartial = bitmask & _equalObjects_COMPARE_PARTIAL_FLAG,
+      objProps = _getAllKeys(object),
+      objLength = objProps.length,
+      othProps = _getAllKeys(other),
+      othLength = othProps.length;
+
+  if (objLength != othLength && !isPartial) {
+    return false;
+  }
+  var index = objLength;
+  while (index--) {
+    var key = objProps[index];
+    if (!(isPartial ? key in other : _equalObjects_hasOwnProperty.call(other, key))) {
+      return false;
+    }
+  }
+  // Assume cyclic values are equal.
+  var stacked = stack.get(object);
+  if (stacked && stack.get(other)) {
+    return stacked == other;
+  }
+  var result = true;
+  stack.set(object, other);
+  stack.set(other, object);
+
+  var skipCtor = isPartial;
+  while (++index < objLength) {
+    key = objProps[index];
+    var objValue = object[key],
+        othValue = other[key];
+
+    if (customizer) {
+      var compared = isPartial
+        ? customizer(othValue, objValue, key, other, object, stack)
+        : customizer(objValue, othValue, key, object, other, stack);
+    }
+    // Recursively compare objects (susceptible to call stack limits).
+    if (!(compared === undefined
+          ? (objValue === othValue || equalFunc(objValue, othValue, bitmask, customizer, stack))
+          : compared
+        )) {
+      result = false;
+      break;
+    }
+    skipCtor || (skipCtor = key == 'constructor');
+  }
+  if (result && !skipCtor) {
+    var objCtor = object.constructor,
+        othCtor = other.constructor;
+
+    // Non `Object` object instances with different constructors are not equal.
+    if (objCtor != othCtor &&
+        ('constructor' in object && 'constructor' in other) &&
+        !(typeof objCtor == 'function' && objCtor instanceof objCtor &&
+          typeof othCtor == 'function' && othCtor instanceof othCtor)) {
+      result = false;
+    }
+  }
+  stack['delete'](object);
+  stack['delete'](other);
+  return result;
+}
+
+/* harmony default export */ var _equalObjects = (equalObjects);
 
 // CONCATENATED MODULE: ./node_modules/lodash-es/_baseIsEqualDeep.js
 
@@ -8543,30 +9458,6 @@ function flatMap(collection, iteratee) {
 
 /* harmony default export */ var lodash_es_flatMap = (flatMap);
 
-// CONCATENATED MODULE: ./node_modules/lodash-es/_arrayEach.js
-/**
- * A specialized version of `_.forEach` for arrays without support for
- * iteratee shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns `array`.
- */
-function arrayEach(array, iteratee) {
-  var index = -1,
-      length = array == null ? 0 : array.length;
-
-  while (++index < length) {
-    if (iteratee(array[index], index, array) === false) {
-      break;
-    }
-  }
-  return array;
-}
-
-/* harmony default export */ var _arrayEach = (arrayEach);
-
 // CONCATENATED MODULE: ./node_modules/lodash-es/_castFunction.js
 
 
@@ -8920,15 +9811,20 @@ function formatUrl(payload) {
 
 
 
+
 var Actions_ActionBase =
 /*#__PURE__*/
 function () {
   function ActionBase(axios, models, dataPath) {
     _classCallCheck(this, ActionBase);
 
+    this._dataPath = "data";
     this._axios = axios;
     this._models = models;
-    this._dataPath = dataPath; // add watched changes to queue
+
+    if (dataPath) {
+      this._dataPath = "".concat(this._dataPath, ".").concat(dataPath);
+    } // add watched changes to queue
     // this.queueActionWatcher = (
     //   { commit, state }: ActionContext<S, R>,
     //   payload: QueuePayload
@@ -8945,6 +9841,7 @@ function () {
     //     commit(`QUEUE_ACTION_${model.name}`, payload);
     //   }
     // };
+
   }
 
   _createClass(ActionBase, [{
@@ -8984,8 +9881,8 @@ function () {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  resultData = _this._dataPath ? lodash_es_get(result.data, _this._dataPath) : result.data;
-                  commit("ADD_".concat(_this._getModel(payload).name.toUpperCase()), resultData);
+                  resultData = lodash_es_get(result, _this._dataPath);
+                  commit("ADD_".concat(_this._getModel(payload).name.toUpperCase()), lodash_es_cloneDeep(resultData));
                   return _context.abrupt("return", resultData);
 
                 case 3:
@@ -9033,8 +9930,8 @@ function () {
                 };
                 config = _objectSpread2({}, mainConfig, {}, payload.axiosConfig);
                 return _context2.abrupt("return", this._axios(config).then(function (result) {
-                  var resultData = _this2._dataPath ? lodash_es_get(result.data, _this2._dataPath) : result.data;
-                  commit("ADD_".concat(_this2._getModel(payload).name.toUpperCase()), resultData);
+                  var resultData = lodash_es_get(result, _this2._dataPath);
+                  commit("ADD_".concat(_this2._getModel(payload).name.toUpperCase()), lodash_es_cloneDeep(resultData));
                   return resultData;
                 }));
 
@@ -9319,897 +10216,6 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
 var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseAssignValue.js
-
-
-/**
- * The base implementation of `assignValue` and `assignMergeValue` without
- * value checks.
- *
- * @private
- * @param {Object} object The object to modify.
- * @param {string} key The key of the property to assign.
- * @param {*} value The value to assign.
- */
-function baseAssignValue(object, key, value) {
-  if (key == '__proto__' && lodash_es_defineProperty) {
-    lodash_es_defineProperty(object, key, {
-      'configurable': true,
-      'enumerable': true,
-      'value': value,
-      'writable': true
-    });
-  } else {
-    object[key] = value;
-  }
-}
-
-/* harmony default export */ var _baseAssignValue = (baseAssignValue);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_assignValue.js
-
-
-
-/** Used for built-in method references. */
-var _assignValue_objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var _assignValue_hasOwnProperty = _assignValue_objectProto.hasOwnProperty;
-
-/**
- * Assigns `value` to `key` of `object` if the existing value is not equivalent
- * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
- * for equality comparisons.
- *
- * @private
- * @param {Object} object The object to modify.
- * @param {string} key The key of the property to assign.
- * @param {*} value The value to assign.
- */
-function assignValue(object, key, value) {
-  var objValue = object[key];
-  if (!(_assignValue_hasOwnProperty.call(object, key) && lodash_es_eq(objValue, value)) ||
-      (value === undefined && !(key in object))) {
-    _baseAssignValue(object, key, value);
-  }
-}
-
-/* harmony default export */ var _assignValue = (assignValue);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_copyObject.js
-
-
-
-/**
- * Copies properties of `source` to `object`.
- *
- * @private
- * @param {Object} source The object to copy properties from.
- * @param {Array} props The property identifiers to copy.
- * @param {Object} [object={}] The object to copy properties to.
- * @param {Function} [customizer] The function to customize copied values.
- * @returns {Object} Returns `object`.
- */
-function copyObject(source, props, object, customizer) {
-  var isNew = !object;
-  object || (object = {});
-
-  var index = -1,
-      length = props.length;
-
-  while (++index < length) {
-    var key = props[index];
-
-    var newValue = customizer
-      ? customizer(object[key], source[key], key, object, source)
-      : undefined;
-
-    if (newValue === undefined) {
-      newValue = source[key];
-    }
-    if (isNew) {
-      _baseAssignValue(object, key, newValue);
-    } else {
-      _assignValue(object, key, newValue);
-    }
-  }
-  return object;
-}
-
-/* harmony default export */ var _copyObject = (copyObject);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseAssign.js
-
-
-
-/**
- * The base implementation of `_.assign` without support for multiple sources
- * or `customizer` functions.
- *
- * @private
- * @param {Object} object The destination object.
- * @param {Object} source The source object.
- * @returns {Object} Returns `object`.
- */
-function baseAssign(object, source) {
-  return object && _copyObject(source, lodash_es_keys(source), object);
-}
-
-/* harmony default export */ var _baseAssign = (baseAssign);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_nativeKeysIn.js
-/**
- * This function is like
- * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
- * except that it includes inherited enumerable properties.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- */
-function nativeKeysIn(object) {
-  var result = [];
-  if (object != null) {
-    for (var key in Object(object)) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-/* harmony default export */ var _nativeKeysIn = (nativeKeysIn);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseKeysIn.js
-
-
-
-
-/** Used for built-in method references. */
-var _baseKeysIn_objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var _baseKeysIn_hasOwnProperty = _baseKeysIn_objectProto.hasOwnProperty;
-
-/**
- * The base implementation of `_.keysIn` which doesn't treat sparse arrays as dense.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- */
-function baseKeysIn(object) {
-  if (!lodash_es_isObject(object)) {
-    return _nativeKeysIn(object);
-  }
-  var isProto = _isPrototype(object),
-      result = [];
-
-  for (var key in object) {
-    if (!(key == 'constructor' && (isProto || !_baseKeysIn_hasOwnProperty.call(object, key)))) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-/* harmony default export */ var _baseKeysIn = (baseKeysIn);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/keysIn.js
-
-
-
-
-/**
- * Creates an array of the own and inherited enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects.
- *
- * @static
- * @memberOf _
- * @since 3.0.0
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keysIn(new Foo);
- * // => ['a', 'b', 'c'] (iteration order is not guaranteed)
- */
-function keysIn_keysIn(object) {
-  return lodash_es_isArrayLike(object) ? _arrayLikeKeys(object, true) : _baseKeysIn(object);
-}
-
-/* harmony default export */ var lodash_es_keysIn = (keysIn_keysIn);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseAssignIn.js
-
-
-
-/**
- * The base implementation of `_.assignIn` without support for multiple sources
- * or `customizer` functions.
- *
- * @private
- * @param {Object} object The destination object.
- * @param {Object} source The source object.
- * @returns {Object} Returns `object`.
- */
-function baseAssignIn(object, source) {
-  return object && _copyObject(source, lodash_es_keysIn(source), object);
-}
-
-/* harmony default export */ var _baseAssignIn = (baseAssignIn);
-
-// EXTERNAL MODULE: ./node_modules/lodash-es/_cloneBuffer.js
-var _cloneBuffer = __webpack_require__("dff1");
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_copyArray.js
-/**
- * Copies the values of `source` to `array`.
- *
- * @private
- * @param {Array} source The array to copy values from.
- * @param {Array} [array=[]] The array to copy values to.
- * @returns {Array} Returns `array`.
- */
-function copyArray(source, array) {
-  var index = -1,
-      length = source.length;
-
-  array || (array = Array(length));
-  while (++index < length) {
-    array[index] = source[index];
-  }
-  return array;
-}
-
-/* harmony default export */ var _copyArray = (copyArray);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_copySymbols.js
-
-
-
-/**
- * Copies own symbols of `source` to `object`.
- *
- * @private
- * @param {Object} source The object to copy symbols from.
- * @param {Object} [object={}] The object to copy symbols to.
- * @returns {Object} Returns `object`.
- */
-function copySymbols(source, object) {
-  return _copyObject(source, _getSymbols(source), object);
-}
-
-/* harmony default export */ var _copySymbols = (copySymbols);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_getPrototype.js
-
-
-/** Built-in value references. */
-var getPrototype = _overArg(Object.getPrototypeOf, Object);
-
-/* harmony default export */ var _getPrototype = (getPrototype);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_getSymbolsIn.js
-
-
-
-
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var _getSymbolsIn_nativeGetSymbols = Object.getOwnPropertySymbols;
-
-/**
- * Creates an array of the own and inherited enumerable symbols of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of symbols.
- */
-var getSymbolsIn = !_getSymbolsIn_nativeGetSymbols ? lodash_es_stubArray : function(object) {
-  var result = [];
-  while (object) {
-    _arrayPush(result, _getSymbols(object));
-    object = _getPrototype(object);
-  }
-  return result;
-};
-
-/* harmony default export */ var _getSymbolsIn = (getSymbolsIn);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_copySymbolsIn.js
-
-
-
-/**
- * Copies own and inherited symbols of `source` to `object`.
- *
- * @private
- * @param {Object} source The object to copy symbols from.
- * @param {Object} [object={}] The object to copy symbols to.
- * @returns {Object} Returns `object`.
- */
-function copySymbolsIn(source, object) {
-  return _copyObject(source, _getSymbolsIn(source), object);
-}
-
-/* harmony default export */ var _copySymbolsIn = (copySymbolsIn);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_getAllKeysIn.js
-
-
-
-
-/**
- * Creates an array of own and inherited enumerable property names and
- * symbols of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names and symbols.
- */
-function getAllKeysIn(object) {
-  return _baseGetAllKeys(object, lodash_es_keysIn, _getSymbolsIn);
-}
-
-/* harmony default export */ var _getAllKeysIn = (getAllKeysIn);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_initCloneArray.js
-/** Used for built-in method references. */
-var _initCloneArray_objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var _initCloneArray_hasOwnProperty = _initCloneArray_objectProto.hasOwnProperty;
-
-/**
- * Initializes an array clone.
- *
- * @private
- * @param {Array} array The array to clone.
- * @returns {Array} Returns the initialized clone.
- */
-function initCloneArray(array) {
-  var length = array.length,
-      result = new array.constructor(length);
-
-  // Add properties assigned by `RegExp#exec`.
-  if (length && typeof array[0] == 'string' && _initCloneArray_hasOwnProperty.call(array, 'index')) {
-    result.index = array.index;
-    result.input = array.input;
-  }
-  return result;
-}
-
-/* harmony default export */ var _initCloneArray = (initCloneArray);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneArrayBuffer.js
-
-
-/**
- * Creates a clone of `arrayBuffer`.
- *
- * @private
- * @param {ArrayBuffer} arrayBuffer The array buffer to clone.
- * @returns {ArrayBuffer} Returns the cloned array buffer.
- */
-function cloneArrayBuffer(arrayBuffer) {
-  var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
-  new _Uint8Array(result).set(new _Uint8Array(arrayBuffer));
-  return result;
-}
-
-/* harmony default export */ var _cloneArrayBuffer = (cloneArrayBuffer);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneDataView.js
-
-
-/**
- * Creates a clone of `dataView`.
- *
- * @private
- * @param {Object} dataView The data view to clone.
- * @param {boolean} [isDeep] Specify a deep clone.
- * @returns {Object} Returns the cloned data view.
- */
-function cloneDataView(dataView, isDeep) {
-  var buffer = isDeep ? _cloneArrayBuffer(dataView.buffer) : dataView.buffer;
-  return new dataView.constructor(buffer, dataView.byteOffset, dataView.byteLength);
-}
-
-/* harmony default export */ var _cloneDataView = (cloneDataView);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneRegExp.js
-/** Used to match `RegExp` flags from their coerced string values. */
-var reFlags = /\w*$/;
-
-/**
- * Creates a clone of `regexp`.
- *
- * @private
- * @param {Object} regexp The regexp to clone.
- * @returns {Object} Returns the cloned regexp.
- */
-function cloneRegExp(regexp) {
-  var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
-  result.lastIndex = regexp.lastIndex;
-  return result;
-}
-
-/* harmony default export */ var _cloneRegExp = (cloneRegExp);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneSymbol.js
-
-
-/** Used to convert symbols to primitives and strings. */
-var _cloneSymbol_symbolProto = _Symbol ? _Symbol.prototype : undefined,
-    _cloneSymbol_symbolValueOf = _cloneSymbol_symbolProto ? _cloneSymbol_symbolProto.valueOf : undefined;
-
-/**
- * Creates a clone of the `symbol` object.
- *
- * @private
- * @param {Object} symbol The symbol object to clone.
- * @returns {Object} Returns the cloned symbol object.
- */
-function cloneSymbol(symbol) {
-  return _cloneSymbol_symbolValueOf ? Object(_cloneSymbol_symbolValueOf.call(symbol)) : {};
-}
-
-/* harmony default export */ var _cloneSymbol = (cloneSymbol);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_cloneTypedArray.js
-
-
-/**
- * Creates a clone of `typedArray`.
- *
- * @private
- * @param {Object} typedArray The typed array to clone.
- * @param {boolean} [isDeep] Specify a deep clone.
- * @returns {Object} Returns the cloned typed array.
- */
-function cloneTypedArray(typedArray, isDeep) {
-  var buffer = isDeep ? _cloneArrayBuffer(typedArray.buffer) : typedArray.buffer;
-  return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
-}
-
-/* harmony default export */ var _cloneTypedArray = (cloneTypedArray);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_initCloneByTag.js
-
-
-
-
-
-
-/** `Object#toString` result references. */
-var _initCloneByTag_boolTag = '[object Boolean]',
-    _initCloneByTag_dateTag = '[object Date]',
-    _initCloneByTag_mapTag = '[object Map]',
-    _initCloneByTag_numberTag = '[object Number]',
-    _initCloneByTag_regexpTag = '[object RegExp]',
-    _initCloneByTag_setTag = '[object Set]',
-    _initCloneByTag_stringTag = '[object String]',
-    _initCloneByTag_symbolTag = '[object Symbol]';
-
-var _initCloneByTag_arrayBufferTag = '[object ArrayBuffer]',
-    _initCloneByTag_dataViewTag = '[object DataView]',
-    _initCloneByTag_float32Tag = '[object Float32Array]',
-    _initCloneByTag_float64Tag = '[object Float64Array]',
-    _initCloneByTag_int8Tag = '[object Int8Array]',
-    _initCloneByTag_int16Tag = '[object Int16Array]',
-    _initCloneByTag_int32Tag = '[object Int32Array]',
-    _initCloneByTag_uint8Tag = '[object Uint8Array]',
-    _initCloneByTag_uint8ClampedTag = '[object Uint8ClampedArray]',
-    _initCloneByTag_uint16Tag = '[object Uint16Array]',
-    _initCloneByTag_uint32Tag = '[object Uint32Array]';
-
-/**
- * Initializes an object clone based on its `toStringTag`.
- *
- * **Note:** This function only supports cloning values with tags of
- * `Boolean`, `Date`, `Error`, `Map`, `Number`, `RegExp`, `Set`, or `String`.
- *
- * @private
- * @param {Object} object The object to clone.
- * @param {string} tag The `toStringTag` of the object to clone.
- * @param {boolean} [isDeep] Specify a deep clone.
- * @returns {Object} Returns the initialized clone.
- */
-function initCloneByTag(object, tag, isDeep) {
-  var Ctor = object.constructor;
-  switch (tag) {
-    case _initCloneByTag_arrayBufferTag:
-      return _cloneArrayBuffer(object);
-
-    case _initCloneByTag_boolTag:
-    case _initCloneByTag_dateTag:
-      return new Ctor(+object);
-
-    case _initCloneByTag_dataViewTag:
-      return _cloneDataView(object, isDeep);
-
-    case _initCloneByTag_float32Tag: case _initCloneByTag_float64Tag:
-    case _initCloneByTag_int8Tag: case _initCloneByTag_int16Tag: case _initCloneByTag_int32Tag:
-    case _initCloneByTag_uint8Tag: case _initCloneByTag_uint8ClampedTag: case _initCloneByTag_uint16Tag: case _initCloneByTag_uint32Tag:
-      return _cloneTypedArray(object, isDeep);
-
-    case _initCloneByTag_mapTag:
-      return new Ctor;
-
-    case _initCloneByTag_numberTag:
-    case _initCloneByTag_stringTag:
-      return new Ctor(object);
-
-    case _initCloneByTag_regexpTag:
-      return _cloneRegExp(object);
-
-    case _initCloneByTag_setTag:
-      return new Ctor;
-
-    case _initCloneByTag_symbolTag:
-      return _cloneSymbol(object);
-  }
-}
-
-/* harmony default export */ var _initCloneByTag = (initCloneByTag);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseCreate.js
-
-
-/** Built-in value references. */
-var objectCreate = Object.create;
-
-/**
- * The base implementation of `_.create` without support for assigning
- * properties to the created object.
- *
- * @private
- * @param {Object} proto The object to inherit from.
- * @returns {Object} Returns the new object.
- */
-var baseCreate = (function() {
-  function object() {}
-  return function(proto) {
-    if (!lodash_es_isObject(proto)) {
-      return {};
-    }
-    if (objectCreate) {
-      return objectCreate(proto);
-    }
-    object.prototype = proto;
-    var result = new object;
-    object.prototype = undefined;
-    return result;
-  };
-}());
-
-/* harmony default export */ var _baseCreate = (baseCreate);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_initCloneObject.js
-
-
-
-
-/**
- * Initializes an object clone.
- *
- * @private
- * @param {Object} object The object to clone.
- * @returns {Object} Returns the initialized clone.
- */
-function initCloneObject(object) {
-  return (typeof object.constructor == 'function' && !_isPrototype(object))
-    ? _baseCreate(_getPrototype(object))
-    : {};
-}
-
-/* harmony default export */ var _initCloneObject = (initCloneObject);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseIsMap.js
-
-
-
-/** `Object#toString` result references. */
-var _baseIsMap_mapTag = '[object Map]';
-
-/**
- * The base implementation of `_.isMap` without Node.js optimizations.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a map, else `false`.
- */
-function baseIsMap(value) {
-  return lodash_es_isObjectLike(value) && _getTag(value) == _baseIsMap_mapTag;
-}
-
-/* harmony default export */ var _baseIsMap = (baseIsMap);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/isMap.js
-
-
-
-
-/* Node.js helper references. */
-var nodeIsMap = _nodeUtil["a" /* default */] && _nodeUtil["a" /* default */].isMap;
-
-/**
- * Checks if `value` is classified as a `Map` object.
- *
- * @static
- * @memberOf _
- * @since 4.3.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a map, else `false`.
- * @example
- *
- * _.isMap(new Map);
- * // => true
- *
- * _.isMap(new WeakMap);
- * // => false
- */
-var isMap = nodeIsMap ? _baseUnary(nodeIsMap) : _baseIsMap;
-
-/* harmony default export */ var lodash_es_isMap = (isMap);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseIsSet.js
-
-
-
-/** `Object#toString` result references. */
-var _baseIsSet_setTag = '[object Set]';
-
-/**
- * The base implementation of `_.isSet` without Node.js optimizations.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a set, else `false`.
- */
-function baseIsSet(value) {
-  return lodash_es_isObjectLike(value) && _getTag(value) == _baseIsSet_setTag;
-}
-
-/* harmony default export */ var _baseIsSet = (baseIsSet);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/isSet.js
-
-
-
-
-/* Node.js helper references. */
-var nodeIsSet = _nodeUtil["a" /* default */] && _nodeUtil["a" /* default */].isSet;
-
-/**
- * Checks if `value` is classified as a `Set` object.
- *
- * @static
- * @memberOf _
- * @since 4.3.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a set, else `false`.
- * @example
- *
- * _.isSet(new Set);
- * // => true
- *
- * _.isSet(new WeakSet);
- * // => false
- */
-var isSet = nodeIsSet ? _baseUnary(nodeIsSet) : _baseIsSet;
-
-/* harmony default export */ var lodash_es_isSet = (isSet);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseClone.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/** Used to compose bitmasks for cloning. */
-var CLONE_DEEP_FLAG = 1,
-    CLONE_FLAT_FLAG = 2,
-    CLONE_SYMBOLS_FLAG = 4;
-
-/** `Object#toString` result references. */
-var _baseClone_argsTag = '[object Arguments]',
-    _baseClone_arrayTag = '[object Array]',
-    _baseClone_boolTag = '[object Boolean]',
-    _baseClone_dateTag = '[object Date]',
-    _baseClone_errorTag = '[object Error]',
-    _baseClone_funcTag = '[object Function]',
-    _baseClone_genTag = '[object GeneratorFunction]',
-    _baseClone_mapTag = '[object Map]',
-    _baseClone_numberTag = '[object Number]',
-    _baseClone_objectTag = '[object Object]',
-    _baseClone_regexpTag = '[object RegExp]',
-    _baseClone_setTag = '[object Set]',
-    _baseClone_stringTag = '[object String]',
-    _baseClone_symbolTag = '[object Symbol]',
-    _baseClone_weakMapTag = '[object WeakMap]';
-
-var _baseClone_arrayBufferTag = '[object ArrayBuffer]',
-    _baseClone_dataViewTag = '[object DataView]',
-    _baseClone_float32Tag = '[object Float32Array]',
-    _baseClone_float64Tag = '[object Float64Array]',
-    _baseClone_int8Tag = '[object Int8Array]',
-    _baseClone_int16Tag = '[object Int16Array]',
-    _baseClone_int32Tag = '[object Int32Array]',
-    _baseClone_uint8Tag = '[object Uint8Array]',
-    _baseClone_uint8ClampedTag = '[object Uint8ClampedArray]',
-    _baseClone_uint16Tag = '[object Uint16Array]',
-    _baseClone_uint32Tag = '[object Uint32Array]';
-
-/** Used to identify `toStringTag` values supported by `_.clone`. */
-var cloneableTags = {};
-cloneableTags[_baseClone_argsTag] = cloneableTags[_baseClone_arrayTag] =
-cloneableTags[_baseClone_arrayBufferTag] = cloneableTags[_baseClone_dataViewTag] =
-cloneableTags[_baseClone_boolTag] = cloneableTags[_baseClone_dateTag] =
-cloneableTags[_baseClone_float32Tag] = cloneableTags[_baseClone_float64Tag] =
-cloneableTags[_baseClone_int8Tag] = cloneableTags[_baseClone_int16Tag] =
-cloneableTags[_baseClone_int32Tag] = cloneableTags[_baseClone_mapTag] =
-cloneableTags[_baseClone_numberTag] = cloneableTags[_baseClone_objectTag] =
-cloneableTags[_baseClone_regexpTag] = cloneableTags[_baseClone_setTag] =
-cloneableTags[_baseClone_stringTag] = cloneableTags[_baseClone_symbolTag] =
-cloneableTags[_baseClone_uint8Tag] = cloneableTags[_baseClone_uint8ClampedTag] =
-cloneableTags[_baseClone_uint16Tag] = cloneableTags[_baseClone_uint32Tag] = true;
-cloneableTags[_baseClone_errorTag] = cloneableTags[_baseClone_funcTag] =
-cloneableTags[_baseClone_weakMapTag] = false;
-
-/**
- * The base implementation of `_.clone` and `_.cloneDeep` which tracks
- * traversed objects.
- *
- * @private
- * @param {*} value The value to clone.
- * @param {boolean} bitmask The bitmask flags.
- *  1 - Deep clone
- *  2 - Flatten inherited properties
- *  4 - Clone symbols
- * @param {Function} [customizer] The function to customize cloning.
- * @param {string} [key] The key of `value`.
- * @param {Object} [object] The parent object of `value`.
- * @param {Object} [stack] Tracks traversed objects and their clone counterparts.
- * @returns {*} Returns the cloned value.
- */
-function baseClone(value, bitmask, customizer, key, object, stack) {
-  var result,
-      isDeep = bitmask & CLONE_DEEP_FLAG,
-      isFlat = bitmask & CLONE_FLAT_FLAG,
-      isFull = bitmask & CLONE_SYMBOLS_FLAG;
-
-  if (customizer) {
-    result = object ? customizer(value, key, object, stack) : customizer(value);
-  }
-  if (result !== undefined) {
-    return result;
-  }
-  if (!lodash_es_isObject(value)) {
-    return value;
-  }
-  var isArr = lodash_es_isArray(value);
-  if (isArr) {
-    result = _initCloneArray(value);
-    if (!isDeep) {
-      return _copyArray(value, result);
-    }
-  } else {
-    var tag = _getTag(value),
-        isFunc = tag == _baseClone_funcTag || tag == _baseClone_genTag;
-
-    if (Object(isBuffer["a" /* default */])(value)) {
-      return Object(_cloneBuffer["a" /* default */])(value, isDeep);
-    }
-    if (tag == _baseClone_objectTag || tag == _baseClone_argsTag || (isFunc && !object)) {
-      result = (isFlat || isFunc) ? {} : _initCloneObject(value);
-      if (!isDeep) {
-        return isFlat
-          ? _copySymbolsIn(value, _baseAssignIn(result, value))
-          : _copySymbols(value, _baseAssign(result, value));
-      }
-    } else {
-      if (!cloneableTags[tag]) {
-        return object ? value : {};
-      }
-      result = _initCloneByTag(value, tag, isDeep);
-    }
-  }
-  // Check for circular references and return its corresponding clone.
-  stack || (stack = new _Stack);
-  var stacked = stack.get(value);
-  if (stacked) {
-    return stacked;
-  }
-  stack.set(value, result);
-
-  if (lodash_es_isSet(value)) {
-    value.forEach(function(subValue) {
-      result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
-    });
-  } else if (lodash_es_isMap(value)) {
-    value.forEach(function(subValue, key) {
-      result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
-    });
-  }
-
-  var keysFunc = isFull
-    ? (isFlat ? _getAllKeysIn : _getAllKeys)
-    : (isFlat ? keysIn : lodash_es_keys);
-
-  var props = isArr ? undefined : keysFunc(value);
-  _arrayEach(props || value, function(subValue, key) {
-    if (props) {
-      key = subValue;
-      subValue = value[key];
-    }
-    // Recursively populate clone (susceptible to call stack limits).
-    _assignValue(result, key, baseClone(subValue, bitmask, customizer, key, value, stack));
-  });
-  return result;
-}
-
-/* harmony default export */ var _baseClone = (baseClone);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/cloneDeep.js
-
-
-/** Used to compose bitmasks for cloning. */
-var cloneDeep_CLONE_DEEP_FLAG = 1,
-    cloneDeep_CLONE_SYMBOLS_FLAG = 4;
-
-/**
- * This method is like `_.clone` except that it recursively clones `value`.
- *
- * @static
- * @memberOf _
- * @since 1.0.0
- * @category Lang
- * @param {*} value The value to recursively clone.
- * @returns {*} Returns the deep cloned value.
- * @see _.clone
- * @example
- *
- * var objects = [{ 'a': 1 }, { 'b': 2 }];
- *
- * var deep = _.cloneDeep(objects);
- * console.log(deep[0] === objects[0]);
- * // => false
- */
-function cloneDeep(value) {
-  return _baseClone(value, cloneDeep_CLONE_DEEP_FLAG | cloneDeep_CLONE_SYMBOLS_FLAG);
-}
-
-/* harmony default export */ var lodash_es_cloneDeep = (cloneDeep);
 
 // CONCATENATED MODULE: ./node_modules/lodash-es/isEqual.js
 
@@ -10564,16 +10570,39 @@ function () {
 
       _this.state[modelIdx] = model.type; // adding ADD_* mutations
 
-      _this.mutations["ADD_".concat(model.name.toUpperCase())] = function (myState, item) {
-        return applyModifier("afterGet", modelKey, _this.models, item).then(function (i) {
-          _this.storeOriginItem(lodash_es_get(myState, "".concat(modelIdx, ".originItems")), i, model.beforeQueue);
+      _this.mutations["ADD_".concat(model.name.toUpperCase())] =
+      /*#__PURE__*/
+      function () {
+        var _ref = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee(myState, item) {
+          var res;
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  _context.next = 2;
+                  return _this.patchEntity(myState, model, item);
 
-          _this.patchEntity(myState, model, i); // this.linkReferences(i, myState, model.references);
+                case 2:
+                  res = _context.sent;
 
+                  _this.storeOriginItem(lodash_es_get(myState, "".concat(modelIdx, ".originItems")), res, model.beforeQueue);
 
-          myState[modelIdx].lastLoad = new Date();
-        });
-      }; // adding DELETE_* mutations
+                  myState[modelIdx].lastLoad = new Date();
+
+                case 5:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        }));
+
+        return function (_x, _x2) {
+          return _ref.apply(this, arguments);
+        };
+      }(); // adding DELETE_* mutations
 
 
       _this.mutations["DELETE_".concat(model.name.toUpperCase())] = function (myState, item) {
@@ -10608,42 +10637,42 @@ function () {
         var storeAction =
         /*#__PURE__*/
         function () {
-          var _ref = _asyncToGenerator(
+          var _ref2 = _asyncToGenerator(
           /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee(qp) {
+          regeneratorRuntime.mark(function _callee2(qp) {
             var QToStore;
-            return regeneratorRuntime.wrap(function _callee$(_context) {
+            return regeneratorRuntime.wrap(function _callee2$(_context2) {
               while (1) {
-                switch (_context.prev = _context.next) {
+                switch (_context2.prev = _context2.next) {
                   case 0:
                     QToStore = lodash_es_omit(qp, "method", "action");
 
                     if (!(qp.action === "post")) {
-                      _context.next = 16;
+                      _context2.next = 16;
                       break;
                     }
 
-                    _context.t0 = external_commonjs_vue_commonjs2_vue_root_Vue_default.a;
-                    _context.t1 = store.items;
-                    _context.t2 = qp.data.id;
-                    _context.next = 7;
+                    _context2.t0 = external_commonjs_vue_commonjs2_vue_root_Vue_default.a;
+                    _context2.t1 = store.items;
+                    _context2.t2 = qp.data.id;
+                    _context2.next = 7;
                     return applyModifier("afterGet", modelKey, _this.models, qp.data);
 
                   case 7:
-                    _context.t3 = _context.sent;
+                    _context2.t3 = _context2.sent;
 
-                    _context.t0.set.call(_context.t0, _context.t1, _context.t2, _context.t3);
+                    _context2.t0.set.call(_context2.t0, _context2.t1, _context2.t2, _context2.t3);
 
-                    _context.t4 = store.actionQueue[qp.action];
-                    _context.next = 12;
+                    _context2.t4 = store.actionQueue[qp.action];
+                    _context2.next = 12;
                     return applyModifier("beforeSave", modelKey, _this.models, QToStore);
 
                   case 12:
-                    _context.t5 = _context.sent;
+                    _context2.t5 = _context2.sent;
 
-                    _context.t4.push.call(_context.t4, _context.t5);
+                    _context2.t4.push.call(_context2.t4, _context2.t5);
 
-                    _context.next = 24;
+                    _context2.next = 24;
                     break;
 
                   case 16:
@@ -10651,27 +10680,27 @@ function () {
                       external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(store.items, qp.id);
                     }
 
-                    _context.t6 = external_commonjs_vue_commonjs2_vue_root_Vue_default.a;
-                    _context.t7 = store.actionQueue[qp.action];
-                    _context.t8 = qp.data.id;
-                    _context.next = 22;
+                    _context2.t6 = external_commonjs_vue_commonjs2_vue_root_Vue_default.a;
+                    _context2.t7 = store.actionQueue[qp.action];
+                    _context2.t8 = qp.data.id;
+                    _context2.next = 22;
                     return applyModifier("beforeSave", modelKey, _this.models, QToStore);
 
                   case 22:
-                    _context.t9 = _context.sent;
+                    _context2.t9 = _context2.sent;
 
-                    _context.t6.set.call(_context.t6, _context.t7, _context.t8, _context.t9);
+                    _context2.t6.set.call(_context2.t6, _context2.t7, _context2.t8, _context2.t9);
 
                   case 24:
                   case "end":
-                    return _context.stop();
+                    return _context2.stop();
                 }
               }
-            }, _callee);
+            }, _callee2);
           }));
 
-          return function storeAction(_x) {
-            return _ref.apply(this, arguments);
+          return function storeAction(_x3) {
+            return _ref2.apply(this, arguments);
           };
         }();
 
@@ -10707,93 +10736,93 @@ function () {
     value: function () {
       var _storeOriginItem = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee3(originItems, item, modifiers) {
+      regeneratorRuntime.mark(function _callee4(originItems, item, modifiers) {
         var modified;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 if (!lodash_es_isArray(item)) {
-                  _context3.next = 4;
+                  _context4.next = 4;
                   break;
                 }
 
                 item.map(
                 /*#__PURE__*/
                 function () {
-                  var _ref2 = _asyncToGenerator(
+                  var _ref3 = _asyncToGenerator(
                   /*#__PURE__*/
-                  regeneratorRuntime.mark(function _callee2(i) {
+                  regeneratorRuntime.mark(function _callee3(i) {
                     var modified;
-                    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                    return regeneratorRuntime.wrap(function _callee3$(_context3) {
                       while (1) {
-                        switch (_context2.prev = _context2.next) {
+                        switch (_context3.prev = _context3.next) {
                           case 0:
                             if (!modifiers) {
-                              _context2.next = 6;
+                              _context3.next = 6;
                               break;
                             }
 
-                            _context2.next = 3;
+                            _context3.next = 3;
                             return modifiers(i);
 
                           case 3:
-                            _context2.t0 = _context2.sent;
-                            _context2.next = 7;
+                            _context3.t0 = _context3.sent;
+                            _context3.next = 7;
                             break;
 
                           case 6:
-                            _context2.t0 = i;
+                            _context3.t0 = i;
 
                           case 7:
-                            modified = _context2.t0;
+                            modified = _context3.t0;
                             external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(originItems, i.id, lodash_es_cloneDeep(modified));
 
                           case 9:
                           case "end":
-                            return _context2.stop();
+                            return _context3.stop();
                         }
                       }
-                    }, _callee2);
+                    }, _callee3);
                   }));
 
-                  return function (_x5) {
-                    return _ref2.apply(this, arguments);
+                  return function (_x7) {
+                    return _ref3.apply(this, arguments);
                   };
                 }());
-                _context3.next = 13;
+                _context4.next = 13;
                 break;
 
               case 4:
                 if (!modifiers) {
-                  _context3.next = 10;
+                  _context4.next = 10;
                   break;
                 }
 
-                _context3.next = 7;
+                _context4.next = 7;
                 return modifiers(item);
 
               case 7:
-                _context3.t0 = _context3.sent;
-                _context3.next = 11;
+                _context4.t0 = _context4.sent;
+                _context4.next = 11;
                 break;
 
               case 10:
-                _context3.t0 = item;
+                _context4.t0 = item;
 
               case 11:
-                modified = _context3.t0;
+                modified = _context4.t0;
                 external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(originItems, item.id, lodash_es_cloneDeep(modified));
 
               case 13:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }));
 
-      function storeOriginItem(_x2, _x3, _x4) {
+      function storeOriginItem(_x4, _x5, _x6) {
         return _storeOriginItem.apply(this, arguments);
       }
 
@@ -10812,35 +10841,35 @@ function () {
     value: function () {
       var _patchEntity = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee5(state, model, entity // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      regeneratorRuntime.mark(function _callee6(state, model, entity // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) {
         var _this2 = this;
 
-        var store;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        var store, toStoreEntity;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 if (entity) {
-                  _context5.next = 2;
+                  _context6.next = 2;
                   break;
                 }
 
-                return _context5.abrupt("return");
+                return _context6.abrupt("return");
 
               case 2:
                 if (!lodash_es_isArray(entity)) {
-                  _context5.next = 4;
+                  _context6.next = 4;
                   break;
                 }
 
-                return _context5.abrupt("return", Promise.all(entity.map(function (e) {
+                return _context6.abrupt("return", Promise.all(entity.map(function (e) {
                   return _this2.patchEntity(state, model, e);
                 })));
 
               case 4:
                 if (!(entity.id && model)) {
-                  _context5.next = 15;
+                  _context6.next = 18;
                   break;
                 }
 
@@ -10849,29 +10878,29 @@ function () {
                   lodash_es_forEach(model.references,
                   /*#__PURE__*/
                   function () {
-                    var _ref3 = _asyncToGenerator(
+                    var _ref4 = _asyncToGenerator(
                     /*#__PURE__*/
-                    regeneratorRuntime.mark(function _callee4(modelName, prop) {
-                      return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    regeneratorRuntime.mark(function _callee5(modelName, prop) {
+                      return regeneratorRuntime.wrap(function _callee5$(_context5) {
                         while (1) {
-                          switch (_context4.prev = _context4.next) {
+                          switch (_context5.prev = _context5.next) {
                             case 0:
-                              _context4.next = 2;
+                              _context5.next = 2;
                               return _this2.patchReference(state, entity, modelName, prop);
 
                             case 2:
-                              entity[prop] = _context4.sent;
+                              entity[prop] = _context5.sent;
 
                             case 3:
                             case "end":
-                              return _context4.stop();
+                              return _context5.stop();
                           }
                         }
-                      }, _callee4);
+                      }, _callee5);
                     }));
 
-                    return function (_x9, _x10) {
-                      return _ref3.apply(this, arguments);
+                    return function (_x11, _x12) {
+                      return _ref4.apply(this, arguments);
                     };
                   }());
                 }
@@ -10879,33 +10908,40 @@ function () {
                 store = state[model.plural];
 
                 if (!lodash_es_has(store.items, entity.id)) {
-                  _context5.next = 12;
+                  _context6.next = 12;
                   break;
                 }
 
-                lodash_es_forEach(entity, function (value, idx) {
-                  if (!lodash_es_isFunction(value)) {
-                    if (!lodash_es_isEqual(value, lodash_es_get(store.items[entity.id], idx))) {
-                      external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(store.items[entity.id], idx, value);
+                lodash_es_forEach(entity, function (value, name) {
+                  if (!lodash_es_isFunction(value) && !lodash_es_has(model.references, name)) {
+                    var storeEntity = store.items[entity.id];
+
+                    if (lodash_es_has(storeEntity, name) && !lodash_es_isEqual(value, lodash_es_get(storeEntity, name))) {
+                      external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(storeEntity, name, value);
                     }
                   }
                 });
-                return _context5.abrupt("return", store.items[entity.id]);
+                return _context6.abrupt("return", store.items[entity.id]);
 
               case 12:
-                store.items = _objectSpread2({}, store.items, _defineProperty({}, entity.id, entity));
-                this.storeOriginItem(store.originItems, entity, model.beforeQueue);
-                return _context5.abrupt("return", entity);
+                _context6.next = 14;
+                return applyModifier("afterGet", model.name.toLowerCase(), this.models, entity);
 
-              case 15:
+              case 14:
+                toStoreEntity = _context6.sent;
+                store.items = _objectSpread2({}, store.items, _defineProperty({}, entity.id, toStoreEntity));
+                this.storeOriginItem(store.originItems, toStoreEntity, model.beforeQueue);
+                return _context6.abrupt("return", toStoreEntity);
+
+              case 18:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
 
-      function patchEntity(_x6, _x7, _x8) {
+      function patchEntity(_x8, _x9, _x10) {
         return _patchEntity.apply(this, arguments);
       }
 
@@ -10916,38 +10952,31 @@ function () {
     value: function () {
       var _patchReference = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee6(state, entity, modelName, prop) {
-        var refEntity;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+      regeneratorRuntime.mark(function _callee7(state, entity, modelName, prop) {
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                _context6.next = 2;
-                return applyModifier("afterGet", modelName, this.models, entity[prop]);
-
-              case 2:
-                refEntity = _context6.sent;
-
                 if (!lodash_es_has(this.models, modelName)) {
-                  _context6.next = 7;
+                  _context7.next = 4;
                   break;
                 }
 
-                return _context6.abrupt("return", this.patchEntity(state, this.models[modelName], refEntity));
+                return _context7.abrupt("return", this.patchEntity(state, this.models[modelName], entity[prop]));
 
-              case 7:
+              case 4:
                 // eslint-disable-next-line no-console
                 console.warn("Patch error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
 
-              case 8:
+              case 5:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6, this);
+        }, _callee7, this);
       }));
 
-      function patchReference(_x11, _x12, _x13, _x14) {
+      function patchReference(_x13, _x14, _x15, _x16) {
         return _patchReference.apply(this, arguments);
       }
 
