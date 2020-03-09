@@ -459,7 +459,9 @@ describe("ApiStore custom model", function() {
     mock.onGet(`/user/${user.id}`).reply(200, user);
     store.dispatch("api/get", {
       id: user.id,
-      type: "user"
+      type: "user",
+      forceFetch: true,
+      clear: false
     });
     await flushPromises();
     expect(store.getters["api/users"].items[user.id].localProp).toBe(true);

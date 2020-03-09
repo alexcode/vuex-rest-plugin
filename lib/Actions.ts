@@ -1,6 +1,7 @@
 import { ActionContext, Commit, ActionTree, Action } from "vuex";
 import { AxiosInstance, Method } from "axios";
 import at from "lodash-es/at";
+import cloneDeep from "lodash-es/cloneDeep";
 import flatMap from "lodash-es/flatMap";
 import forEach from "lodash-es/forEach";
 import get from "lodash-es/get";
@@ -16,11 +17,13 @@ import { applyModifier, formatUrl } from "./utils";
 class ActionBase<S, R> {
   private _axios: AxiosInstance;
   private _models: ModelTypeTree;
-  private _dataPath: string | undefined;
+  private _dataPath = "data";
   constructor(axios: AxiosInstance, models: ModelTypeTree, dataPath?: string) {
     this._axios = axios;
     this._models = models;
-    this._dataPath = dataPath;
+    if (dataPath) {
+      this._dataPath = `${this._dataPath}.${dataPath}`;
+    }
 
     // add watched changes to queue
     // this.queueActionWatcher = (
@@ -62,10 +65,11 @@ class ActionBase<S, R> {
     return this._axios
       .get(formatUrl(payload), payload.axiosConfig)
       .then(async result => {
-        const resultData = this._dataPath
-          ? get(result.data, this._dataPath)
-          : result.data;
-        commit(`ADD_${this._getModel(payload).name.toUpperCase()}`, resultData);
+        const resultData = get(result, this._dataPath);
+        commit(
+          `ADD_${this._getModel(payload).name.toUpperCase()}`,
+          cloneDeep(resultData)
+        );
         return resultData;
       });
   }
@@ -88,10 +92,11 @@ class ActionBase<S, R> {
     };
     const config = { ...mainConfig, ...payload.axiosConfig };
     return this._axios(config).then(result => {
-      const resultData = this._dataPath
-        ? get(result.data, this._dataPath)
-        : result.data;
-      commit(`ADD_${this._getModel(payload).name.toUpperCase()}`, resultData);
+      const resultData = get(result, this._dataPath);
+      commit(
+        `ADD_${this._getModel(payload).name.toUpperCase()}`,
+        cloneDeep(resultData)
+      );
       return resultData;
     });
   }

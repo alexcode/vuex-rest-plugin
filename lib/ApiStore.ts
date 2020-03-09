@@ -44,22 +44,18 @@ export default class ApiStore<S> implements StoreOptions<S> {
       this.state[modelIdx] = model.type;
 
       // adding ADD_* mutations
-      this.mutations[`ADD_${model.name.toUpperCase()}`] = (
+      this.mutations[`ADD_${model.name.toUpperCase()}`] = async (
         myState: ApiState,
         item: IndexedObject | Array<IndexedObject>
-      ) =>
-        applyModifier("afterGet", modelKey, this.models, item).then(
-          (i: IndexedObject) => {
-            this.storeOriginItem(
-              get(myState, `${modelIdx}.originItems`),
-              i,
-              model.beforeQueue
-            );
-            this.patchEntity(myState, model, i);
-            // this.linkReferences(i, myState, model.references);
-            myState[modelIdx].lastLoad = new Date();
-          }
+      ) => {
+        const res = await this.patchEntity(myState, model, item);
+        this.storeOriginItem(
+          get(myState, `${modelIdx}.originItems`),
+          res,
+          model.beforeQueue
         );
+        myState[modelIdx].lastLoad = new Date();
+      };
 
       // adding DELETE_* mutations
       this.mutations[`DELETE_${model.name.toUpperCase()}`] = (
@@ -200,20 +196,34 @@ export default class ApiStore<S> implements StoreOptions<S> {
       const store = state[model.plural];
 
       if (has(store.items, entity.id)) {
-        forEach(entity, (value, idx: string) => {
-          if (!isFunction(value)) {
-            if (!isEqual(value, get(store.items[entity.id], idx))) {
-              Vue.set(store.items[entity.id], idx, value);
+        forEach(entity, (value, name: string) => {
+          if (!isFunction(value) && !has(model.references, name)) {
+            const storeEntity = store.items[entity.id];
+            if (
+              has(storeEntity, name) &&
+              !isEqual(value, get(storeEntity, name))
+            ) {
+              Vue.set(storeEntity, name, value);
             }
           }
         });
 
         return store.items[entity.id];
       } else {
-        store.items = { ...store.items, [entity.id]: entity };
-        this.storeOriginItem(store.originItems, entity, model.beforeQueue);
+        const toStoreEntity = await applyModifier(
+          "afterGet",
+          model.name.toLowerCase(),
+          this.models,
+          entity
+        );
+        store.items = { ...store.items, [entity.id]: toStoreEntity };
+        this.storeOriginItem(
+          store.originItems,
+          toStoreEntity,
+          model.beforeQueue
+        );
 
-        return entity;
+        return toStoreEntity;
       }
     }
   }
@@ -224,15 +234,8 @@ export default class ApiStore<S> implements StoreOptions<S> {
     modelName: string,
     prop: string
   ) {
-    const refEntity = await applyModifier(
-      "afterGet",
-      modelName,
-      this.models,
-      entity[prop]
-    );
-
     if (has(this.models, modelName)) {
-      return this.patchEntity(state, this.models[modelName], refEntity);
+      return this.patchEntity(state, this.models[modelName], entity[prop]);
     } else {
       // eslint-disable-next-line no-console
       console.warn(

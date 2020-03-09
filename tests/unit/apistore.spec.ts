@@ -5,7 +5,6 @@ import axios from "axios";
 import flushPromises from "flush-promises";
 import size from "lodash-es/size";
 import forEach from "lodash-es/forEach";
-import cloneDeep from "lodash-es/cloneDeep";
 import ApiStorePlugin from "../../lib/ApiStorePlugin";
 import ApiState from "../../lib/ApiState";
 
@@ -134,23 +133,27 @@ describe("ApiStore by default", function() {
   });
 
   it("test force fetch", async () => {
-    const singleResource = cloneDeep(data[0]);
     await fillStore();
     // Uncomment the following line and set expect(mock.history.get.length).toBe(1);
     // when the next axios-mock-adapter version (current v1.16.0) is released
     // mock.resetHistory();
-    singleResource.newData = "new_stuff";
-    mock.onGet(`/resource/${singleResource.id}`).reply(200, singleResource);
-    store.dispatch("api/get", {
-      id: singleResource.id,
+    store.getters["api/resources"].items[data[0].id].name = "changed name";
+    store.getters["api/resources"].items[data[0].id].newData = "new_stuff";
+    mock.onGet(`/resource/${data[0].id}`).reply(200, data[0]);
+    const res = await store.dispatch("api/get", {
+      id: data[0].id,
       type: "resource",
       forceFetch: true
     });
     await flushPromises();
     expect(mock.history.get.length).toBe(2);
-    expect(
-      store.getters["api/resources"].items[singleResource.id]
-    ).toStrictEqual(singleResource);
+    expect(store.getters["api/resources"].items[data[0].id].name).not.toBe(
+      "changed name"
+    );
+    expect(store.getters["api/resources"].items[data[0].id].newData).toBe(
+      "new_stuff"
+    );
+    expect(res).toStrictEqual(data[0]);
   });
 
   it("test if references are proper ref", async () => {
