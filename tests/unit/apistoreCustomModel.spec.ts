@@ -466,4 +466,50 @@ describe("ApiStore custom model", function() {
     await flushPromises();
     expect(store.getters["api/users"].items[user.id].localProp).toBe(true);
   });
+
+  it("test class with constructor", async () => {
+    class CustomUser {
+      id: string;
+      name: string;
+      constructor(o: any) {
+        this.id = o.id;
+        this.name = "test_constructor";
+      }
+    }
+
+    const store = new Vuex.Store({
+      plugins: [
+        ApiStorePlugin({
+          axios: axiosInstance,
+          models: {
+            user: {
+              name: "USER",
+              plural: "USERS",
+              type: new ApiState(),
+              afterGet: (v: any) => new CustomUser(v)
+            }
+          }
+        })
+      ]
+    });
+    const user = data[0].user;
+    mock.onGet(`/user/${user.id}`).reply(200, user);
+    store.dispatch("api/get", {
+      id: user.id,
+      type: "user"
+    });
+    await flushPromises();
+
+    mock.onGet(`/user/${user.id}`).reply(200, user);
+    store.dispatch("api/get", {
+      id: user.id,
+      type: "user",
+      forceFetch: true,
+      clear: false
+    });
+    await flushPromises();
+    expect(store.getters["api/users"].items[user.id].name).toBe(
+      "test_constructor"
+    );
+  });
 });

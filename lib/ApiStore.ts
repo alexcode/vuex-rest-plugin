@@ -193,16 +193,20 @@ export default class ApiStore<S> implements StoreOptions<S> {
         });
       }
 
+      const entityAfter = await applyModifier(
+        "afterGet",
+        model.name.toLowerCase(),
+        this.models,
+        entity
+      );
+
       const store = state[model.plural];
 
       if (has(store.items, entity.id)) {
-        forEach(entity, (value, name: string) => {
+        const storeEntity = store.items[entity.id];
+        forEach(entityAfter, (value, name: string) => {
           if (!isFunction(value) && !has(model.references, name)) {
-            const storeEntity = store.items[entity.id];
-            if (
-              has(storeEntity, name) &&
-              !isEqual(value, get(storeEntity, name))
-            ) {
+            if (has(entity, name) && !isEqual(value, get(storeEntity, name))) {
               Vue.set(storeEntity, name, value);
             }
           }
@@ -210,20 +214,10 @@ export default class ApiStore<S> implements StoreOptions<S> {
 
         return store.items[entity.id];
       } else {
-        const toStoreEntity = await applyModifier(
-          "afterGet",
-          model.name.toLowerCase(),
-          this.models,
-          entity
-        );
-        store.items = { ...store.items, [entity.id]: toStoreEntity };
-        this.storeOriginItem(
-          store.originItems,
-          toStoreEntity,
-          model.beforeQueue
-        );
+        store.items = { ...store.items, [entity.id]: entityAfter };
+        this.storeOriginItem(store.originItems, entityAfter, model.beforeQueue);
 
-        return toStoreEntity;
+        return entityAfter;
       }
     }
   }
