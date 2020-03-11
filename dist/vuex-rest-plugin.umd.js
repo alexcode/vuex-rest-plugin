@@ -10854,7 +10854,7 @@ function () {
       ) {
         var _this2 = this;
 
-        var store, toStoreEntity;
+        var entityAfter, store, storeEntity;
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
@@ -10878,7 +10878,7 @@ function () {
 
               case 4:
                 if (!(entity.id && model)) {
-                  _context6.next = 18;
+                  _context6.next = 19;
                   break;
                 }
 
@@ -10914,35 +10914,34 @@ function () {
                   }());
                 }
 
+                _context6.next = 8;
+                return applyModifier("afterGet", model.name.toLowerCase(), this.models, entity);
+
+              case 8:
+                entityAfter = _context6.sent;
                 store = state[model.plural];
 
                 if (!lodash_es_has(store.items, entity.id)) {
-                  _context6.next = 12;
+                  _context6.next = 16;
                   break;
                 }
 
-                lodash_es_forEach(entity, function (value, name) {
+                storeEntity = store.items[entity.id];
+                lodash_es_forEach(entityAfter, function (value, name) {
                   if (!lodash_es_isFunction(value) && !lodash_es_has(model.references, name)) {
-                    var storeEntity = store.items[entity.id];
-
-                    if (lodash_es_has(storeEntity, name) && !lodash_es_isEqual(value, lodash_es_get(storeEntity, name))) {
+                    if (lodash_es_has(entity, name) && !lodash_es_isEqual(value, lodash_es_get(storeEntity, name))) {
                       external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(storeEntity, name, value);
                     }
                   }
                 });
                 return _context6.abrupt("return", store.items[entity.id]);
 
-              case 12:
-                _context6.next = 14;
-                return applyModifier("afterGet", model.name.toLowerCase(), this.models, entity);
+              case 16:
+                store.items = _objectSpread2({}, store.items, _defineProperty({}, entity.id, entityAfter));
+                this.storeOriginItem(store.originItems, entityAfter, model.beforeQueue);
+                return _context6.abrupt("return", entityAfter);
 
-              case 14:
-                toStoreEntity = _context6.sent;
-                store.items = _objectSpread2({}, store.items, _defineProperty({}, entity.id, toStoreEntity));
-                this.storeOriginItem(store.originItems, toStoreEntity, model.beforeQueue);
-                return _context6.abrupt("return", toStoreEntity);
-
-              case 18:
+              case 19:
               case "end":
                 return _context6.stop();
             }
