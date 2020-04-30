@@ -1778,7 +1778,7 @@ module.exports = isForced;
 /***/ }),
 
 /***/ "96cf":
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
@@ -1787,7 +1787,7 @@ module.exports = isForced;
  * LICENSE file in the root directory of this source tree.
  */
 
-var runtime = (function (exports) {
+!(function(global) {
   "use strict";
 
   var Op = Object.prototype;
@@ -1797,6 +1797,23 @@ var runtime = (function (exports) {
   var iteratorSymbol = $Symbol.iterator || "@@iterator";
   var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
   var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+  var inModule = typeof module === "object";
+  var runtime = global.regeneratorRuntime;
+  if (runtime) {
+    if (inModule) {
+      // If regeneratorRuntime is defined globally and we're in a module,
+      // make the exports object identical to regeneratorRuntime.
+      module.exports = runtime;
+    }
+    // Don't bother evaluating the rest of this file if the runtime was
+    // already defined globally.
+    return;
+  }
+
+  // Define the runtime globally (as expected by generated code) as either
+  // module.exports (if we're in a module) or a new, empty object.
+  runtime = global.regeneratorRuntime = inModule ? module.exports : {};
 
   function wrap(innerFn, outerFn, self, tryLocsList) {
     // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
@@ -1810,7 +1827,7 @@ var runtime = (function (exports) {
 
     return generator;
   }
-  exports.wrap = wrap;
+  runtime.wrap = wrap;
 
   // Try/catch helper to minimize deoptimizations. Returns a completion
   // record like context.tryEntries[i].completion. This interface could
@@ -1881,7 +1898,7 @@ var runtime = (function (exports) {
     });
   }
 
-  exports.isGeneratorFunction = function(genFun) {
+  runtime.isGeneratorFunction = function(genFun) {
     var ctor = typeof genFun === "function" && genFun.constructor;
     return ctor
       ? ctor === GeneratorFunction ||
@@ -1891,7 +1908,7 @@ var runtime = (function (exports) {
       : false;
   };
 
-  exports.mark = function(genFun) {
+  runtime.mark = function(genFun) {
     if (Object.setPrototypeOf) {
       Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
     } else {
@@ -1908,7 +1925,7 @@ var runtime = (function (exports) {
   // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
   // `hasOwn.call(value, "__await")` to determine if the yielded value is
   // meant to be awaited.
-  exports.awrap = function(arg) {
+  runtime.awrap = function(arg) {
     return { __await: arg };
   };
 
@@ -1933,14 +1950,22 @@ var runtime = (function (exports) {
         return Promise.resolve(value).then(function(unwrapped) {
           // When a yielded Promise is resolved, its final value becomes
           // the .value of the Promise<{value,done}> result for the
-          // current iteration.
+          // current iteration. If the Promise is rejected, however, the
+          // result for this iteration will be rejected with the same
+          // reason. Note that rejections of yielded Promises are not
+          // thrown back into the generator function, as is the case
+          // when an awaited Promise is rejected. This difference in
+          // behavior between yield and await is important, because it
+          // allows the consumer to decide what to do with the yielded
+          // rejection (swallow it and continue, manually .throw it back
+          // into the generator, abandon iteration, whatever). With
+          // await, by contrast, there is no opportunity to examine the
+          // rejection reason outside the generator function, so the
+          // only option is to throw it from the await expression, and
+          // let the generator function handle the exception.
           result.value = unwrapped;
           resolve(result);
-        }, function(error) {
-          // If a rejected Promise was yielded, throw the rejection back
-          // into the async generator function so it can be handled there.
-          return invoke("throw", error, resolve, reject);
-        });
+        }, reject);
       }
     }
 
@@ -1983,17 +2008,17 @@ var runtime = (function (exports) {
   AsyncIterator.prototype[asyncIteratorSymbol] = function () {
     return this;
   };
-  exports.AsyncIterator = AsyncIterator;
+  runtime.AsyncIterator = AsyncIterator;
 
   // Note that simple async functions are implemented on top of
   // AsyncIterator objects; they just return a Promise for the value of
   // the final result produced by the iterator.
-  exports.async = function(innerFn, outerFn, self, tryLocsList) {
+  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
     var iter = new AsyncIterator(
       wrap(innerFn, outerFn, self, tryLocsList)
     );
 
-    return exports.isGeneratorFunction(outerFn)
+    return runtime.isGeneratorFunction(outerFn)
       ? iter // If outerFn is a generator, return the full iterator.
       : iter.next().then(function(result) {
           return result.done ? result.value : iter.next();
@@ -2090,8 +2115,7 @@ var runtime = (function (exports) {
       context.delegate = null;
 
       if (context.method === "throw") {
-        // Note: ["return"] must be used for ES3 parsing compatibility.
-        if (delegate.iterator["return"]) {
+        if (delegate.iterator.return) {
           // If the delegate iterator has a return method, give it a
           // chance to clean up.
           context.method = "return";
@@ -2211,7 +2235,7 @@ var runtime = (function (exports) {
     this.reset(true);
   }
 
-  exports.keys = function(object) {
+  runtime.keys = function(object) {
     var keys = [];
     for (var key in object) {
       keys.push(key);
@@ -2272,7 +2296,7 @@ var runtime = (function (exports) {
     // Return an iterator with no values.
     return { next: doneResult };
   }
-  exports.values = values;
+  runtime.values = values;
 
   function doneResult() {
     return { value: undefined, done: true };
@@ -2477,35 +2501,12 @@ var runtime = (function (exports) {
       return ContinueSentinel;
     }
   };
-
-  // Regardless of whether this script is executing as a CommonJS module
-  // or not, return the runtime object so that we can declare the variable
-  // regeneratorRuntime in the outer scope, which allows this module to be
-  // injected easily by `bin/regenerator --include-runtime script.js`.
-  return exports;
-
-}(
-  // If this script is executing as a CommonJS module, use module.exports
-  // as the regeneratorRuntime namespace. Otherwise create a new empty
-  // object. Either way, the resulting object will be used to initialize
-  // the regeneratorRuntime variable at the top of this file.
-   true ? module.exports : undefined
-));
-
-try {
-  regeneratorRuntime = runtime;
-} catch (accidentalStrictMode) {
-  // This module should not be running in strict mode, so the above
-  // assignment should always work unless something is misconfigured. Just
-  // in case runtime.js accidentally runs in strict mode, we can escape
-  // strict mode using a global Function call. This could conceivably fail
-  // if a Content Security Policy forbids using Function, but in that case
-  // the proper solution is to fix the accidental strict mode problem. If
-  // you've misconfigured your bundler to force strict mode and applied a
-  // CSP to forbid Function, and you're not willing to fix either of those
-  // problems, please detail your unique predicament in a GitHub issue.
-  Function("r", "regeneratorRuntime = r")(runtime);
-}
+})(
+  // In sloppy mode, unbound `this` refers to the global object, fallback to
+  // Function constructor if we're in global strict mode. That is sadly a form
+  // of indirect eval which violates Content Security Policy.
+  (function() { return this })() || Function("return this")()
+);
 
 
 /***/ }),
@@ -10556,7 +10557,7 @@ var omit = _flatRest(function(object, paths) {
 
 
 
- // type RootState<S> = S & { [index: string]: ApiState };
+
 
 var ApiStore_ApiStore =
 /*#__PURE__*/
@@ -10585,22 +10586,23 @@ function () {
         var _ref = _asyncToGenerator(
         /*#__PURE__*/
         regeneratorRuntime.mark(function _callee(myState, item) {
-          var res;
+          var state, res;
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  _context.next = 2;
+                  state = myState[modelIdx];
+                  _context.next = 3;
                   return _this.patchEntity(myState, model, item);
 
-                case 2:
+                case 3:
                   res = _context.sent;
 
-                  _this.storeOriginItem(lodash_es_get(myState, "".concat(modelIdx, ".originItems")), res, model.beforeQueue);
+                  _this.storeOriginItem(state.originItems, res, model.beforeQueue);
 
                   myState[modelIdx].lastLoad = new Date();
 
-                case 5:
+                case 6:
                 case "end":
                   return _context.stop();
               }
@@ -10615,16 +10617,16 @@ function () {
 
 
       _this.mutations["DELETE_".concat(model.name.toUpperCase())] = function (myState, item) {
-        var store = myState[modelIdx];
+        var state = myState[modelIdx];
 
         var deleteItem = function deleteItem(i) {
           if (lodash_es_isString(i)) {
-            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(store.originItems, i);
-            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(store.items, i);
+            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(state.originItems, i);
+            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(state.items, i);
           } else {
-            _this.removeOriginItem(store.originItems, i);
+            _this.removeOriginItem(state.originItems, i);
 
-            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(store.items, i.id);
+            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(state.items, i.id);
           }
         };
 
@@ -10641,7 +10643,7 @@ function () {
       };
 
       _this.mutations["QUEUE_ACTION_".concat(model.name.toUpperCase())] = function (myState, payload) {
-        var store = myState[modelIdx];
+        var state = myState[modelIdx];
 
         var storeAction =
         /*#__PURE__*/
@@ -10662,7 +10664,7 @@ function () {
                     }
 
                     _context2.t0 = external_commonjs_vue_commonjs2_vue_root_Vue_default.a;
-                    _context2.t1 = store.items;
+                    _context2.t1 = state.items;
                     _context2.t2 = qp.data.id;
                     _context2.next = 7;
                     return applyModifier("afterGet", modelKey, _this.models, qp.data);
@@ -10672,7 +10674,7 @@ function () {
 
                     _context2.t0.set.call(_context2.t0, _context2.t1, _context2.t2, _context2.t3);
 
-                    _context2.t4 = store.actionQueue[qp.action];
+                    _context2.t4 = state.actionQueue[qp.action];
                     _context2.next = 12;
                     return applyModifier("beforeSave", modelKey, _this.models, QToStore);
 
@@ -10686,11 +10688,11 @@ function () {
 
                   case 16:
                     if (qp.action === "delete") {
-                      external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(store.items, qp.id);
+                      external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(state.items, qp.id);
                     }
 
                     _context2.t6 = external_commonjs_vue_commonjs2_vue_root_Vue_default.a;
-                    _context2.t7 = store.actionQueue[qp.action];
+                    _context2.t7 = state.actionQueue[qp.action];
                     _context2.t8 = qp.data.id;
                     _context2.next = 22;
                     return applyModifier("beforeSave", modelKey, _this.models, QToStore);
@@ -10713,7 +10715,7 @@ function () {
           };
         }();
 
-        if (lodash_es_has(store.actionQueue, payload.action)) {
+        if (lodash_es_has(state.actionQueue, payload.action)) {
           storeAction(payload);
         } else {
           // eslint-disable-next-line no-console
@@ -10722,13 +10724,26 @@ function () {
       };
 
       _this.mutations["UNQUEUE_ACTION_".concat(model.name.toUpperCase())] = function (myState, payload) {
+        var state = myState[model.plural];
         var id = payload.id || payload.data.id;
-        external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(myState[model.plural].actionQueue[payload.action], id);
+
+        if (payload.action === "patch") {
+          _this.revertOriginItem(state, id);
+        }
+
+        external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(state.actionQueue[payload.action], id);
       };
 
       _this.mutations["RESET_QUEUE_".concat(model.name.toUpperCase())] = function (myState) {
-        lodash_es_forEach(myState[model.plural].actionQueue, function (actionList, action) {
-          myState[model.plural].actionQueue[action] = lodash_es_isArray(actionList) ? [] : {};
+        var state = myState[model.plural];
+        lodash_es_forEach(state.actionQueue, function (actionList, action) {
+          if (action === "patch") {
+            lodash_es_forEach(actionList, function (item, id) {
+              return _this.revertOriginItem(state, id);
+            });
+          }
+
+          state.actionQueue[action] = lodash_es_isArray(actionList) ? [] : {};
         });
       }; // adding getters
 
@@ -10844,17 +10859,25 @@ function () {
       if (item && lodash_es_has(originItems, item.id)) {
         external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(originItems, item.id);
       }
+    } // Revert to original copy
+
+  }, {
+    key: "revertOriginItem",
+    value: function revertOriginItem(state, id) {
+      if (lodash_es_has(state.originItems, id)) {
+        state.items[id] = state.originItems[id];
+      }
     }
   }, {
     key: "patchEntity",
     value: function () {
       var _patchEntity = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee6(state, model, entity // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      regeneratorRuntime.mark(function _callee6(store, model, entity // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) {
         var _this2 = this;
 
-        var entityAfter, store, storeEntity;
+        var entityAfter, state, storeEntity;
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
@@ -10873,7 +10896,7 @@ function () {
                 }
 
                 return _context6.abrupt("return", Promise.all(entity.map(function (e) {
-                  return _this2.patchEntity(state, model, e);
+                  return _this2.patchEntity(store, model, e);
                 })));
 
               case 4:
@@ -10895,7 +10918,7 @@ function () {
                           switch (_context5.prev = _context5.next) {
                             case 0:
                               _context5.next = 2;
-                              return _this2.patchReference(state, entity, modelName, prop);
+                              return _this2.patchReference(store, entity, modelName, prop);
 
                             case 2:
                               entity[prop] = _context5.sent;
@@ -10919,14 +10942,14 @@ function () {
 
               case 8:
                 entityAfter = _context6.sent;
-                store = state[model.plural];
+                state = store[model.plural];
 
-                if (!lodash_es_has(store.items, entity.id)) {
+                if (!lodash_es_has(state.items, entity.id)) {
                   _context6.next = 16;
                   break;
                 }
 
-                storeEntity = store.items[entity.id];
+                storeEntity = state.items[entity.id];
                 lodash_es_forEach(entityAfter, function (value, name) {
                   if (!lodash_es_isFunction(value) && !lodash_es_has(model.references, name)) {
                     if (lodash_es_has(entity, name) && !lodash_es_isEqual(value, lodash_es_get(storeEntity, name))) {
@@ -10934,11 +10957,11 @@ function () {
                     }
                   }
                 });
-                return _context6.abrupt("return", store.items[entity.id]);
+                return _context6.abrupt("return", state.items[entity.id]);
 
               case 16:
-                store.items = _objectSpread2({}, store.items, _defineProperty({}, entity.id, entityAfter));
-                this.storeOriginItem(store.originItems, entityAfter, model.beforeQueue);
+                state.items = _objectSpread2({}, state.items, _defineProperty({}, entity.id, entityAfter));
+                this.storeOriginItem(state.originItems, entityAfter, model.beforeQueue);
                 return _context6.abrupt("return", entityAfter);
 
               case 19:
@@ -10960,7 +10983,7 @@ function () {
     value: function () {
       var _patchReference = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee7(state, entity, modelName, prop) {
+      regeneratorRuntime.mark(function _callee7(store, entity, modelName, prop) {
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
@@ -10970,7 +10993,7 @@ function () {
                   break;
                 }
 
-                return _context7.abrupt("return", this.patchEntity(state, this.models[modelName], entity[prop]));
+                return _context7.abrupt("return", this.patchEntity(store, this.models[modelName], entity[prop]));
 
               case 4:
                 // eslint-disable-next-line no-console
