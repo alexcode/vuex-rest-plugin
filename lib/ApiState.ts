@@ -5,7 +5,7 @@ import { IndexedObjectTree, IndexedObject } from "./types";
 
 export default class ApiState {
   [key: string]: any;
-  items?: IndexedObjectTree;
+  items: IndexedObjectTree;
   lastLoad: Date;
   loaded: boolean;
   originItems: IndexedObject;

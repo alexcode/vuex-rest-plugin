@@ -338,7 +338,7 @@ describe("ApiStore by default", function() {
       store.getters["api/resources"].actionQueue.patch[resource.id]
     ).toBeUndefined();
     // Object should comeback to initial state
-    expect(store.getters["api/resources"].items[resource.id]).toEqual(resource);
+    expect(store.getters["api/resources"].items[resource.id]).toEqual(data[0]);
   });
 
   it("test cancelAction", async () => {

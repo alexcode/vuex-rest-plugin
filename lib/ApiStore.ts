@@ -20,7 +20,9 @@ import {
 } from "./types";
 import { applyModifier } from "./utils";
 
-// type RootState<S> = S & { [index: string]: ApiState };
+interface StateTree {
+  [index: string]: ApiState;
+}
 
 export default class ApiStore<S> implements StoreOptions<S> {
   namespaced: boolean;
@@ -45,31 +47,28 @@ export default class ApiStore<S> implements StoreOptions<S> {
 
       // adding ADD_* mutations
       this.mutations[`ADD_${model.name.toUpperCase()}`] = async (
-        myState: ApiState,
+        myState: StateTree,
         item: IndexedObject | Array<IndexedObject>
       ) => {
+        const state = myState[modelIdx];
         const res = await this.patchEntity(myState, model, item);
-        this.storeOriginItem(
-          get(myState, `${modelIdx}.originItems`),
-          res,
-          model.beforeQueue
-        );
+        this.storeOriginItem(state.originItems, res, model.beforeQueue);
         myState[modelIdx].lastLoad = new Date();
       };
 
       // adding DELETE_* mutations
       this.mutations[`DELETE_${model.name.toUpperCase()}`] = (
-        myState: ApiState,
+        myState: StateTree,
         item: string | Array<IndexedObject>
       ) => {
-        const store = myState[modelIdx];
+        const state = myState[modelIdx];
         const deleteItem = (i: string | IndexedObject) => {
           if (isString(i)) {
-            Vue.delete(store.originItems, i);
-            Vue.delete(store.items, i);
+            Vue.delete(state.originItems, i);
+            Vue.delete(state.items, i);
           } else {
-            this.removeOriginItem(store.originItems, i);
-            Vue.delete(store.items, i.id);
+            this.removeOriginItem(state.originItems, i);
+            Vue.delete(state.items, i.id);
           }
         };
 
@@ -82,38 +81,38 @@ export default class ApiStore<S> implements StoreOptions<S> {
 
       // adding CLEAR_* mutations
       this.mutations[`CLEAR_${model.name.toUpperCase()}`] = (
-        myState: ApiState
+        myState: StateTree
       ) => myState[modelIdx].reset();
 
       this.mutations[`QUEUE_ACTION_${model.name.toUpperCase()}`] = (
-        myState: ApiState,
+        myState: StateTree,
         payload: QueuePayload
       ) => {
-        const store = myState[modelIdx];
+        const state = myState[modelIdx];
         const storeAction = async (qp: QueuePayload) => {
           const QToStore = omit(qp, "method", "action");
           if (qp.action === "post") {
             Vue.set(
-              store.items,
+              state.items,
               qp.data.id,
               await applyModifier("afterGet", modelKey, this.models, qp.data)
             );
-            store.actionQueue[qp.action].push(
+            state.actionQueue[qp.action].push(
               await applyModifier("beforeSave", modelKey, this.models, QToStore)
             );
           } else {
             if (qp.action === "delete") {
-              Vue.delete(store.items, qp.id);
+              Vue.delete(state.items, qp.id);
             }
             Vue.set(
-              store.actionQueue[qp.action],
+              state.actionQueue[qp.action],
               qp.data.id,
               await applyModifier("beforeSave", modelKey, this.models, QToStore)
             );
           }
         };
 
-        if (has(store.actionQueue, payload.action)) {
+        if (has(state.actionQueue, payload.action)) {
           storeAction(payload);
         } else {
           // eslint-disable-next-line no-console
@@ -122,20 +121,27 @@ export default class ApiStore<S> implements StoreOptions<S> {
       };
 
       this.mutations[`UNQUEUE_ACTION_${model.name.toUpperCase()}`] = (
-        myState: ApiState,
+        myState: StateTree,
         payload: QueuePayload
       ) => {
+        const state = myState[model.plural];
         const id = payload.id || payload.data.id;
-        Vue.delete(myState[model.plural].actionQueue[payload.action], id);
+        if (payload.action === "patch") {
+          this.revertOriginItem(state, id);
+        }
+        Vue.delete(state.actionQueue[payload.action], id);
       };
 
       this.mutations[`RESET_QUEUE_${model.name.toUpperCase()}`] = (
-        myState: ApiState
+        myState: StateTree
       ) => {
-        forEach(myState[model.plural].actionQueue, (actionList, action) => {
-          myState[model.plural].actionQueue[action] = isArray(actionList)
-            ? []
-            : {};
+        const state = myState[model.plural];
+        forEach(state.actionQueue, (actionList, action) => {
+          if (action === "patch") {
+            forEach(actionList, (item, id) => this.revertOriginItem(state, id));
+          }
+
+          state.actionQueue[action] = isArray(actionList) ? [] : {};
         });
       };
 
@@ -166,9 +172,15 @@ export default class ApiStore<S> implements StoreOptions<S> {
       Vue.delete(originItems, item.id);
     }
   }
+  // Revert to original copy
+  private revertOriginItem(state: ApiState, id: string) {
+    if (has(state.originItems, id)) {
+      state.items[id] = state.originItems[id];
+    }
+  }
 
   private async patchEntity(
-    state: ApiState,
+    store: StateTree,
     model: ModelType,
     entity: IndexedObject | Array<IndexedObject>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -177,7 +189,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
       return;
     }
     if (isArray(entity)) {
-      return Promise.all(entity.map(e => this.patchEntity(state, model, e)));
+      return Promise.all(entity.map(e => this.patchEntity(store, model, e)));
     }
 
     if (entity.id && model) {
@@ -185,7 +197,7 @@ export default class ApiStore<S> implements StoreOptions<S> {
       if (model.references) {
         forEach(model.references, async (modelName, prop) => {
           entity[prop] = await this.patchReference(
-            state,
+            store,
             entity,
             modelName,
             prop
@@ -200,10 +212,10 @@ export default class ApiStore<S> implements StoreOptions<S> {
         entity
       );
 
-      const store = state[model.plural];
+      const state = store[model.plural];
 
-      if (has(store.items, entity.id)) {
-        const storeEntity = store.items[entity.id];
+      if (has(state.items, entity.id)) {
+        const storeEntity = state.items[entity.id];
         forEach(entityAfter, (value, name: string) => {
           if (!isFunction(value) && !has(model.references, name)) {
             if (has(entity, name) && !isEqual(value, get(storeEntity, name))) {
@@ -212,10 +224,10 @@ export default class ApiStore<S> implements StoreOptions<S> {
           }
         });
 
-        return store.items[entity.id];
+        return state.items[entity.id];
       } else {
-        store.items = { ...store.items, [entity.id]: entityAfter };
-        this.storeOriginItem(store.originItems, entityAfter, model.beforeQueue);
+        state.items = { ...state.items, [entity.id]: entityAfter };
+        this.storeOriginItem(state.originItems, entityAfter, model.beforeQueue);
 
         return entityAfter;
       }
@@ -223,13 +235,13 @@ export default class ApiStore<S> implements StoreOptions<S> {
   }
 
   private async patchReference(
-    state: ApiState,
+    store: StateTree,
     entity: IndexedObject,
     modelName: string,
     prop: string
   ) {
     if (has(this.models, modelName)) {
-      return this.patchEntity(state, this.models[modelName], entity[prop]);
+      return this.patchEntity(store, this.models[modelName], entity[prop]);
     } else {
       // eslint-disable-next-line no-console
       console.warn(

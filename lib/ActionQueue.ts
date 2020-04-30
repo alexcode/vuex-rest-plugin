@@ -2,6 +2,7 @@ import some from "lodash-es/some";
 import has from "lodash-es/has";
 
 export default class ActionQueue {
+  [key: string]: any;
   readonly post: Array<object>;
   readonly patch: object;
   readonly delete: object;
