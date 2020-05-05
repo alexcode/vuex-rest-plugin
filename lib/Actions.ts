@@ -11,7 +11,15 @@ import keys from "lodash-es/keys";
 import map from "lodash-es/map";
 import values from "lodash-es/values";
 import ApiState from "./ApiState";
-import { ModelTypeTree, Payload, QueuePayload, ModelType } from "./types";
+import {
+  IndexedObject,
+  ModelTypeTree,
+  Payload,
+  QueuePayload,
+  QueuePayloadWithModifiers,
+  ModelType,
+  ModifierName
+} from "./types";
 import { applyModifier, formatUrl } from "./utils";
 
 class ActionBase<S, R> {
@@ -57,21 +65,40 @@ class ActionBase<S, R> {
     return get(state, `${this._getModel(payload).plural}.items`)[payload.id];
   }
 
+  async _addToStore(
+    commit: Commit,
+    type: string,
+    path: string,
+    data: IndexedObject | Array<IndexedObject>
+  ) {
+    commit(`SAVE_ORIGIN_${path}`, cloneDeep(data));
+    const modified = await applyModifier(
+      ModifierName.afterGet,
+      type,
+      this._models,
+      data
+    );
+
+    commit(`ADD_${path}`, modified);
+  }
+
   // fetch entity from API
-  _fetchEntity(commit: Commit, payload: Payload) {
+  async _fetchEntity(commit: Commit, payload: Payload) {
     if (get(payload, "clear", this._isAll(payload))) {
       commit(`CLEAR_${this._getModel(payload).name.toUpperCase()}`);
     }
-    return this._axios
-      .get(formatUrl(payload), payload.axiosConfig)
-      .then(async result => {
-        const resultData = get(result, this._dataPath);
-        commit(
-          `ADD_${this._getModel(payload).name.toUpperCase()}`,
-          cloneDeep(resultData)
-        );
-        return resultData;
-      });
+    const result = await this._axios.get(
+      formatUrl(payload),
+      payload.axiosConfig
+    );
+    const resultData = get(result, this._dataPath);
+    this._addToStore(
+      commit,
+      payload.type,
+      this._getModel(payload).name.toUpperCase(),
+      resultData
+    );
+    return resultData;
   }
 
   // store entity to API
@@ -84,21 +111,22 @@ class ActionBase<S, R> {
       method,
       url: formatUrl(payload),
       data: await applyModifier(
-        "beforeSave",
+        ModifierName.beforeSave,
         payload.type,
         this._models,
         payload.data
       )
     };
     const config = { ...mainConfig, ...payload.axiosConfig };
-    return this._axios(config).then(result => {
-      const resultData = get(result, this._dataPath);
-      commit(
-        `ADD_${this._getModel(payload).name.toUpperCase()}`,
-        cloneDeep(resultData)
-      );
-      return resultData;
-    });
+    const result = await this._axios(config);
+    const resultData = get(result, this._dataPath);
+    this._addToStore(
+      commit,
+      payload.type,
+      this._getModel(payload).name.toUpperCase(),
+      resultData
+    );
+    return resultData;
   }
 
   // delete entity to API
@@ -110,7 +138,12 @@ class ActionBase<S, R> {
       return this._axios
         .patch(
           `${formatUrl(payload)}/delete`,
-          await applyModifier("beforeSave", payload.type, this._models, data),
+          await applyModifier(
+            ModifierName.beforeSave,
+            payload.type,
+            this._models,
+            data
+          ),
           payload.axiosConfig
         )
         .then(() => {
@@ -123,6 +156,34 @@ class ActionBase<S, R> {
       .then(() => {
         commit(`DELETE_${model.name.toUpperCase()}`, id);
       });
+  }
+
+  async _getQueuePayloadWithModifiers({
+    data,
+    type,
+    action
+  }: QueuePayload): Promise<QueuePayloadWithModifiers> {
+    const afterGet = await applyModifier(
+      ModifierName.afterGet,
+      type,
+      this._models,
+      data
+    );
+
+    return {
+      action,
+      id: data.id,
+      afterGet,
+      toQueue: {
+        type,
+        data: await applyModifier(
+          ModifierName.beforeSave,
+          type,
+          this._models,
+          data
+        )
+      }
+    };
   }
 
   _processAction(action: Method, payload: Payload, commit: Commit) {
@@ -163,7 +224,12 @@ class ActionBase<S, R> {
       const origin = at(get(state, `${model.plural}.originItems`), originIds);
       commit(
         `ADD_${model.name}`,
-        await applyModifier("afterQueue", queue, this._models, origin)
+        await applyModifier(
+          ModifierName.afterQueue,
+          queue,
+          this._models,
+          origin
+        )
       );
       commit(`RESET_QUEUE_${model.name}`);
     }
@@ -207,11 +273,14 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       return base._deleteEntity(commit, payload);
     };
 
-    this.queueAction = (
+    this.queueAction = async (
       { commit }: ActionContext<S, R>,
       payload: QueuePayload
     ) => {
-      return commit(`QUEUE_ACTION_${base._getModel(payload).name}`, payload);
+      return commit(
+        `QUEUE_ACTION_${base._getModel(payload).name}`,
+        await base._getQueuePayloadWithModifiers(payload)
+      );
     };
 
     this.processAction = (

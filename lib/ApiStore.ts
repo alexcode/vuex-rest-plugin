@@ -1,6 +1,5 @@
 import { StoreOptions } from "vuex";
 import Vue from "vue";
-import cloneDeep from "lodash-es/cloneDeep";
 import forEach from "lodash-es/forEach";
 import get from "lodash-es/get";
 import has from "lodash-es/has";
@@ -8,17 +7,16 @@ import isArray from "lodash-es/isArray";
 import isEqual from "lodash-es/isEqual";
 import isFunction from "lodash-es/isFunction";
 import isString from "lodash-es/isString";
-import omit from "lodash-es/omit";
 import Actions from "./Actions";
 import ApiState from "./ApiState";
 import {
   ModelTypeTree,
   QueuePayload,
+  QueuePayloadWithModifiers,
   IndexedObject,
-  ModelType,
-  Modifier
+  IndexedObjectTree,
+  ModelType
 } from "./types";
-import { applyModifier } from "./utils";
 
 interface StateTree {
   [index: string]: ApiState;
@@ -39,21 +37,26 @@ export default class ApiStore<S> implements StoreOptions<S> {
     this.state = Object.create(null);
     this.getters = Object.create(null);
     this.mutations = Object.create(null);
-    forEach(this.models, (model, modelKey) => {
+    forEach(this.models, model => {
       const modelIdx = model.plural;
 
       // adding all states
       this.state[modelIdx] = model.type;
 
       // adding ADD_* mutations
-      this.mutations[`ADD_${model.name.toUpperCase()}`] = async (
+      this.mutations[`ADD_${model.name.toUpperCase()}`] = (
         myState: StateTree,
         item: IndexedObject | Array<IndexedObject>
       ) => {
-        const state = myState[modelIdx];
-        const res = await this.patchEntity(myState, model, item);
-        this.storeOriginItem(state.originItems, res, model.beforeQueue);
         myState[modelIdx].lastLoad = new Date();
+        this.upsertData(myState, model, item);
+      };
+
+      this.mutations[`SAVE_ORIGIN_${model.name.toUpperCase()}`] = (
+        myState: StateTree,
+        item: IndexedObject | Array<IndexedObject>
+      ) => {
+        this.saveOrigins(myState, model, item);
       };
 
       // adding DELETE_* mutations
@@ -86,37 +89,23 @@ export default class ApiStore<S> implements StoreOptions<S> {
 
       this.mutations[`QUEUE_ACTION_${model.name.toUpperCase()}`] = (
         myState: StateTree,
-        payload: QueuePayload
+        { id, action, afterGet, toQueue }: QueuePayloadWithModifiers
       ) => {
         const state = myState[modelIdx];
-        const storeAction = async (qp: QueuePayload) => {
-          const QToStore = omit(qp, "method", "action");
-          if (qp.action === "post") {
-            Vue.set(
-              state.items,
-              qp.data.id,
-              await applyModifier("afterGet", modelKey, this.models, qp.data)
-            );
-            state.actionQueue[qp.action].push(
-              await applyModifier("beforeSave", modelKey, this.models, QToStore)
-            );
-          } else {
-            if (qp.action === "delete") {
-              Vue.delete(state.items, qp.id);
-            }
-            Vue.set(
-              state.actionQueue[qp.action],
-              qp.data.id,
-              await applyModifier("beforeSave", modelKey, this.models, QToStore)
-            );
-          }
-        };
 
-        if (has(state.actionQueue, payload.action)) {
-          storeAction(payload);
+        if (has(state.actionQueue, action)) {
+          if (action === "post") {
+            Vue.set(state.items, id, afterGet);
+            state.actionQueue[action].push(toQueue);
+          } else {
+            if (action === "delete") {
+              Vue.delete(state.items, id);
+            }
+            Vue.set(state.actionQueue[action], id, toQueue);
+          }
         } else {
           // eslint-disable-next-line no-console
-          console.warn(`action ${payload.action} is not storable`);
+          console.warn(`action ${action} is not storable`);
         }
       };
 
@@ -150,20 +139,47 @@ export default class ApiStore<S> implements StoreOptions<S> {
         myState[modelIdx];
     });
   }
-  // storing Origin item copy
-  private async storeOriginItem(
-    originItems: IndexedObject,
-    item: IndexedObject | Array<IndexedObject>,
-    modifiers?: Modifier
-  ) {
-    if (isArray(item)) {
-      item.map(async i => {
-        const modified = modifiers ? await modifiers(i) : i;
-        Vue.set(originItems, i.id, cloneDeep(modified));
-      });
+
+  // Removing original copy
+  private getIndexedMap(data: IndexedObject | Array<IndexedObject>) {
+    const indexMap: IndexedObjectTree = {};
+    if (isArray(data)) {
+      return data.reduce((acc, entity) => {
+        acc[entity.id] = entity;
+        return acc;
+      }, indexMap);
     } else {
-      const modified = modifiers ? await modifiers(item) : item;
-      Vue.set(originItems, item.id, cloneDeep(modified));
+      indexMap[data.id] = data;
+      return indexMap;
+    }
+  }
+
+  // Save original copy
+  private saveOriginItem(state: ApiState, data: IndexedObject) {
+    state.originItems = {
+      ...state.originItems,
+      ...this.getIndexedMap(data)
+    };
+  }
+  // Save original copy
+  private saveOrigins(
+    store: StateTree,
+    model: ModelType,
+    data: IndexedObject | Array<IndexedObject>
+  ) {
+    try {
+      const state = store[model.plural];
+      if (isArray(data)) {
+        data.forEach((e: IndexedObject) => this.saveOriginItem(state, e));
+      } else {
+        this.saveOriginItem(state, data);
+        forEach(model.references, (modelName, prop) => {
+          this.saveOrigins(store, this.models[modelName], data[prop]);
+        });
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn(`We could not find the model ${model.plural}.`);
     }
   }
   // Removing original copy
@@ -179,69 +195,60 @@ export default class ApiStore<S> implements StoreOptions<S> {
     }
   }
 
-  private async patchEntity(
+  private upsertData(
     store: StateTree,
     model: ModelType,
-    entity: IndexedObject | Array<IndexedObject>
+    data: IndexedObject | Array<IndexedObject>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
-    if (!entity) {
-      return;
-    }
-    if (isArray(entity)) {
-      return Promise.all(entity.map(e => this.patchEntity(store, model, e)));
-    }
-
-    if (entity.id && model) {
-      // Patch references
-      if (model.references) {
-        forEach(model.references, async (modelName, prop) => {
-          entity[prop] = await this.patchReference(
-            store,
-            entity,
-            modelName,
-            prop
-          );
-        });
-      }
-
-      const entityAfter = await applyModifier(
-        "afterGet",
-        model.name.toLowerCase(),
-        this.models,
-        entity
-      );
-
-      const state = store[model.plural];
-
-      if (has(state.items, entity.id)) {
-        const storeEntity = state.items[entity.id];
-        forEach(entityAfter, (value, name: string) => {
-          if (!isFunction(value) && !has(model.references, name)) {
-            if (has(entity, name) && !isEqual(value, get(storeEntity, name))) {
-              Vue.set(storeEntity, name, value);
-            }
-          }
-        });
-
-        return state.items[entity.id];
-      } else {
-        state.items = { ...state.items, [entity.id]: entityAfter };
-        this.storeOriginItem(state.originItems, entityAfter, model.beforeQueue);
-
-        return entityAfter;
-      }
+  ): IndexedObject | Array<IndexedObject> {
+    if (isArray(data)) {
+      return data.map((e: IndexedObject) => this.patchEntity(store, model, e));
+    } else {
+      return this.patchEntity(store, model, data);
     }
   }
 
-  private async patchReference(
+  private patchEntity(
+    store: StateTree,
+    model: ModelType,
+    entity: IndexedObject
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): IndexedObject {
+    // Patch references
+    if (model.references) {
+      forEach(model.references, (modelName, prop) => {
+        entity[prop] = this.patchReference(store, entity, modelName, prop);
+      });
+    }
+
+    const state = store[model.plural];
+
+    if (has(state.items, entity.id)) {
+      const storeEntity = state.items[entity.id];
+      forEach(entity, (value, name: string) => {
+        if (!isFunction(value) && !has(model.references, name)) {
+          if (has(entity, name) && !isEqual(value, get(storeEntity, name))) {
+            Vue.set(storeEntity, name, value);
+          }
+        }
+      });
+
+      return state.items[entity.id];
+    } else {
+      state.items = { ...state.items, ...this.getIndexedMap(entity) };
+
+      return entity;
+    }
+  }
+
+  private patchReference(
     store: StateTree,
     entity: IndexedObject,
     modelName: string,
     prop: string
   ) {
     if (has(this.models, modelName)) {
-      return this.patchEntity(store, this.models[modelName], entity[prop]);
+      return this.upsertData(store, this.models[modelName], entity[prop]);
     } else {
       // eslint-disable-next-line no-console
       console.warn(

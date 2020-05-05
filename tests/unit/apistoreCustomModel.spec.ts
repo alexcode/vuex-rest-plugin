@@ -18,6 +18,13 @@ describe("ApiStore custom model", function() {
   const data = require("./apistore.spec.data.json");
   const axiosInstance = axios.create();
   const mock = new MockAdapter(axiosInstance);
+  const fillStore = async (store: any, data: any) => {
+    mock.onGet("/resource").reply(200, data);
+    store.dispatch("api/get", {
+      type: "resource"
+    });
+    await flushPromises();
+  };
   afterEach(() => {
     mock.reset();
   });
@@ -95,8 +102,7 @@ describe("ApiStore custom model", function() {
       ]
     });
     const resource = data[0];
-    store.commit("api/ADD_RESOURCE", resource);
-    await flushPromises();
+    await fillStore(store, resource);
     expect(
       store.getters["api/places"].items[resource.depot[0].id]
     ).toStrictEqual(resource.depot[0]);
@@ -414,57 +420,6 @@ describe("ApiStore custom model", function() {
     expect(store.getters["api/users"].items[resource.user.id]).toBeInstanceOf(
       CustomUser
     );
-  });
-
-  it("test class with local property", async () => {
-    class CustomUser {
-      id: string;
-      someId: string;
-      localProp = false;
-      constructor(o: any) {
-        this.id = o.id;
-        this.someId = o.someId;
-      }
-    }
-
-    const store = new Vuex.Store({
-      plugins: [
-        ApiStorePlugin({
-          axios: axiosInstance,
-          models: {
-            user: {
-              name: "USER",
-              plural: "USERS",
-              type: new ApiState(),
-              afterGet: (v: any) =>
-                new CustomUser({
-                  id: v.id,
-                  someId: "other_id_user"
-                })
-            }
-          }
-        })
-      ]
-    });
-    const user = data[0].user;
-    mock.onGet(`/user/${user.id}`).reply(200, user);
-    store.dispatch("api/get", {
-      id: user.id,
-      type: "user"
-    });
-    await flushPromises();
-
-    store.getters["api/users"].items[user.id].localProp = true;
-
-    mock.onGet(`/user/${user.id}`).reply(200, user);
-    store.dispatch("api/get", {
-      id: user.id,
-      type: "user",
-      forceFetch: true,
-      clear: false
-    });
-    await flushPromises();
-    expect(store.getters["api/users"].items[user.id].localProp).toBe(true);
   });
 
   it("test class with constructor", async () => {

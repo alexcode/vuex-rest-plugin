@@ -5,6 +5,7 @@ import axios from "axios";
 import flushPromises from "flush-promises";
 import size from "lodash-es/size";
 import forEach from "lodash-es/forEach";
+import cloneDeep from "lodash-es/cloneDeep";
 import ApiStorePlugin from "../../lib/ApiStorePlugin";
 import ApiState from "../../lib/ApiState";
 
@@ -50,7 +51,7 @@ describe("ApiStore by default", function() {
   const axiosInstance = axios.create();
   const mock = new MockAdapter(axiosInstance);
   const fillStore = async () => {
-    mock.onGet("/resource").reply(200, data);
+    mock.onGet("/resource").reply(200, cloneDeep(data));
     store.dispatch("api/get", {
       type: "resource"
     });
@@ -137,22 +138,21 @@ describe("ApiStore by default", function() {
     // Uncomment the following line and set expect(mock.history.get.length).toBe(1);
     // when the next axios-mock-adapter version (current v1.16.0) is released
     // mock.resetHistory();
-    store.getters["api/resources"].items[data[0].id].name = "changed name";
-    store.getters["api/resources"].items[data[0].id].newData = "new_stuff";
-    mock.onGet(`/resource/${data[0].id}`).reply(200, data[0]);
+    const { id } = data[0];
+    store.getters["api/resources"].items[id].name = "changed name";
+    store.getters["api/resources"].items[id].newData = "new_stuff";
+    mock.onGet(`/resource/${id}`).reply(200, data[0]);
     const res = await store.dispatch("api/get", {
-      id: data[0].id,
+      id,
       type: "resource",
       forceFetch: true
     });
     await flushPromises();
     expect(mock.history.get.length).toBe(2);
-    expect(store.getters["api/resources"].items[data[0].id].name).not.toBe(
+    expect(store.getters["api/resources"].items[id].name).not.toBe(
       "changed name"
     );
-    expect(store.getters["api/resources"].items[data[0].id].newData).toBe(
-      "new_stuff"
-    );
+    expect(store.getters["api/resources"].items[id].newData).toBe("new_stuff");
     expect(res).toStrictEqual(data[0]);
   });
 
@@ -337,7 +337,7 @@ describe("ApiStore by default", function() {
     expect(
       store.getters["api/resources"].actionQueue.patch[resource.id]
     ).toBeUndefined();
-    // Object should comeback to initial state
+    // Object should come back to initial state
     expect(store.getters["api/resources"].items[resource.id]).toEqual(data[0]);
   });
 

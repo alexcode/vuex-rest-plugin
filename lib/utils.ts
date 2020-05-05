@@ -1,37 +1,54 @@
-import get from "lodash-es/get";
 import has from "lodash-es/has";
 import isArray from "lodash-es/isArray";
 import isDate from "lodash-es/isDate";
 import isFunction from "lodash-es/isFunction";
 import isObject from "lodash-es/isObject";
 import map from "lodash-es/map";
-import { ModelTypeTree, Payload } from "./types";
+import { IndexedObject, ModifierName, ModelTypeTree, Payload } from "./types";
 
 export async function applyModifier(
-  modifier: string,
+  modifier: ModifierName,
   modelName: string,
   models: ModelTypeTree,
-  data?: object | Array<object>
+  data?: IndexedObject | Array<IndexedObject>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> {
-  const applyFn = (d?: object) => {
-    const fn = get(models, `${modelName}.${modifier}`);
-    return !isFunction(fn) ? Promise.resolve(d) : fn(d);
+  const applyItemModifier = async (
+    modifier: ModifierName,
+    modelName: string,
+    models: ModelTypeTree,
+    data: IndexedObject
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> => {
+    try {
+      await Promise.all(
+        map(models[modelName]["references"], async (ref, key) => {
+          if (has(data, key) && data[key]) {
+            data[key] = await applyModifier(modifier, ref, models, data[key]);
+          }
+          return Promise.resolve(data[key]);
+        })
+      );
+      const fn = models[modelName][modifier];
+      return !isFunction(fn) ? Promise.resolve(data) : await fn(data);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Modifier error on "${modelName}" for data ${JSON.stringify(data)}`
+      );
+    }
   };
-  const refs = get(models, `${modelName}.references`, []);
-  const applyRefFn = (d?: object) =>
-    map(refs, (ref, key) => {
-      if (has(d, key)) {
-        return applyModifier(modifier, ref, models, get(d, key));
-      }
-      return Promise.resolve(d);
-    });
 
-  if (isArray(data)) {
-    return Promise.all(data.map(applyRefFn)).then(() =>
-      Promise.all(data.map(applyFn))
-    );
+  if (data) {
+    if (isArray(data)) {
+      return Promise.all(
+        data.map(item => applyItemModifier(modifier, modelName, models, item))
+      );
+    } else {
+      return await applyItemModifier(modifier, modelName, models, data);
+    }
   }
-  return Promise.resolve(applyRefFn(data)).then(() => applyFn(data));
+  return Promise.resolve(data);
 }
 
 export function formatUrl(payload: Payload) {
@@ -42,6 +59,7 @@ export function formatUrl(payload: Payload) {
   }
 
   if (payload.query && isObject(payload.query)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query = map(payload.query, (value: any, key: string) => {
       let resquestValue = value;
       if (isFunction(value.toISOString) || isDate(value)) {
