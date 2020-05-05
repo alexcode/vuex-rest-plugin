@@ -247,13 +247,8 @@ export default class ApiStore<S> implements StoreOptions<S> {
     modelName: string,
     prop: string
   ) {
-    if (has(this.models, modelName)) {
+    if (has(this.models, modelName) && has(entity, prop)) {
       return this.upsertData(store, this.models[modelName], entity[prop]);
-    } else {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Patch error: We could not find the model ${modelName} for the reference ${prop}.`
-      );
     }
   }
 }

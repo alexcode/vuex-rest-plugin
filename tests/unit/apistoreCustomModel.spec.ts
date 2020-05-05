@@ -72,7 +72,7 @@ describe("ApiStore custom model", function() {
     console.info("Start expected log");
     await flushPromises();
     expect(spyWarn).toHaveBeenCalledWith(
-      "Patch error: We could not find the model fakeref for the reference user."
+      "We could not find the model RESOURCES."
     );
     console.info("End expected log");
   });
