@@ -159,6 +159,15 @@ this.$store.dispatch("api/queueActionWatcher", {
 });
 ```
 
+### `add`
+
+Add data in the store without fetching it from API. This is useful in cases like Websockets.
+
+```js
+this.$store.dispatch('api/add', { type: 'resource'  data: {...} });
+this.$store.dispatch('api/add', { type: 'resource'  data: [{...}] });
+```
+
 The store can be emptied with the reset action.
 
 ```js

@@ -33,9 +33,7 @@ export async function applyModifier(
       return !isFunction(fn) ? Promise.resolve(data) : await fn(data);
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.warn(
-        `Modifier error on "${modelName}" for data ${JSON.stringify(data)}`
-      );
+      console.warn(`Modifier error on "${modelName}". ${e}`);
     }
   };
 

@@ -71,9 +71,7 @@ describe("ApiStore custom model", function() {
     });
     console.info("Start expected log");
     await flushPromises();
-    expect(spyWarn).toHaveBeenCalledWith(
-      "We could not find the model RESOURCES."
-    );
+    expect(spyWarn).toHaveBeenCalled();
     console.info("End expected log");
   });
 

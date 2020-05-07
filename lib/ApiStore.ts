@@ -126,10 +126,6 @@ export default class ApiStore<S> implements StoreOptions<S> {
       ) => {
         const state = myState[model.plural];
         forEach(state.actionQueue, (actionList, action) => {
-          if (action === "patch") {
-            forEach(actionList, (item, id) => this.revertOriginItem(state, id));
-          }
-
           state.actionQueue[action] = isArray(actionList) ? [] : {};
         });
       };
@@ -174,7 +170,9 @@ export default class ApiStore<S> implements StoreOptions<S> {
       } else {
         this.saveOriginItem(state, data);
         forEach(model.references, (modelName, prop) => {
-          this.saveOrigins(store, this.models[modelName], data[prop]);
+          if (data[prop]) {
+            this.saveOrigins(store, this.models[modelName], data[prop]);
+          }
         });
       }
     } catch (e) {
@@ -214,31 +212,34 @@ export default class ApiStore<S> implements StoreOptions<S> {
     entity: IndexedObject
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): IndexedObject {
-    // Patch references
-    if (model.references) {
-      forEach(model.references, (modelName, prop) => {
-        entity[prop] = this.patchReference(store, entity, modelName, prop);
-      });
-    }
+    if (entity && entity.id) {
+      // Patch references
+      if (model.references) {
+        forEach(model.references, (modelName, prop) => {
+          entity[prop] = this.patchReference(store, entity, modelName, prop);
+        });
+      }
 
-    const state = store[model.plural];
+      const state = store[model.plural];
 
-    if (has(state.items, entity.id)) {
-      const storeEntity = state.items[entity.id];
-      forEach(entity, (value, name: string) => {
-        if (!isFunction(value) && !has(model.references, name)) {
-          if (has(entity, name) && !isEqual(value, get(storeEntity, name))) {
-            Vue.set(storeEntity, name, value);
+      if (has(state.items, entity.id)) {
+        const storeEntity = state.items[entity.id];
+        forEach(entity, (value, name: string) => {
+          if (!isFunction(value) && !has(model.references, name)) {
+            if (has(entity, name) && !isEqual(value, get(storeEntity, name))) {
+              Vue.set(storeEntity, name, value);
+            }
           }
-        }
-      });
+        });
 
-      return state.items[entity.id];
-    } else {
-      state.items = { ...state.items, ...this.getIndexedMap(entity) };
+        return state.items[entity.id];
+      } else {
+        state.items = { ...state.items, ...this.getIndexedMap(entity) };
 
-      return entity;
+        return entity;
+      }
     }
+    return entity;
   }
 
   private patchReference(

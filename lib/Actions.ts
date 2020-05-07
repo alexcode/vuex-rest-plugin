@@ -71,14 +71,13 @@ class ActionBase<S, R> {
     path: string,
     data: IndexedObject | Array<IndexedObject>
   ) {
-    commit(`SAVE_ORIGIN_${path}`, cloneDeep(data));
     const modified = await applyModifier(
       ModifierName.afterGet,
       type,
       this._models,
       data
     );
-
+    commit(`SAVE_ORIGIN_${path}`, cloneDeep(modified));
     commit(`ADD_${path}`, modified);
   }
 
@@ -99,6 +98,23 @@ class ActionBase<S, R> {
       resultData
     );
     return resultData;
+  }
+
+  // add Entity to Store
+  async _addEntity(commit: Commit, payload: Payload) {
+    if (get(payload, "clear")) {
+      commit(`CLEAR_${this._getModel(payload).name.toUpperCase()}`);
+    }
+    if (payload.data) {
+      this._addToStore(
+        commit,
+        payload.type,
+        this._getModel(payload).name.toUpperCase(),
+        payload.data
+      );
+    }
+
+    return payload.data;
   }
 
   // store entity to API
@@ -242,6 +258,7 @@ export default class Actions<S, R> implements ActionTree<S, R> {
   post: Action<S, R>;
   patch: Action<S, R>;
   delete: Action<S, R>;
+  add: Action<S, R>;
   // queueActionWatcher: Action<S, R>;
   queueAction: Action<S, R>;
   processActionQueue: Action<S, R>;
@@ -257,8 +274,9 @@ export default class Actions<S, R> implements ActionTree<S, R> {
       const entity = base._getEntity(state, payload);
       if (payload.forceFetch || !entity) {
         return base._fetchEntity(commit, payload);
+      } else {
+        return entity;
       }
-      return entity;
     };
 
     this.post = ({ commit }: ActionContext<S, R>, payload: Payload) => {
@@ -271,6 +289,10 @@ export default class Actions<S, R> implements ActionTree<S, R> {
 
     this.delete = ({ commit }: ActionContext<S, R>, payload: Payload) => {
       return base._deleteEntity(commit, payload);
+    };
+
+    this.add = ({ commit }: ActionContext<S, R>, payload: Payload) => {
+      return base._addEntity(commit, payload);
     };
 
     this.queueAction = async (
