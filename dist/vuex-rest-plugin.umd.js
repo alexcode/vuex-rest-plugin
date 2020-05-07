@@ -230,6 +230,30 @@ $({ target: 'Object', stat: true }, {
 
 /***/ }),
 
+/***/ "13d5":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__("23e7");
+var $reduce = __webpack_require__("d58f").left;
+var arrayMethodIsStrict = __webpack_require__("a640");
+var arrayMethodUsesToLength = __webpack_require__("ae40");
+
+var STRICT_METHOD = arrayMethodIsStrict('reduce');
+var USES_TO_LENGTH = arrayMethodUsesToLength('reduce', { 1: 0 });
+
+// `Array.prototype.reduce` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.reduce
+$({ target: 'Array', proto: true, forced: !STRICT_METHOD || !USES_TO_LENGTH }, {
+  reduce: function reduce(callbackfn /* , initialValue */) {
+    return $reduce(this, callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+
+/***/ }),
+
 /***/ "159b":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3687,6 +3711,53 @@ module.exports = function (it, TAG, STATIC) {
   if (it && !has(it = STATIC ? it : it.prototype, TO_STRING_TAG)) {
     defineProperty(it, TO_STRING_TAG, { configurable: true, value: TAG });
   }
+};
+
+
+/***/ }),
+
+/***/ "d58f":
+/***/ (function(module, exports, __webpack_require__) {
+
+var aFunction = __webpack_require__("1c0b");
+var toObject = __webpack_require__("7b0b");
+var IndexedObject = __webpack_require__("44ad");
+var toLength = __webpack_require__("50c4");
+
+// `Array.prototype.{ reduce, reduceRight }` methods implementation
+var createMethod = function (IS_RIGHT) {
+  return function (that, callbackfn, argumentsLength, memo) {
+    aFunction(callbackfn);
+    var O = toObject(that);
+    var self = IndexedObject(O);
+    var length = toLength(O.length);
+    var index = IS_RIGHT ? length - 1 : 0;
+    var i = IS_RIGHT ? -1 : 1;
+    if (argumentsLength < 2) while (true) {
+      if (index in self) {
+        memo = self[index];
+        index += i;
+        break;
+      }
+      index += i;
+      if (IS_RIGHT ? index < 0 : length <= index) {
+        throw TypeError('Reduce of empty array with no initial value');
+      }
+    }
+    for (;IS_RIGHT ? index >= 0 : length > index; index += i) if (index in self) {
+      memo = callbackfn(memo, self[index], index, O);
+    }
+    return memo;
+  };
+};
+
+module.exports = {
+  // `Array.prototype.reduce` method
+  // https://tc39.github.io/ecma262/#sec-array.prototype.reduce
+  left: createMethod(false),
+  // `Array.prototype.reduceRight` method
+  // https://tc39.github.io/ecma262/#sec-array.prototype.reduceright
+  right: createMethod(true)
 };
 
 
@@ -9642,6 +9713,15 @@ function values_values(object) {
 
 /* harmony default export */ var lodash_es_values = (values_values);
 
+// CONCATENATED MODULE: ./lib/types.ts
+var ModifierName;
+
+(function (ModifierName) {
+  ModifierName["afterGet"] = "afterGet";
+  ModifierName["beforeSave"] = "beforeSave";
+  ModifierName["beforeQueue"] = "beforeQueue";
+  ModifierName["afterQueue"] = "afterQueue";
+})(ModifierName || (ModifierName = {}));
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.join.js
 var es_array_join = __webpack_require__("a15b");
 
@@ -9714,7 +9794,6 @@ var isDate = nodeIsDate ? _baseUnary(nodeIsDate) : _baseIsDate;
 
 
 
-
 function applyModifier(_x, _x2, _x3, _x4) {
   return _applyModifier.apply(this, arguments);
 }
@@ -9722,49 +9801,135 @@ function applyModifier(_x, _x2, _x3, _x4) {
 function _applyModifier() {
   _applyModifier = _asyncToGenerator(
   /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee(modifier, modelName, models, data) {
-    var applyFn, refs, applyRefFn;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+  regeneratorRuntime.mark(function _callee3(modifier, modelName, models, data // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) {
+    var applyItemModifier;
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
-        switch (_context.prev = _context.next) {
+        switch (_context3.prev = _context3.next) {
           case 0:
-            applyFn = function applyFn(d) {
-              var fn = lodash_es_get(models, "".concat(modelName, ".").concat(modifier));
-              return !lodash_es_isFunction(fn) ? Promise.resolve(d) : fn(d);
-            };
+            applyItemModifier =
+            /*#__PURE__*/
+            function () {
+              var _ref = _asyncToGenerator(
+              /*#__PURE__*/
+              regeneratorRuntime.mark(function _callee2(modifier, modelName, models, data // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ) {
+                var fn;
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                  while (1) {
+                    switch (_context2.prev = _context2.next) {
+                      case 0:
+                        _context2.prev = 0;
+                        _context2.next = 3;
+                        return Promise.all(lodash_es_map(models[modelName]["references"],
+                        /*#__PURE__*/
+                        function () {
+                          var _ref2 = _asyncToGenerator(
+                          /*#__PURE__*/
+                          regeneratorRuntime.mark(function _callee(ref, key) {
+                            return regeneratorRuntime.wrap(function _callee$(_context) {
+                              while (1) {
+                                switch (_context.prev = _context.next) {
+                                  case 0:
+                                    if (!(lodash_es_has(data, key) && data[key])) {
+                                      _context.next = 4;
+                                      break;
+                                    }
 
-            refs = lodash_es_get(models, "".concat(modelName, ".references"), []);
+                                    _context.next = 3;
+                                    return applyModifier(modifier, ref, models, data[key]);
 
-            applyRefFn = function applyRefFn(d) {
-              return lodash_es_map(refs, function (ref, key) {
-                if (lodash_es_has(d, key)) {
-                  return applyModifier(modifier, ref, models, lodash_es_get(d, key));
-                }
+                                  case 3:
+                                    data[key] = _context.sent;
 
-                return Promise.resolve(d);
-              });
-            };
+                                  case 4:
+                                    return _context.abrupt("return", Promise.resolve(data[key]));
 
-            if (!lodash_es_isArray(data)) {
-              _context.next = 5;
+                                  case 5:
+                                  case "end":
+                                    return _context.stop();
+                                }
+                              }
+                            }, _callee);
+                          }));
+
+                          return function (_x9, _x10) {
+                            return _ref2.apply(this, arguments);
+                          };
+                        }()));
+
+                      case 3:
+                        fn = models[modelName][modifier];
+
+                        if (lodash_es_isFunction(fn)) {
+                          _context2.next = 8;
+                          break;
+                        }
+
+                        _context2.t0 = Promise.resolve(data);
+                        _context2.next = 11;
+                        break;
+
+                      case 8:
+                        _context2.next = 10;
+                        return fn(data);
+
+                      case 10:
+                        _context2.t0 = _context2.sent;
+
+                      case 11:
+                        return _context2.abrupt("return", _context2.t0);
+
+                      case 14:
+                        _context2.prev = 14;
+                        _context2.t1 = _context2["catch"](0);
+                        // eslint-disable-next-line no-console
+                        console.warn("Modifier error on \"".concat(modelName, "\". ").concat(_context2.t1));
+
+                      case 17:
+                      case "end":
+                        return _context2.stop();
+                    }
+                  }
+                }, _callee2, null, [[0, 14]]);
+              }));
+
+              return function applyItemModifier(_x5, _x6, _x7, _x8) {
+                return _ref.apply(this, arguments);
+              };
+            }();
+
+            if (!data) {
+              _context3.next = 9;
               break;
             }
 
-            return _context.abrupt("return", Promise.all(data.map(applyRefFn)).then(function () {
-              return Promise.all(data.map(applyFn));
-            }));
+            if (!lodash_es_isArray(data)) {
+              _context3.next = 6;
+              break;
+            }
 
-          case 5:
-            return _context.abrupt("return", Promise.resolve(applyRefFn(data)).then(function () {
-              return applyFn(data);
-            }));
+            return _context3.abrupt("return", Promise.all(data.map(function (item) {
+              return applyItemModifier(modifier, modelName, models, item);
+            })));
 
           case 6:
+            _context3.next = 8;
+            return applyItemModifier(modifier, modelName, models, data);
+
+          case 8:
+            return _context3.abrupt("return", _context3.sent);
+
+          case 9:
+            return _context3.abrupt("return", Promise.resolve(data));
+
+          case 10:
           case "end":
-            return _context.stop();
+            return _context3.stop();
         }
       }
-    }, _callee);
+    }, _callee3);
   }));
   return _applyModifier.apply(this, arguments);
 }
@@ -9777,6 +9942,7 @@ function formatUrl(payload) {
   }
 
   if (payload.query && lodash_es_isObject(payload.query)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     var query = lodash_es_map(payload.query, function (value, key) {
       var resquestValue = value;
 
@@ -9796,6 +9962,7 @@ function formatUrl(payload) {
   return url;
 }
 // CONCATENATED MODULE: ./lib/Actions.ts
+
 
 
 
@@ -9869,83 +10036,68 @@ function () {
     key: "_getEntity",
     value: function _getEntity(state, payload) {
       return lodash_es_get(state, "".concat(this._getModel(payload).plural, ".items"))[payload.id];
-    } // fetch entity from API
+    }
+  }, {
+    key: "_addToStore",
+    value: function () {
+      var _addToStore2 = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee(commit, type, path, data) {
+        var modified;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return applyModifier(ModifierName.afterGet, type, this._models, data);
+
+              case 2:
+                modified = _context.sent;
+                commit("SAVE_ORIGIN_".concat(path), lodash_es_cloneDeep(modified));
+                commit("ADD_".concat(path), modified);
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function _addToStore(_x, _x2, _x3, _x4) {
+        return _addToStore2.apply(this, arguments);
+      }
+
+      return _addToStore;
+    }() // fetch entity from API
 
   }, {
     key: "_fetchEntity",
-    value: function _fetchEntity(commit, payload) {
-      var _this = this;
-
-      if (lodash_es_get(payload, "clear", this._isAll(payload))) {
-        commit("CLEAR_".concat(this._getModel(payload).name.toUpperCase()));
-      }
-
-      return this._axios.get(formatUrl(payload), payload.axiosConfig).then(
-      /*#__PURE__*/
-      function () {
-        var _ref = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee(result) {
-          var resultData;
-          return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  resultData = lodash_es_get(result, _this._dataPath);
-                  commit("ADD_".concat(_this._getModel(payload).name.toUpperCase()), lodash_es_cloneDeep(resultData));
-                  return _context.abrupt("return", resultData);
-
-                case 3:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee);
-        }));
-
-        return function (_x) {
-          return _ref.apply(this, arguments);
-        };
-      }());
-    } // store entity to API
-
-  }, {
-    key: "_storeEntity",
     value: function () {
-      var _storeEntity2 = _asyncToGenerator(
+      var _fetchEntity2 = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee2(commit, payload) {
-        var _this2 = this;
-
-        var method,
-            mainConfig,
-            config,
-            _args2 = arguments;
+        var result, resultData;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                method = _args2.length > 2 && _args2[2] !== undefined ? _args2[2] : "post";
-                _context2.t0 = method;
-                _context2.t1 = formatUrl(payload);
-                _context2.next = 5;
-                return applyModifier("beforeSave", payload.type, this._models, payload.data);
+                if (lodash_es_get(payload, "clear", this._isAll(payload))) {
+                  commit("CLEAR_".concat(this._getModel(payload).name.toUpperCase()));
+                }
 
-              case 5:
-                _context2.t2 = _context2.sent;
-                mainConfig = {
-                  method: _context2.t0,
-                  url: _context2.t1,
-                  data: _context2.t2
-                };
-                config = _objectSpread2({}, mainConfig, {}, payload.axiosConfig);
-                return _context2.abrupt("return", this._axios(config).then(function (result) {
-                  var resultData = lodash_es_get(result, _this2._dataPath);
-                  commit("ADD_".concat(_this2._getModel(payload).name.toUpperCase()), lodash_es_cloneDeep(resultData));
-                  return resultData;
-                }));
+                _context2.next = 3;
+                return this._axios.get(formatUrl(payload), payload.axiosConfig);
 
-              case 9:
+              case 3:
+                result = _context2.sent;
+                resultData = lodash_es_get(result, this._dataPath);
+
+                this._addToStore(commit, payload.type, this._getModel(payload).name.toUpperCase(), resultData);
+
+                return _context2.abrupt("return", resultData);
+
+              case 7:
               case "end":
                 return _context2.stop();
             }
@@ -9953,7 +10105,98 @@ function () {
         }, _callee2, this);
       }));
 
-      function _storeEntity(_x2, _x3) {
+      function _fetchEntity(_x5, _x6) {
+        return _fetchEntity2.apply(this, arguments);
+      }
+
+      return _fetchEntity;
+    }() // add Entity to Store
+
+  }, {
+    key: "_addEntity",
+    value: function () {
+      var _addEntity2 = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3(commit, payload) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (lodash_es_get(payload, "clear")) {
+                  commit("CLEAR_".concat(this._getModel(payload).name.toUpperCase()));
+                }
+
+                if (payload.data) {
+                  this._addToStore(commit, payload.type, this._getModel(payload).name.toUpperCase(), payload.data);
+                }
+
+                return _context3.abrupt("return", payload.data);
+
+              case 3:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function _addEntity(_x7, _x8) {
+        return _addEntity2.apply(this, arguments);
+      }
+
+      return _addEntity;
+    }() // store entity to API
+
+  }, {
+    key: "_storeEntity",
+    value: function () {
+      var _storeEntity2 = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee4(commit, payload) {
+        var method,
+            mainConfig,
+            config,
+            result,
+            resultData,
+            _args4 = arguments;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                method = _args4.length > 2 && _args4[2] !== undefined ? _args4[2] : "post";
+                _context4.t0 = method;
+                _context4.t1 = formatUrl(payload);
+                _context4.next = 5;
+                return applyModifier(ModifierName.beforeSave, payload.type, this._models, payload.data);
+
+              case 5:
+                _context4.t2 = _context4.sent;
+                mainConfig = {
+                  method: _context4.t0,
+                  url: _context4.t1,
+                  data: _context4.t2
+                };
+                config = _objectSpread2({}, mainConfig, {}, payload.axiosConfig);
+                _context4.next = 10;
+                return this._axios(config);
+
+              case 10:
+                result = _context4.sent;
+                resultData = lodash_es_get(result, this._dataPath);
+
+                this._addToStore(commit, payload.type, this._getModel(payload).name.toUpperCase(), resultData);
+
+                return _context4.abrupt("return", resultData);
+
+              case 14:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function _storeEntity(_x9, _x10) {
         return _storeEntity2.apply(this, arguments);
       }
 
@@ -9965,53 +10208,104 @@ function () {
     value: function () {
       var _deleteEntity2 = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee3(commit, payload) {
+      regeneratorRuntime.mark(function _callee5(commit, payload) {
         var model, id, data;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 model = this._getModel(payload);
                 id = payload.id, data = payload.data;
 
                 if (!this._isAll(payload)) {
-                  _context3.next = 11;
+                  _context5.next = 11;
                   break;
                 }
 
-                _context3.t0 = this._axios;
-                _context3.t1 = "".concat(formatUrl(payload), "/delete");
-                _context3.next = 7;
-                return applyModifier("beforeSave", payload.type, this._models, data);
+                _context5.t0 = this._axios;
+                _context5.t1 = "".concat(formatUrl(payload), "/delete");
+                _context5.next = 7;
+                return applyModifier(ModifierName.beforeSave, payload.type, this._models, data);
 
               case 7:
-                _context3.t2 = _context3.sent;
-                _context3.t3 = payload.axiosConfig;
+                _context5.t2 = _context5.sent;
+                _context5.t3 = payload.axiosConfig;
 
-                _context3.t4 = function () {
+                _context5.t4 = function () {
                   commit("DELETE_".concat(model.name.toUpperCase()), data);
                 };
 
-                return _context3.abrupt("return", _context3.t0.patch.call(_context3.t0, _context3.t1, _context3.t2, _context3.t3).then(_context3.t4));
+                return _context5.abrupt("return", _context5.t0.patch.call(_context5.t0, _context5.t1, _context5.t2, _context5.t3).then(_context5.t4));
 
               case 11:
-                return _context3.abrupt("return", this._axios.delete(formatUrl(payload), payload.axiosConfig).then(function () {
+                return _context5.abrupt("return", this._axios.delete(formatUrl(payload), payload.axiosConfig).then(function () {
                   commit("DELETE_".concat(model.name.toUpperCase()), id);
                 }));
 
               case 12:
               case "end":
-                return _context3.stop();
+                return _context5.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee5, this);
       }));
 
-      function _deleteEntity(_x4, _x5) {
+      function _deleteEntity(_x11, _x12) {
         return _deleteEntity2.apply(this, arguments);
       }
 
       return _deleteEntity;
+    }()
+  }, {
+    key: "_getQueuePayloadWithModifiers",
+    value: function () {
+      var _getQueuePayloadWithModifiers2 = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee6(_ref) {
+        var data, type, action, afterGet;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                data = _ref.data, type = _ref.type, action = _ref.action;
+                _context6.next = 3;
+                return applyModifier(ModifierName.afterGet, type, this._models, data);
+
+              case 3:
+                afterGet = _context6.sent;
+                _context6.t0 = action;
+                _context6.t1 = data.id;
+                _context6.t2 = afterGet;
+                _context6.t3 = type;
+                _context6.next = 10;
+                return applyModifier(ModifierName.beforeSave, type, this._models, data);
+
+              case 10:
+                _context6.t4 = _context6.sent;
+                _context6.t5 = {
+                  type: _context6.t3,
+                  data: _context6.t4
+                };
+                return _context6.abrupt("return", {
+                  action: _context6.t0,
+                  id: _context6.t1,
+                  afterGet: _context6.t2,
+                  toQueue: _context6.t5
+                });
+
+              case 13:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function _getQueuePayloadWithModifiers(_x13) {
+        return _getQueuePayloadWithModifiers2.apply(this, arguments);
+      }
+
+      return _getQueuePayloadWithModifiers;
     }()
   }, {
     key: "_processAction",
@@ -10025,7 +10319,7 @@ function () {
   }, {
     key: "_confirmActionType",
     value: function _confirmActionType(queue, _ref2) {
-      var _this3 = this;
+      var _this = this;
 
       var state = _ref2.state,
           commit = _ref2.commit;
@@ -10039,27 +10333,27 @@ function () {
           function () {
             var _ref3 = _asyncToGenerator(
             /*#__PURE__*/
-            regeneratorRuntime.mark(function _callee4(entity) {
+            regeneratorRuntime.mark(function _callee7(entity) {
               var payload;
-              return regeneratorRuntime.wrap(function _callee4$(_context4) {
+              return regeneratorRuntime.wrap(function _callee7$(_context7) {
                 while (1) {
-                  switch (_context4.prev = _context4.next) {
+                  switch (_context7.prev = _context7.next) {
                     case 0:
                       payload = _objectSpread2({
                         id: entity.data.id
                       }, entity);
 
-                      _this3._processAction(action, payload, commit);
+                      _this._processAction(action, payload, commit);
 
                     case 2:
                     case "end":
-                      return _context4.stop();
+                      return _context7.stop();
                   }
                 }
-              }, _callee4);
+              }, _callee7);
             }));
 
-            return function (_x6) {
+            return function (_x14) {
               return _ref3.apply(this, arguments);
             };
           }());
@@ -10075,41 +10369,41 @@ function () {
     value: function () {
       var _cancelActionType2 = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee5(queue, _ref4) {
+      regeneratorRuntime.mark(function _callee8(queue, _ref4) {
         var state, commit, model, originIds, origin;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 state = _ref4.state, commit = _ref4.commit;
                 model = this._models[queue];
 
                 if (!lodash_es_get(state, "".concat(model.plural, ".hasAction"))) {
-                  _context5.next = 12;
+                  _context8.next = 12;
                   break;
                 }
 
                 originIds = lodash_es_keys(lodash_es_get(state, "".concat(model.plural, ".actionQueue.delete"), [])).concat(lodash_es_keys(lodash_es_get(state, "".concat(model.plural, ".actionQueue.post"), [])), lodash_es_keys(lodash_es_get(state, "".concat(model.plural, ".actionQueue.patch"), [])));
                 origin = lodash_es_at(lodash_es_get(state, "".concat(model.plural, ".originItems")), originIds);
-                _context5.t0 = commit;
-                _context5.t1 = "ADD_".concat(model.name);
-                _context5.next = 9;
-                return applyModifier("afterQueue", queue, this._models, origin);
+                _context8.t0 = commit;
+                _context8.t1 = "ADD_".concat(model.name);
+                _context8.next = 9;
+                return applyModifier(ModifierName.afterQueue, queue, this._models, origin);
 
               case 9:
-                _context5.t2 = _context5.sent;
-                (0, _context5.t0)(_context5.t1, _context5.t2);
+                _context8.t2 = _context8.sent;
+                (0, _context8.t0)(_context8.t1, _context8.t2);
                 commit("RESET_QUEUE_".concat(model.name));
 
               case 12:
               case "end":
-                return _context5.stop();
+                return _context8.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee8, this);
       }));
 
-      function _cancelActionType(_x7, _x8) {
+      function _cancelActionType(_x15, _x16) {
         return _cancelActionType2.apply(this, arguments);
       }
 
@@ -10130,34 +10424,34 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
   function () {
     var _ref5 = _asyncToGenerator(
     /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee6(_ref6, payload) {
+    regeneratorRuntime.mark(function _callee9(_ref6, payload) {
       var commit, state, entity;
-      return regeneratorRuntime.wrap(function _callee6$(_context6) {
+      return regeneratorRuntime.wrap(function _callee9$(_context9) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               commit = _ref6.commit, state = _ref6.state;
               entity = base._getEntity(state, payload);
 
               if (!(payload.forceFetch || !entity)) {
-                _context6.next = 4;
+                _context9.next = 6;
                 break;
               }
 
-              return _context6.abrupt("return", base._fetchEntity(commit, payload));
+              return _context9.abrupt("return", base._fetchEntity(commit, payload));
 
-            case 4:
-              return _context6.abrupt("return", entity);
+            case 6:
+              return _context9.abrupt("return", entity);
 
-            case 5:
+            case 7:
             case "end":
-              return _context6.stop();
+              return _context9.stop();
           }
         }
-      }, _callee6);
+      }, _callee9);
     }));
 
-    return function (_x9, _x10) {
+    return function (_x17, _x18) {
       return _ref5.apply(this, arguments);
     };
   }();
@@ -10177,13 +10471,47 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
     return base._deleteEntity(commit, payload);
   };
 
-  this.queueAction = function (_ref10, payload) {
+  this.add = function (_ref10, payload) {
     var commit = _ref10.commit;
-    return commit("QUEUE_ACTION_".concat(base._getModel(payload).name), payload);
+    return base._addEntity(commit, payload);
   };
 
-  this.processAction = function (_ref11, payload) {
-    var commit = _ref11.commit;
+  this.queueAction =
+  /*#__PURE__*/
+  function () {
+    var _ref11 = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee10(_ref12, payload) {
+      var commit;
+      return regeneratorRuntime.wrap(function _callee10$(_context10) {
+        while (1) {
+          switch (_context10.prev = _context10.next) {
+            case 0:
+              commit = _ref12.commit;
+              _context10.t0 = commit;
+              _context10.t1 = "QUEUE_ACTION_".concat(base._getModel(payload).name);
+              _context10.next = 5;
+              return base._getQueuePayloadWithModifiers(payload);
+
+            case 5:
+              _context10.t2 = _context10.sent;
+              return _context10.abrupt("return", (0, _context10.t0)(_context10.t1, _context10.t2));
+
+            case 7:
+            case "end":
+              return _context10.stop();
+          }
+        }
+      }, _callee10);
+    }));
+
+    return function (_x19, _x20) {
+      return _ref11.apply(this, arguments);
+    };
+  }();
+
+  this.processAction = function (_ref13, payload) {
+    var commit = _ref13.commit;
     return base._processAction(payload.action, payload.payload, commit);
   };
 
@@ -10207,8 +10535,8 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
     }
   };
 
-  this.cancelAction = function (_ref12, payload) {
-    var commit = _ref12.commit;
+  this.cancelAction = function (_ref14, payload) {
+    var commit = _ref14.commit;
 
     var model = base._getModel(payload);
 
@@ -10222,6 +10550,9 @@ var Actions_Actions = function Actions(axios, models, dataPath) {
   };
 };
 
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.reduce.js
+var es_array_reduce = __webpack_require__("13d5");
 
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
@@ -10296,252 +10627,7 @@ function isString(value) {
 
 /* harmony default export */ var lodash_es_isString = (isString);
 
-// CONCATENATED MODULE: ./node_modules/lodash-es/last.js
-/**
- * Gets the last element of `array`.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Array
- * @param {Array} array The array to query.
- * @returns {*} Returns the last element of `array`.
- * @example
- *
- * _.last([1, 2, 3]);
- * // => 3
- */
-function last(array) {
-  var length = array == null ? 0 : array.length;
-  return length ? array[length - 1] : undefined;
-}
-
-/* harmony default export */ var lodash_es_last = (last);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseSlice.js
-/**
- * The base implementation of `_.slice` without an iteratee call guard.
- *
- * @private
- * @param {Array} array The array to slice.
- * @param {number} [start=0] The start position.
- * @param {number} [end=array.length] The end position.
- * @returns {Array} Returns the slice of `array`.
- */
-function baseSlice(array, start, end) {
-  var index = -1,
-      length = array.length;
-
-  if (start < 0) {
-    start = -start > length ? 0 : (length + start);
-  }
-  end = end > length ? length : end;
-  if (end < 0) {
-    end += length;
-  }
-  length = start > end ? 0 : ((end - start) >>> 0);
-  start >>>= 0;
-
-  var result = Array(length);
-  while (++index < length) {
-    result[index] = array[index + start];
-  }
-  return result;
-}
-
-/* harmony default export */ var _baseSlice = (baseSlice);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_parent.js
-
-
-
-/**
- * Gets the parent value at `path` of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {Array} path The path to get the parent value of.
- * @returns {*} Returns the parent value.
- */
-function _parent_parent(object, path) {
-  return path.length < 2 ? object : _baseGet(object, _baseSlice(path, 0, -1));
-}
-
-/* harmony default export */ var _parent = (_parent_parent);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_baseUnset.js
-
-
-
-
-
-/**
- * The base implementation of `_.unset`.
- *
- * @private
- * @param {Object} object The object to modify.
- * @param {Array|string} path The property path to unset.
- * @returns {boolean} Returns `true` if the property is deleted, else `false`.
- */
-function baseUnset(object, path) {
-  path = _castPath(path, object);
-  object = _parent(object, path);
-  return object == null || delete object[_toKey(lodash_es_last(path))];
-}
-
-/* harmony default export */ var _baseUnset = (baseUnset);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/isPlainObject.js
-
-
-
-
-/** `Object#toString` result references. */
-var isPlainObject_objectTag = '[object Object]';
-
-/** Used for built-in method references. */
-var isPlainObject_funcProto = Function.prototype,
-    isPlainObject_objectProto = Object.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var isPlainObject_funcToString = isPlainObject_funcProto.toString;
-
-/** Used to check objects for own properties. */
-var isPlainObject_hasOwnProperty = isPlainObject_objectProto.hasOwnProperty;
-
-/** Used to infer the `Object` constructor. */
-var objectCtorString = isPlainObject_funcToString.call(Object);
-
-/**
- * Checks if `value` is a plain object, that is, an object created by the
- * `Object` constructor or one with a `[[Prototype]]` of `null`.
- *
- * @static
- * @memberOf _
- * @since 0.8.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- * }
- *
- * _.isPlainObject(new Foo);
- * // => false
- *
- * _.isPlainObject([1, 2, 3]);
- * // => false
- *
- * _.isPlainObject({ 'x': 0, 'y': 0 });
- * // => true
- *
- * _.isPlainObject(Object.create(null));
- * // => true
- */
-function isPlainObject(value) {
-  if (!lodash_es_isObjectLike(value) || _baseGetTag(value) != isPlainObject_objectTag) {
-    return false;
-  }
-  var proto = _getPrototype(value);
-  if (proto === null) {
-    return true;
-  }
-  var Ctor = isPlainObject_hasOwnProperty.call(proto, 'constructor') && proto.constructor;
-  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
-    isPlainObject_funcToString.call(Ctor) == objectCtorString;
-}
-
-/* harmony default export */ var lodash_es_isPlainObject = (isPlainObject);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/_customOmitClone.js
-
-
-/**
- * Used by `_.omit` to customize its `_.cloneDeep` use to only clone plain
- * objects.
- *
- * @private
- * @param {*} value The value to inspect.
- * @param {string} key The key of the property to inspect.
- * @returns {*} Returns the uncloned value or `undefined` to defer cloning to `_.cloneDeep`.
- */
-function customOmitClone(value) {
-  return lodash_es_isPlainObject(value) ? undefined : value;
-}
-
-/* harmony default export */ var _customOmitClone = (customOmitClone);
-
-// CONCATENATED MODULE: ./node_modules/lodash-es/omit.js
-
-
-
-
-
-
-
-
-
-/** Used to compose bitmasks for cloning. */
-var omit_CLONE_DEEP_FLAG = 1,
-    omit_CLONE_FLAT_FLAG = 2,
-    omit_CLONE_SYMBOLS_FLAG = 4;
-
-/**
- * The opposite of `_.pick`; this method creates an object composed of the
- * own and inherited enumerable property paths of `object` that are not omitted.
- *
- * **Note:** This method is considerably slower than `_.pick`.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Object
- * @param {Object} object The source object.
- * @param {...(string|string[])} [paths] The property paths to omit.
- * @returns {Object} Returns the new object.
- * @example
- *
- * var object = { 'a': 1, 'b': '2', 'c': 3 };
- *
- * _.omit(object, ['a', 'c']);
- * // => { 'b': '2' }
- */
-var omit = _flatRest(function(object, paths) {
-  var result = {};
-  if (object == null) {
-    return result;
-  }
-  var isDeep = false;
-  paths = _arrayMap(paths, function(path) {
-    path = _castPath(path, object);
-    isDeep || (isDeep = path.length > 1);
-    return path;
-  });
-  _copyObject(object, _getAllKeysIn(object), result);
-  if (isDeep) {
-    result = _baseClone(result, omit_CLONE_DEEP_FLAG | omit_CLONE_FLAT_FLAG | omit_CLONE_SYMBOLS_FLAG, _customOmitClone);
-  }
-  var length = paths.length;
-  while (length--) {
-    _baseUnset(result, paths[length]);
-  }
-  return result;
-});
-
-/* harmony default export */ var lodash_es_omit = (omit);
-
 // CONCATENATED MODULE: ./lib/ApiStore.ts
-
-
-
-
-
-
-
-
-
 
 
 
@@ -10575,45 +10661,20 @@ function () {
     this.state = Object.create(null);
     this.getters = Object.create(null);
     this.mutations = Object.create(null);
-    lodash_es_forEach(this.models, function (model, modelKey) {
+    lodash_es_forEach(this.models, function (model) {
       var modelIdx = model.plural; // adding all states
 
       _this.state[modelIdx] = model.type; // adding ADD_* mutations
 
-      _this.mutations["ADD_".concat(model.name.toUpperCase())] =
-      /*#__PURE__*/
-      function () {
-        var _ref = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee(myState, item) {
-          var state, res;
-          return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  state = myState[modelIdx];
-                  _context.next = 3;
-                  return _this.patchEntity(myState, model, item);
+      _this.mutations["ADD_".concat(model.name.toUpperCase())] = function (myState, item) {
+        myState[modelIdx].lastLoad = new Date();
 
-                case 3:
-                  res = _context.sent;
+        _this.upsertData(myState, model, item);
+      };
 
-                  _this.storeOriginItem(state.originItems, res, model.beforeQueue);
-
-                  myState[modelIdx].lastLoad = new Date();
-
-                case 6:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee);
-        }));
-
-        return function (_x, _x2) {
-          return _ref.apply(this, arguments);
-        };
-      }(); // adding DELETE_* mutations
+      _this.mutations["SAVE_ORIGIN_".concat(model.name.toUpperCase())] = function (myState, item) {
+        _this.saveOrigins(myState, model, item);
+      }; // adding DELETE_* mutations
 
 
       _this.mutations["DELETE_".concat(model.name.toUpperCase())] = function (myState, item) {
@@ -10642,84 +10703,27 @@ function () {
         return myState[modelIdx].reset();
       };
 
-      _this.mutations["QUEUE_ACTION_".concat(model.name.toUpperCase())] = function (myState, payload) {
+      _this.mutations["QUEUE_ACTION_".concat(model.name.toUpperCase())] = function (myState, _ref) {
+        var id = _ref.id,
+            action = _ref.action,
+            afterGet = _ref.afterGet,
+            toQueue = _ref.toQueue;
         var state = myState[modelIdx];
 
-        var storeAction =
-        /*#__PURE__*/
-        function () {
-          var _ref2 = _asyncToGenerator(
-          /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee2(qp) {
-            var QToStore;
-            return regeneratorRuntime.wrap(function _callee2$(_context2) {
-              while (1) {
-                switch (_context2.prev = _context2.next) {
-                  case 0:
-                    QToStore = lodash_es_omit(qp, "method", "action");
+        if (lodash_es_has(state.actionQueue, action)) {
+          if (action === "post") {
+            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(state.items, id, afterGet);
+            state.actionQueue[action].push(toQueue);
+          } else {
+            if (action === "delete") {
+              external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(state.items, id);
+            }
 
-                    if (!(qp.action === "post")) {
-                      _context2.next = 16;
-                      break;
-                    }
-
-                    _context2.t0 = external_commonjs_vue_commonjs2_vue_root_Vue_default.a;
-                    _context2.t1 = state.items;
-                    _context2.t2 = qp.data.id;
-                    _context2.next = 7;
-                    return applyModifier("afterGet", modelKey, _this.models, qp.data);
-
-                  case 7:
-                    _context2.t3 = _context2.sent;
-
-                    _context2.t0.set.call(_context2.t0, _context2.t1, _context2.t2, _context2.t3);
-
-                    _context2.t4 = state.actionQueue[qp.action];
-                    _context2.next = 12;
-                    return applyModifier("beforeSave", modelKey, _this.models, QToStore);
-
-                  case 12:
-                    _context2.t5 = _context2.sent;
-
-                    _context2.t4.push.call(_context2.t4, _context2.t5);
-
-                    _context2.next = 24;
-                    break;
-
-                  case 16:
-                    if (qp.action === "delete") {
-                      external_commonjs_vue_commonjs2_vue_root_Vue_default.a.delete(state.items, qp.id);
-                    }
-
-                    _context2.t6 = external_commonjs_vue_commonjs2_vue_root_Vue_default.a;
-                    _context2.t7 = state.actionQueue[qp.action];
-                    _context2.t8 = qp.data.id;
-                    _context2.next = 22;
-                    return applyModifier("beforeSave", modelKey, _this.models, QToStore);
-
-                  case 22:
-                    _context2.t9 = _context2.sent;
-
-                    _context2.t6.set.call(_context2.t6, _context2.t7, _context2.t8, _context2.t9);
-
-                  case 24:
-                  case "end":
-                    return _context2.stop();
-                }
-              }
-            }, _callee2);
-          }));
-
-          return function storeAction(_x3) {
-            return _ref2.apply(this, arguments);
-          };
-        }();
-
-        if (lodash_es_has(state.actionQueue, payload.action)) {
-          storeAction(payload);
+            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(state.actionQueue[action], id, toQueue);
+          }
         } else {
           // eslint-disable-next-line no-console
-          console.warn("action ".concat(payload.action, " is not storable"));
+          console.warn("action ".concat(action, " is not storable"));
         }
       };
 
@@ -10737,12 +10741,6 @@ function () {
       _this.mutations["RESET_QUEUE_".concat(model.name.toUpperCase())] = function (myState) {
         var state = myState[model.plural];
         lodash_es_forEach(state.actionQueue, function (actionList, action) {
-          if (action === "patch") {
-            lodash_es_forEach(actionList, function (item, id) {
-              return _this.revertOriginItem(state, id);
-            });
-          }
-
           state.actionQueue[action] = lodash_es_isArray(actionList) ? [] : {};
         });
       }; // adding getters
@@ -10752,106 +10750,56 @@ function () {
         return myState[modelIdx];
       };
     });
-  } // storing Origin item copy
+  } // Removing original copy
 
 
   _createClass(ApiStore, [{
-    key: "storeOriginItem",
-    value: function () {
-      var _storeOriginItem = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee4(originItems, item, modifiers) {
-        var modified;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                if (!lodash_es_isArray(item)) {
-                  _context4.next = 4;
-                  break;
-                }
+    key: "getIndexedMap",
+    value: function getIndexedMap(data) {
+      var indexMap = {};
 
-                item.map(
-                /*#__PURE__*/
-                function () {
-                  var _ref3 = _asyncToGenerator(
-                  /*#__PURE__*/
-                  regeneratorRuntime.mark(function _callee3(i) {
-                    var modified;
-                    return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                      while (1) {
-                        switch (_context3.prev = _context3.next) {
-                          case 0:
-                            if (!modifiers) {
-                              _context3.next = 6;
-                              break;
-                            }
-
-                            _context3.next = 3;
-                            return modifiers(i);
-
-                          case 3:
-                            _context3.t0 = _context3.sent;
-                            _context3.next = 7;
-                            break;
-
-                          case 6:
-                            _context3.t0 = i;
-
-                          case 7:
-                            modified = _context3.t0;
-                            external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(originItems, i.id, lodash_es_cloneDeep(modified));
-
-                          case 9:
-                          case "end":
-                            return _context3.stop();
-                        }
-                      }
-                    }, _callee3);
-                  }));
-
-                  return function (_x7) {
-                    return _ref3.apply(this, arguments);
-                  };
-                }());
-                _context4.next = 13;
-                break;
-
-              case 4:
-                if (!modifiers) {
-                  _context4.next = 10;
-                  break;
-                }
-
-                _context4.next = 7;
-                return modifiers(item);
-
-              case 7:
-                _context4.t0 = _context4.sent;
-                _context4.next = 11;
-                break;
-
-              case 10:
-                _context4.t0 = item;
-
-              case 11:
-                modified = _context4.t0;
-                external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(originItems, item.id, lodash_es_cloneDeep(modified));
-
-              case 13:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4);
-      }));
-
-      function storeOriginItem(_x4, _x5, _x6) {
-        return _storeOriginItem.apply(this, arguments);
+      if (lodash_es_isArray(data)) {
+        return data.reduce(function (acc, entity) {
+          acc[entity.id] = entity;
+          return acc;
+        }, indexMap);
+      } else {
+        indexMap[data.id] = data;
+        return indexMap;
       }
+    } // Save original copy
 
-      return storeOriginItem;
-    }() // Removing original copy
+  }, {
+    key: "saveOriginItem",
+    value: function saveOriginItem(state, data) {
+      state.originItems = _objectSpread2({}, state.originItems, {}, this.getIndexedMap(data));
+    } // Save original copy
+
+  }, {
+    key: "saveOrigins",
+    value: function saveOrigins(store, model, data) {
+      var _this2 = this;
+
+      try {
+        var state = store[model.plural];
+
+        if (lodash_es_isArray(data)) {
+          data.forEach(function (e) {
+            return _this2.saveOriginItem(state, e);
+          });
+        } else {
+          this.saveOriginItem(state, data);
+          lodash_es_forEach(model.references, function (modelName, prop) {
+            if (data[prop]) {
+              _this2.saveOrigins(store, _this2.models[modelName], data[prop]);
+            }
+          });
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn("We could not find the model ".concat(model.plural, "."));
+      }
+    } // Removing original copy
 
   }, {
     key: "removeOriginItem",
@@ -10869,150 +10817,60 @@ function () {
       }
     }
   }, {
+    key: "upsertData",
+    value: function upsertData(store, model, data // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ) {
+      var _this3 = this;
+
+      if (lodash_es_isArray(data)) {
+        return data.map(function (e) {
+          return _this3.patchEntity(store, model, e);
+        });
+      } else {
+        return this.patchEntity(store, model, data);
+      }
+    }
+  }, {
     key: "patchEntity",
-    value: function () {
-      var _patchEntity = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee6(store, model, entity // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ) {
-        var _this2 = this;
+    value: function patchEntity(store, model, entity // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ) {
+      var _this4 = this;
 
-        var entityAfter, state, storeEntity;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                if (entity) {
-                  _context6.next = 2;
-                  break;
-                }
+      if (entity && entity.id) {
+        // Patch references
+        if (model.references) {
+          lodash_es_forEach(model.references, function (modelName, prop) {
+            entity[prop] = _this4.patchReference(store, entity, modelName, prop);
+          });
+        }
 
-                return _context6.abrupt("return");
+        var state = store[model.plural];
 
-              case 2:
-                if (!lodash_es_isArray(entity)) {
-                  _context6.next = 4;
-                  break;
-                }
-
-                return _context6.abrupt("return", Promise.all(entity.map(function (e) {
-                  return _this2.patchEntity(store, model, e);
-                })));
-
-              case 4:
-                if (!(entity.id && model)) {
-                  _context6.next = 19;
-                  break;
-                }
-
-                // Patch references
-                if (model.references) {
-                  lodash_es_forEach(model.references,
-                  /*#__PURE__*/
-                  function () {
-                    var _ref4 = _asyncToGenerator(
-                    /*#__PURE__*/
-                    regeneratorRuntime.mark(function _callee5(modelName, prop) {
-                      return regeneratorRuntime.wrap(function _callee5$(_context5) {
-                        while (1) {
-                          switch (_context5.prev = _context5.next) {
-                            case 0:
-                              _context5.next = 2;
-                              return _this2.patchReference(store, entity, modelName, prop);
-
-                            case 2:
-                              entity[prop] = _context5.sent;
-
-                            case 3:
-                            case "end":
-                              return _context5.stop();
-                          }
-                        }
-                      }, _callee5);
-                    }));
-
-                    return function (_x11, _x12) {
-                      return _ref4.apply(this, arguments);
-                    };
-                  }());
-                }
-
-                _context6.next = 8;
-                return applyModifier("afterGet", model.name.toLowerCase(), this.models, entity);
-
-              case 8:
-                entityAfter = _context6.sent;
-                state = store[model.plural];
-
-                if (!lodash_es_has(state.items, entity.id)) {
-                  _context6.next = 16;
-                  break;
-                }
-
-                storeEntity = state.items[entity.id];
-                lodash_es_forEach(entityAfter, function (value, name) {
-                  if (!lodash_es_isFunction(value) && !lodash_es_has(model.references, name)) {
-                    if (lodash_es_has(entity, name) && !lodash_es_isEqual(value, lodash_es_get(storeEntity, name))) {
-                      external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(storeEntity, name, value);
-                    }
-                  }
-                });
-                return _context6.abrupt("return", state.items[entity.id]);
-
-              case 16:
-                state.items = _objectSpread2({}, state.items, _defineProperty({}, entity.id, entityAfter));
-                this.storeOriginItem(state.originItems, entityAfter, model.beforeQueue);
-                return _context6.abrupt("return", entityAfter);
-
-              case 19:
-              case "end":
-                return _context6.stop();
+        if (lodash_es_has(state.items, entity.id)) {
+          var storeEntity = state.items[entity.id];
+          lodash_es_forEach(entity, function (value, name) {
+            if (!lodash_es_isFunction(value) && !lodash_es_has(model.references, name)) {
+              if (lodash_es_has(entity, name) && !lodash_es_isEqual(value, lodash_es_get(storeEntity, name))) {
+                external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(storeEntity, name, value);
+              }
             }
-          }
-        }, _callee6, this);
-      }));
-
-      function patchEntity(_x8, _x9, _x10) {
-        return _patchEntity.apply(this, arguments);
+          });
+          return state.items[entity.id];
+        } else {
+          state.items = _objectSpread2({}, state.items, {}, this.getIndexedMap(entity));
+          return entity;
+        }
       }
 
-      return patchEntity;
-    }()
+      return entity;
+    }
   }, {
     key: "patchReference",
-    value: function () {
-      var _patchReference = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee7(store, entity, modelName, prop) {
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                if (!lodash_es_has(this.models, modelName)) {
-                  _context7.next = 4;
-                  break;
-                }
-
-                return _context7.abrupt("return", this.patchEntity(store, this.models[modelName], entity[prop]));
-
-              case 4:
-                // eslint-disable-next-line no-console
-                console.warn("Patch error: We could not find the model ".concat(modelName, " for the reference ").concat(prop, "."));
-
-              case 5:
-              case "end":
-                return _context7.stop();
-            }
-          }
-        }, _callee7, this);
-      }));
-
-      function patchReference(_x13, _x14, _x15, _x16) {
-        return _patchReference.apply(this, arguments);
+    value: function patchReference(store, entity, modelName, prop) {
+      if (lodash_es_has(this.models, modelName) && lodash_es_has(entity, prop)) {
+        return this.upsertData(store, this.models[modelName], entity[prop]);
       }
-
-      return patchReference;
-    }()
+    }
   }]);
 
   return ApiStore;
