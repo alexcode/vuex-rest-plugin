@@ -225,10 +225,12 @@ export default class ApiStore<S> implements StoreOptions<S> {
       if (has(state.items, entity.id)) {
         const storeEntity = state.items[entity.id];
         forEach(entity, (value, name: string) => {
-          if (!isFunction(value) && !has(model.references, name)) {
-            if (has(entity, name) && !isEqual(value, get(storeEntity, name))) {
-              Vue.set(storeEntity, name, value);
-            }
+          if (
+            !isFunction(value) &&
+            has(entity, name) &&
+            !isEqual(value, get(storeEntity, name))
+          ) {
+            Vue.set(storeEntity, name, value);
           }
         });
 
