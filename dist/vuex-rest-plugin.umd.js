@@ -10849,10 +10849,8 @@ function () {
         if (lodash_es_has(state.items, entity.id)) {
           var storeEntity = state.items[entity.id];
           lodash_es_forEach(entity, function (value, name) {
-            if (!lodash_es_isFunction(value) && !lodash_es_has(model.references, name)) {
-              if (lodash_es_has(entity, name) && !lodash_es_isEqual(value, lodash_es_get(storeEntity, name))) {
-                external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(storeEntity, name, value);
-              }
+            if (!lodash_es_isFunction(value) && lodash_es_has(entity, name) && !lodash_es_isEqual(value, lodash_es_get(storeEntity, name))) {
+              external_commonjs_vue_commonjs2_vue_root_Vue_default.a.set(storeEntity, name, value);
             }
           });
           return state.items[entity.id];
