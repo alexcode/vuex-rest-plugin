@@ -119,6 +119,7 @@ Any of the above action can be queue and process/cancel at a later stage. Here a
 this.$store.dispatch("api/queueAction", {
   action: "delete",
   type: "resource",
+  url: "my/custom/path",
   data: data
 });
 ```

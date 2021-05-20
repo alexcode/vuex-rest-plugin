@@ -177,6 +177,7 @@ class ActionBase<S, R> {
   async _getQueuePayloadWithModifiers({
     data,
     type,
+    url,
     action
   }: QueuePayload): Promise<QueuePayloadWithModifiers> {
     const afterGet = await applyModifier(
@@ -192,6 +193,7 @@ class ActionBase<S, R> {
       afterGet,
       toQueue: {
         type,
+        url,
         data: await applyModifier(
           ModifierName.beforeSave,
           type,

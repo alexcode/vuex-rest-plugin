@@ -43,6 +43,7 @@ export interface Payload {
 
 export interface QueuePayload {
   type: string;
+  url: string;
   payload: Payload;
   action: Method;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,6 +52,7 @@ export interface QueuePayload {
 
 export interface ToQueue {
   type: string;
+  url: string;
   data: IndexedObject;
 }
 
