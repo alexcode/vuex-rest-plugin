@@ -10262,12 +10262,12 @@ function () {
       var _getQueuePayloadWithModifiers2 = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee6(_ref) {
-        var data, type, action, afterGet;
+        var data, type, url, action, afterGet;
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                data = _ref.data, type = _ref.type, action = _ref.action;
+                data = _ref.data, type = _ref.type, url = _ref.url, action = _ref.action;
                 _context6.next = 3;
                 return applyModifier(ModifierName.afterGet, type, this._models, data);
 
@@ -10277,23 +10277,25 @@ function () {
                 _context6.t1 = data.id;
                 _context6.t2 = afterGet;
                 _context6.t3 = type;
-                _context6.next = 10;
+                _context6.t4 = url;
+                _context6.next = 11;
                 return applyModifier(ModifierName.beforeSave, type, this._models, data);
 
-              case 10:
-                _context6.t4 = _context6.sent;
-                _context6.t5 = {
+              case 11:
+                _context6.t5 = _context6.sent;
+                _context6.t6 = {
                   type: _context6.t3,
-                  data: _context6.t4
+                  url: _context6.t4,
+                  data: _context6.t5
                 };
                 return _context6.abrupt("return", {
                   action: _context6.t0,
                   id: _context6.t1,
                   afterGet: _context6.t2,
-                  toQueue: _context6.t5
+                  toQueue: _context6.t6
                 });
 
-              case 13:
+              case 14:
               case "end":
                 return _context6.stop();
             }
