@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/lodash-es": "^4.17.3",
     "core-js": "^3.6.4",
-    "lodash-es": "^4.17.15",
+    "lodash-es": "^4.17.21",
     "vue": "^2.6.11"
   },
   "peerDependencies": {
